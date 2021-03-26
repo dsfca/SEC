@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option java_package = "com.server.grpc";
+
+service serverService{
+	
+	rpc submitLocationReport(subLocRepReq) returns (subLocRepReply);
+	rpc obtainLocationReport(obtLocRepReq) returns (obtLocRepReply);
+	
+	rpc obtainUsersAtLocation(obtUseLocReq) returns (obtUseLocRep); 
+}
+
+message subLocRepReq{
+	string userID = 1;
+	string epoch = 2;
+	string report = 3;
+	
+}
+
+message subLocRepReply{
+	string replymessage = 1;
+	int32 replycode = 2; 
+}
+
+message obtLocRepReq{
+	string userID = 1;
+	string epoch = 2;
+	
+}
+
+message obtLocRepReply{
+	string userID = 1;
+	Position pos = 2;
+}
+
+message obtUseLocReq{
+	Position pos = 1;
+	string epoch = 2;
+}
+
+message obtUseLocRep{
+	string epoch = 1;
+	repeated string userList = 2;
+	
+}
+
+
+message Position{
+	int32 X = 1;
+	int32 Y = 2;
+}

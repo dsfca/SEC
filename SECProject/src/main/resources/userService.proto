@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option java_package = "com.user.grpc";
+
+service userService{
+	
+	rpc requestLocationProof(LocProofReq) returns (LocProofRep);
+	
+}
+
+message LocProofReq{
+	string proverID = 1;
+	string epoch = 2;
+	Position loc = 3;
+}
+
+message LocProofRep{
+	string proof = 1;
+	string proof_dig_sig = 2;
+}
+
+message Position{
+	int32 X = 1;
+	int32 Y = 2;
+}
