@@ -40,6 +40,21 @@
     		<artifactId>bcprov-jdk15on</artifactId>
     		<version>1.66</version>
 		</dependency>
+		
+		<!-- Mongo Driver -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.7.0</version>
+        </dependency>
+        
+        <!-- INI file -->
+        <dependency>
+            <groupId>org.ini4j</groupId>
+            <artifactId>ini4j</artifactId>
+            <version>0.5.1</version>
+        </dependency>
+        
 	</dependencies>
 
 		<properties>
