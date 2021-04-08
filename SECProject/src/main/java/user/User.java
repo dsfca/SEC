@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.user.grpc.UserService;
 import com.user.grpc.UserService.LocProofRep;
 import com.user.grpc.UserService.LocProofReq;
 import com.user.grpc.UserService.Position;
@@ -15,15 +14,39 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import shared.Point2D;
+import shared.TrackerLocationSystem;
 
 public class User {
-
-	private int userID;
-	private int port;
 	
-	public User(int ID, int port) throws Exception {
-		this.userID = ID;
-		this.port = port;
+	private final double closer_range_dist = 2;
+
+	private int myID;
+	private int port;
+	private int myCurrentEpoch = -1;
+	private int myOldEpoch = -1;
+	private int G_width;
+	private int G_height;
+	private Point2D myCurrentPoosition; 
+	private final Point2D HOME;
+	
+	
+	
+	/**************************************************************************************
+	* 											-User class constructor()
+	* - 
+	* 
+	* ************************************************************************************/
+	public User(int ID, int G_width, int  G_height) throws Exception {
+		this.myID = ID;
+		this.port = ID + Integer.parseInt("9090");
+		this.G_width = G_width;
+		this.G_height = G_height;
+		
+		myCurrentPoosition = new Point2D((int)(Math.random()*G_width), (int)(Math.random()*G_height));
+		HOME = myCurrentPoosition;
+		initThreadToUpdFilePos();
+		initThreadForUpdPos();
 		init();
 	}
 	
@@ -38,7 +61,7 @@ public class User {
 		 Runnable r =	new Runnable() {
 				@Override
 				public void run() {
-					Server userServer = ServerBuilder.forPort(port).addService(new UserServiceImp()).build();
+					Server userServer = ServerBuilder.forPort(port).addService(new UserServiceImp(myID)).build();
 					try {
 						userServer.start();
 						System.out.println("user server start at " + userServer.getPort());
@@ -52,7 +75,7 @@ public class User {
 			};
 			
 			new Thread(r).start();
-			System.out.println("thread running");
+			System.out.println(" user thread for receive locationProof request running");
 			
 		}
 	
@@ -68,9 +91,9 @@ public class User {
 	 * 		- x,y: Location where user want to be prooved. 
 	 * 
 	 * ************************************************************************************/
-	public void sndProofRequest(List<ManagedChannel> channels, String ID, String epoch, int x, int y) {
+	public void sndProofRequest(List<ManagedChannel> channels, String ID, String epoch, Point2D proverPos) {
 		userServiceBlockingStub userSerStub;
-		Position.Builder pos = Position.newBuilder().setX(x).setY(y);;
+		Position.Builder pos = Position.newBuilder().setX(proverPos.getX()).setY(proverPos.getY());;
 		for(ManagedChannel channel : channels) {
 			userSerStub = userServiceGrpc.newBlockingStub(channel);
 			LocProofReq req = LocProofReq.newBuilder().setProverID(ID).
@@ -81,53 +104,139 @@ public class User {
 		}
 	}
 	
+	/**************************************************************************************
+	 * 											-updateEpoc()
+	 * - 
+	 * 
+	 * ************************************************************************************/
+	public synchronized void updateEpoc(int epoch) {
+		System.out.println("updating epoch of user " + myID);
+		myCurrentEpoch = epoch;
+		notifyAll();
+	}
 	
-	
-	
-	
-	
-	
-	public static void main(String[] args) {
-		try {
-			User u2 = new User(2, 9092);
-			System.out.println("u2 started");
-			User u1 = new User(1, 9091);
-			System.out.println("u1 started");
-			User u3 = new User(3, 9093);
-			System.out.println("u3 started");
-			User u4 = new User(4, 9094);
-			System.out.println("u4 started");
-			
-			
-			List<ManagedChannel> channels = new ArrayList<>();
-			for(int i = 1; i <= 4; i++ ) {
-				ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9090 + i).usePlaintext().build();
-				channels.add(channel);
-			}
-			
-			Thread.sleep(10000);
-		
-			u1.sndProofRequest(channels, "1", "0", 0,0);
-
-			Thread.sleep(10000);
-			
-			u2.sndProofRequest(channels, "2", "0", 0,1);
-			
-			Thread.sleep(10000);
-			
-			u3.sndProofRequest(channels, "3", "0", 1,0);
-			
-			Thread.sleep(10000);
-			
-			u4.sndProofRequest(channels, "4", "0", 1,1);
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
+	/**************************************************************************************
+	 * 											-updateMyPositionInFile()
+	 * - update the user position in the grid file given an epoch.
+	 *   if the current position does not change the thread wait until the
+	 *   current position change.
+	 * 
+	 * -input: 
+	 * 			-epoch: epoch where the user is.
+	 * 
+	 * ************************************************************************************/
+	public synchronized void updateMyPositionInFile(int epoch) throws InterruptedException {
+		while( myCurrentEpoch == myOldEpoch) {
+			wait();
 		}
+		TrackerLocationSystem.update_user_pos(myID, myCurrentPoosition, myCurrentEpoch, port);
+		myOldEpoch = myCurrentEpoch;
+	}
+	
+	/**************************************************************************************
+	 * 											-getCloserUsers()
+	 * - returns the channel of the user that are closer to him in a given epoch 
+	 * in order to send them Proof Location request.
+	 * 
+	 *-input
+	 *			-epoch: the epoch of user use to get closer users.
+	 *
+	 *- returns: list of users channel. 
+	 * 
+	 * ************************************************************************************/
+	public List<ManagedChannel> getCloserUsers(int epoch) throws IOException{
+		List<UserLocation> usersInEpoch = TrackerLocationSystem.getAllUsersInEpoch(epoch);
+		List<ManagedChannel> closerChannel = new ArrayList<>();
+		for(UserLocation u: usersInEpoch) {
+			if(u.getUserId() != myID) {
+				Point2D u_point = u.getPosition();
+				double dist = myCurrentPoosition.distance(u_point);
+				if( dist <= closer_range_dist ) {
+					ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", u.getPort()).usePlaintext().build();
+					closerChannel.add(channel);
+				}
+			}
+		}
+		return closerChannel;	
+	}
+	
+	/**************************************************************************************
+	 * 											-initThreadToUpdFilePos()
+	 * - this procedure start a thread that will run in a loop to update the
+	 *   user position in the grid file. 
+	 *   before updating the user position the thread sleep between 10 to 15sec.
+	 *   when thread finish to update position it send proof request to user near him.
+	 *
+	 * 
+	 *-input
+	 *
+	 *- returns: void
+	 * 
+	 * ************************************************************************************/
+	private void initThreadToUpdFilePos(){
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					while(true) {
+						updateMyPositionInFile(myCurrentEpoch);
+						int sleepTime = (int)(Math.random()*5 + 10);
+						Thread.sleep(sleepTime);
+						
+						List<ManagedChannel> closerChannel = getCloserUsers(myCurrentEpoch);
+						sndProofRequest( closerChannel, ""+myID, ""+myCurrentEpoch, myCurrentPoosition);
+						sleepTime = (int)(Math.random()*5 + 10);
+						Thread.sleep(sleepTime);
+					}
+				} catch (InterruptedException | IOException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		};
 		
+	new Thread(r).start();
+	}
+	
+	/**************************************************************************************
+	 * 											-initThreadForUpdPos()
+	 * - this thread changes the current position of the user.
+	 * 	A user has 45% to move to another position if it's not
+	 *  at home other wise it gets back to home
+	 *
+	 * 
+	 *-input
+	 *
+	 *- returns: void
+	 * 
+	 * ************************************************************************************/
+	private void initThreadForUpdPos() {
+		Runnable r = new Runnable() {
+			double prob_to_move = 0.45;
+			@Override
+			public void run() {
+				try {
+					while(true) {
+						Thread.sleep(5000);
+						double	prob = Math.random();
+						if( prob <= prob_to_move  ) {
+							myCurrentPoosition.setXY( (int)(Math.random()*G_width), (int)(Math.random()*G_height) );
+							System.out.println("user "+ myID + "changing my position to "+ myCurrentPoosition.toString());
+						}
+						else if(!HOME.equals(myCurrentPoosition)) {
+							myCurrentPoosition.setXY(HOME.getX(), HOME.getY());
+						}
+					}
+				
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}	
+		};
+		new Thread(r).start();
 	}
 	
 }
-
 
