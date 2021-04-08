@@ -105,8 +105,12 @@ public class User {
 	}
 	
 	/**************************************************************************************
-	 * 											-updateEpoc()
-	 * - 
+	 * 										-updateEpoc()
+	 * - this procedure update the epoch of user. Normally this procedure is called in TrackerLocationSystem
+	 * 	 to update the position of the users.
+	 * - input:
+	 * 		-epoch: updated epoch.
+	 * 
 	 * 
 	 * ************************************************************************************/
 	public synchronized void updateEpoc(int epoch) {
