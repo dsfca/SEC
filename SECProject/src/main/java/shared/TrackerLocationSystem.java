@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import server.Server;
 import user.User;
 import user.UserLocation;
 
@@ -15,13 +16,32 @@ public class TrackerLocationSystem {
 	
 	private static List<User> users = new ArrayList<User>();
 	private static final String pos_file_path = "resources/Grid.txt";
-	private static int currentEpoch = 0; 
+	private static int currentEpoch = 0;
+	private static int serverPort;
+
+	public TrackerLocationSystem(int num_users, int G_width, int G_height, int server_port) throws Exception {
+		TrackerLocationSystem.serverPort = server_port;
+
+		start_server(server_port);
+		start_users(num_users, G_width, G_height);
+
+		//update user's epoch
+		while(true) {
+			Thread.sleep(15000);
+			currentEpoch++;
+			updateUsersEpoch(currentEpoch);
+		}
+	}
 	
 	public static void start_users(int num_users, int g_width, int g_height) throws Exception {
 		for(int i = 0; i < num_users; i++) {
 			User user = new User(i, g_width, g_height);
 			users.add(user);
 		}
+	}
+
+	public static void start_server(int port) {
+		Server server = new Server(port);
 	}
 	
 	/**************************************************************************************
@@ -92,6 +112,14 @@ public class TrackerLocationSystem {
 		br.close();
 		fr.close();
 		return locations;
+	}
+
+	public static synchronized int getCurrentEpoch() {
+		return currentEpoch;
+	}
+
+	public static synchronized int getServerPort() {
+		return serverPort;
 	}
 	
 	

@@ -3,17 +3,23 @@ package user;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import com.server.grpc.ServerService;
+import com.server.grpc.ServerService.subLocRepReq;
+import com.server.grpc.ServerService.subLocRepReply;
+import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
+import com.server.grpc.serverServiceGrpc;
 
 import com.user.grpc.UserService.LocProofRep;
 import com.user.grpc.UserService.LocProofReq;
 import com.user.grpc.UserService.Position;
 import com.user.grpc.userServiceGrpc;
-import com.user.grpc.userServiceGrpc.userServiceBlockingStub;
+import com.user.grpc.userServiceGrpc.userServiceStub;
 
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.grpc.*;
+import io.grpc.stub.StreamObserver;
 import shared.Point2D;
 import shared.TrackerLocationSystem;
 
@@ -92,16 +98,57 @@ public class User {
 	 * 
 	 * ************************************************************************************/
 	public void sndProofRequest(List<ManagedChannel> channels, String ID, String epoch, Point2D proverPos) {
-		userServiceBlockingStub userSerStub;
-		Position.Builder pos = Position.newBuilder().setX(proverPos.getX()).setY(proverPos.getY());;
+
+		final CountDownLatch finishLatch = new CountDownLatch(channels.size());
+		List<String> proofs = new ArrayList<>();
+		StreamObserver<LocProofRep> replyObserver = new StreamObserver<LocProofRep>() {
+			@Override
+			public void onNext(LocProofRep reply) {
+				System.out.println("[" + ID + "] Proof reply: " + reply.getProof());
+				proofs.add(reply.getProof());
+			}
+
+			@Override
+			public void onError(Throwable t) {
+				Status status = Status.fromThrowable(t);
+				System.out.println("[" + ID + "] Error: " + status);
+				finishLatch.countDown();
+			}
+
+			@Override
+			public void onCompleted() {
+				finishLatch.countDown();
+			}
+		};
+
+		userServiceStub userAsyncStub;
+		Position.Builder pos = Position.newBuilder().setX(proverPos.getX()).setY(proverPos.getY());
 		for(ManagedChannel channel : channels) {
-			userSerStub = userServiceGrpc.newBlockingStub(channel);
-			LocProofReq req = LocProofReq.newBuilder().setProverID(ID).
-					setEpoch(epoch).setLoc(pos).build();
-			LocProofRep rep = userSerStub.requestLocationProof(req);
-			String proof = rep.getProof();
-			System.out.println("proof from "+ channel.authority() + ": " + proof);
+			userAsyncStub = userServiceGrpc.newStub(channel).withDeadlineAfter(5, TimeUnit.SECONDS);
+			LocProofReq req = LocProofReq.newBuilder().setProverID(ID)
+							 						  .setEpoch(epoch).setLoc(pos).build();
+			userAsyncStub.requestLocationProof(req, replyObserver);
 		}
+
+		try {
+			finishLatch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(
+				ManagedChannelBuilder.forAddress("127.0.0.1", TrackerLocationSystem.getServerPort())
+						.usePlaintext().build()
+		).withWaitForReady();
+
+		subLocRepReq submitRequest = subLocRepReq.newBuilder().setUserID(ID).setEpoch(epoch)
+										.setReport("Location: " + pos.toString() + ", proofs:" + proofs.toString())
+										.build();
+
+		subLocRepReply submitReply = serverStub.submitLocationReport(submitRequest);
+
+		System.out.println("[" + ID + "] Got submit reply: " + submitReply.getReplymessage());
+
 	}
 	
 	/**************************************************************************************
