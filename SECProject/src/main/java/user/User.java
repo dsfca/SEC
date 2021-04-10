@@ -18,18 +18,16 @@ import com.user.grpc.UserService.LocProofRep;
 import com.user.grpc.UserService.LocProofReq;
 import com.user.grpc.UserService.Position;
 import com.user.grpc.userServiceGrpc;
+import com.user.grpc.userServiceGrpc.userServiceBlockingStub;
 import com.user.grpc.userServiceGrpc.userServiceStub;
 
-<<<<<<< HEAD
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
-=======
 import crypto.RSAProvider;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
->>>>>>> refs/remotes/origin/working
 import shared.Point2D;
 import shared.TrackerLocationSystem;
 
@@ -119,8 +117,7 @@ public class User {
 	 * 	that the user is actually near him).
 	 * 
 	 * ************************************************************************************/
-<<<<<<< HEAD
-	public void sndProofRequest(List<ManagedChannel> channels, String ID, String epoch, Point2D proverPos) {
+/*	public void sndProofRequest(List<ManagedChannel> channels, String ID, String epoch, Point2D proverPos) {
 
 		final CountDownLatch finishLatch = new CountDownLatch(channels.size());
 		List<String> proofs = new ArrayList<>();
@@ -145,20 +142,17 @@ public class User {
 		};
 
 		userServiceStub userAsyncStub;
-		Position.Builder pos = Position.newBuilder().setX(proverPos.getX()).setY(proverPos.getY());
-=======
+		Position.Builder pos = Position.newBuilder().setX(proverPos.getX()).setY(proverPos.getY());*/
+		
 	public List<String> sndProofRequest(List<ManagedChannel> channels, int ID, int epoch, Point2D proverPos) throws Exception {
 		List<String> proofList = new ArrayList<>();
 		userServiceBlockingStub userSerStub;
 		Position.Builder pos = Position.newBuilder().setX(proverPos.getX()).setY(proverPos.getY());;
->>>>>>> refs/remotes/origin/working
 		for(ManagedChannel channel : channels) {
-<<<<<<< HEAD
-			userAsyncStub = userServiceGrpc.newStub(channel).withDeadlineAfter(5, TimeUnit.SECONDS);
-			LocProofReq req = LocProofReq.newBuilder().setProverID(ID)
+		//	userSerStub = userServiceGrpc.newStub(channel).withDeadlineAfter(5, TimeUnit.SECONDS);
+			/*LocProofReq req = LocProofReq.newBuilder().setProverID(ID)
 							 						  .setEpoch(epoch).setLoc(pos).build();
-			userAsyncStub.requestLocationProof(req, replyObserver);
-=======
+			userSerStub.requestLocationProof(req, replyObserver);*/
 			String sig = get_sig_of(ID +" "+ epoch +" "+ proverPos.toString());
 			userSerStub = userServiceGrpc.newBlockingStub(channel);
 			LocProofReq req = LocProofReq.newBuilder().setProverID(ID).
@@ -173,11 +167,13 @@ public class User {
 			else
 				System.out.println(rep.getMessageError());	
 			channel.shutdown();
->>>>>>> refs/remotes/origin/working
 		}
-<<<<<<< HEAD
+		return proofList;
+	}
+		
+		//please create a method that receives the list of proofs and sent them to server.
 
-		try {
+	/*	try {
 			finishLatch.await();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -194,12 +190,8 @@ public class User {
 
 		subLocRepReply submitReply = serverStub.submitLocationReport(submitRequest);
 
-		System.out.println("[" + ID + "] Got submit reply: " + submitReply.getReplymessage());
-
-=======
-		return proofList;
->>>>>>> refs/remotes/origin/working
-	}
+		System.out.println("[" + ID + "] Got submit reply: " + submitReply.getReplymessage());*/
+	
 	
 	
 	public String get_sig_of(String s) throws Exception {

@@ -8,13 +8,9 @@ import java.io.IOException;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
-
-<<<<<<< HEAD
 import server.Server;
-=======
 
 import crypto.RSAProvider;
->>>>>>> refs/remotes/origin/working
 import user.User;
 import user.UserLocation;
 
@@ -32,11 +28,11 @@ public class TrackerLocationSystem {
 		start_users(num_users, G_width, G_height);
 
 		//update user's epoch
-		while(true) {
+/*		while(true) {
 			Thread.sleep(15000);
 			currentEpoch++;
 			updateUsersEpoch(currentEpoch);
-		}
+		}*/
 	}
 	
 	public static void start_users(int num_users, int g_width, int g_height) throws Exception {
