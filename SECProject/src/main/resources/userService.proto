@@ -9,17 +9,22 @@ service userService{
 }
 
 message LocProofReq{
-	string proverID = 1;
-	string epoch = 2;
+	int32 proverID = 1;
+	int32 epoch = 2;
 	Position loc = 3;
+	string dig_sign = 4;
 }
 
 message LocProofRep{
-	string proof = 1;
-	string proof_dig_sig = 2;
+	bool error = 1;
+	string proof = 2;
+	string proof_dig_sig = 3;
+	string messageError = 4;
+	int32 witnessID = 5;
 }
 
 message Position{
 	int32 X = 1;
 	int32 Y = 2;
 }
+

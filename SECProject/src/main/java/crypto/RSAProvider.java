@@ -207,11 +207,12 @@ public class RSAProvider {
 	/*public static void main(String[] args) {
 		
 		try {
-			String privKeyPath = "clientKeys/rsa_priv_key.key";
-			String pubKeyPath = "clientKeys/rsa_pub_key.key";
-			RSAKeyGenerator(privKeyPath, pubKeyPath);
+		//	for(int i = 0; i < 7; i++) {
+				String privKeyPath = "resources/public_keys/user" + 1 +"_public.key";
+				String pubKeyPath = "resources/private_keys/user" + 1 + "_private.key";
+				RSAKeyGenerator(privKeyPath, pubKeyPath);
+			//}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}*/

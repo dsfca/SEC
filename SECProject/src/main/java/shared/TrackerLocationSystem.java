@@ -5,10 +5,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
+<<<<<<< HEAD
 import server.Server;
+=======
+
+import crypto.RSAProvider;
+>>>>>>> refs/remotes/origin/working
 import user.User;
 import user.UserLocation;
 
@@ -35,7 +41,7 @@ public class TrackerLocationSystem {
 	
 	public static void start_users(int num_users, int g_width, int g_height) throws Exception {
 		for(int i = 0; i < num_users; i++) {
-			User user = new User(i, g_width, g_height);
+			User user = new User(i);
 			users.add(user);
 		}
 	}
@@ -56,29 +62,28 @@ public class TrackerLocationSystem {
 	 * 		-port: port where user receive proof loc request
 	 *  
 	 * ************************************************************************************/
-	public static synchronized void update_user_pos(int userID, Point2D pos, int epoch, int port) {
+	public static synchronized void update_user_pos(int userID, Point2D pos, int epoch, int port, boolean append) {
 		try {
 			File pos_file = new File(pos_file_path);
 			String string_to_write = userID + ", " + epoch + ", " + pos.getX() + ", " + pos.getY() + ", " + port+ "\n";
-			System.out.println("user ID = "+ userID + "writting his file");
-			write(pos_file, string_to_write);
+			write(pos_file, string_to_write, append);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void write(File file, String s) throws IOException {
-		FileWriter fw = new FileWriter(file, true);
+	public static void write(File file, String s, boolean append) throws IOException {
+		FileWriter fw = new FileWriter(file, append);
 		fw.write(s);
 		fw.close();
 	}
 	
 	
-	public static void updateUsersEpoch(int epoch) {
+/*	public static void updateUsersEpoch(int epoch) {
 		for(User u: users) {
 			u.updateEpoc(epoch);
 		}
-	}
+	}*/
 	
 	
 	/**************************************************************************************
@@ -122,6 +127,76 @@ public class TrackerLocationSystem {
 		return serverPort;
 	}
 	
+	/**************************************************************************************
+	 * 										-getUserPublicKey()
+	 * - returns public key of the user with given id. the public key must be
+	 *  generated previously in the path resources/public_keys/user" + id +"_public.key where the id is the id of the user.
+	 *   other wise the exception will raise
+	 * - input:
+	 * 		-n_user: number of user to start the system
+	 * 		-n_epoch: number of epochs
+	 * 		-G_width: width of the grid
+	 * 		-G_height: height of the grid.
+	 * 
+	 * -returns: void
+	 *  
+	 * ************************************************************************************/
+	public static PublicKey getUserPublicKey(int id) throws Exception {
+		PublicKey key = null;
+		String path = "resources/public_keys/user" + id +"_public.key";
+		key = RSAProvider.readPubKey(path);
+		return key;
+	}
+	
+	
+	/**************************************************************************************
+	 * 										-ini_pos_file()
+	 * - init the position of the user in the file grid, in this case the users don't have
+	 *  to update their position at each epoch because it's already in the file
+	 * - input:
+	 * 		-n_user: number of user to start the system
+	 * 		-n_epoch: number of epochs
+	 * 		-G_width: width of the grid
+	 * 		-G_height: height of the grid.
+	 * 
+	 * -returns: void
+	 *  
+	 * ************************************************************************************/
+	private static void ini_pos_file(int n_user, int n_epoch, int G_width, int G_height) {
+		boolean append = false;
+		for(int i = 1; i <= n_epoch; i++) {
+			for(int j = 0; j < n_user; j++) {
+				Point2D userPos = new Point2D((int)(Math.random()*G_width), (int)(Math.random()*G_height));
+				if(i == 1 && j == 0) { append = false;}
+				else {	 append = true; }
+				update_user_pos(j, userPos, i, 9090 + j, append);
+			}
+		}
+			
+	}
+	
+	/**************************************************************************************
+	 * 										-getMyPosInEpoc():
+	 * - return the user location at a given epoch
+	 * -input
+	 * 		- myID: the Id of the user that want to get its position. 
+	 * 		- epoch: the epoch where he wants to get its position
+	 * 		
+	 * - return: UserLocation
+	 * 
+	 * ************************************************************************************/
+	public static UserLocation getMyPosInEpoc(int myId, int epoch) {
+		try {
+			List<UserLocation> users = TrackerLocationSystem.getAllUsersInEpoch(epoch);
+			for(UserLocation u: users) {
+				if(u.getUserId() == myId && epoch == u.getEpoch())
+					return u;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	
 	/**************************************************************************************
@@ -145,18 +220,18 @@ public class TrackerLocationSystem {
 			G_height = Integer.parseInt(args[2]);
 		    server_port = Integer.parseInt(args[3]);
 		    
-		    
+		    ini_pos_file(num_users, 10, G_width, G_height);
 			start_users(num_users, G_width, G_height);
 			
 			// start server
 			
 			
 			//update user's epoch
-			while(true) {
+		/*	while(true) {
 				Thread.sleep(15000);
 				currentEpoch++;
 				updateUsersEpoch(currentEpoch);
-			}
+			}*/
 			
 			
 			
