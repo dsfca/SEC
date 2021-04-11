@@ -66,7 +66,7 @@ public class HA {
 
     public static void main(String[] args) throws Exception {
 
-        HA userHa = new HA(Integer.parseInt(args[0]););
+        HA userHa = new HA(Integer.parseInt(args[0]));
 
         String cmd, arg1, arg2, arg3;
         Scanner sn = new Scanner(System.in);
