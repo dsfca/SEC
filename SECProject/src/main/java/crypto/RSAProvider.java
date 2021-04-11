@@ -204,14 +204,14 @@ public class RSAProvider {
     	return cipherB64String;
 	}
 	
-	/*public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		
 		try {
-		//	for(int i = 0; i < 7; i++) {
+			for(int i = 0; i < 7; i++) {
 				String privKeyPath = "resources/public_keys/user" + 1 +"_public.key";
 				String pubKeyPath = "resources/private_keys/user" + 1 + "_private.key";
 				RSAKeyGenerator(privKeyPath, pubKeyPath);
-			//}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

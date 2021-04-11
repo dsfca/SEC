@@ -1,11 +1,7 @@
 package user;
 
-
-
-import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.List;
 
 import com.user.grpc.UserService.LocProofRep;
 import com.user.grpc.UserService.LocProofReq;

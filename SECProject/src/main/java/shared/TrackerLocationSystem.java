@@ -26,13 +26,6 @@ public class TrackerLocationSystem {
 
 		start_server(server_port);
 		start_users(num_users, G_width, G_height);
-
-		//update user's epoch
-/*		while(true) {
-			Thread.sleep(15000);
-			currentEpoch++;
-			updateUsersEpoch(currentEpoch);
-		}*/
 	}
 	
 	public static void start_users(int num_users, int g_width, int g_height) throws Exception {
@@ -73,13 +66,6 @@ public class TrackerLocationSystem {
 		fw.write(s);
 		fw.close();
 	}
-	
-	
-/*	public static void updateUsersEpoch(int epoch) {
-		for(User u: users) {
-			u.updateEpoc(epoch);
-		}
-	}*/
 	
 	
 	/**************************************************************************************
@@ -218,17 +204,6 @@ public class TrackerLocationSystem {
 		    
 		    ini_pos_file(num_users, 10, G_width, G_height);
 			start_users(num_users, G_width, G_height);
-			
-			// start server
-			
-			
-			//update user's epoch
-		/*	while(true) {
-				Thread.sleep(15000);
-				currentEpoch++;
-				updateUsersEpoch(currentEpoch);
-			}*/
-			
 			
 			
 		} catch (Exception e) {
