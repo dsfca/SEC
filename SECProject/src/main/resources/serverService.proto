@@ -11,8 +11,8 @@ service serverService{
 }
 
 message subLocRepReq{
-	string userID = 1;
-	string epoch = 2;
+	int32 userID = 1;
+	int32 epoch = 2;
 	string report = 3;
 	
 }
@@ -23,23 +23,23 @@ message subLocRepReply{
 }
 
 message obtLocRepReq{
-	string userID = 1;
-	string epoch = 2;
+	int32 userID = 1;
+	int32 epoch = 2;
 	
 }
 
 message obtLocRepReply{
-	string userID = 1;
+	int32 userID = 1;
 	Position pos = 2;
 }
 
 message obtUseLocReq{
 	Position pos = 1;
-	string epoch = 2;
+	int32 epoch = 2;
 }
 
 message obtUseLocRep{
-	string epoch = 1;
+	int32 epoch = 1;
 	repeated string userList = 2;
 	
 }

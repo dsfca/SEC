@@ -19,24 +19,14 @@ public final class ServerService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string userID = 1;</code>
+     * <code>int32 userID = 1;</code>
      */
-    java.lang.String getUserID();
-    /**
-     * <code>string userID = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getUserIDBytes();
+    int getUserID();
 
     /**
-     * <code>string epoch = 2;</code>
+     * <code>int32 epoch = 2;</code>
      */
-    java.lang.String getEpoch();
-    /**
-     * <code>string epoch = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getEpochBytes();
+    int getEpoch();
 
     /**
      * <code>string report = 3;</code>
@@ -61,8 +51,8 @@ public final class ServerService {
       super(builder);
     }
     private subLocRepReq() {
-      userID_ = "";
-      epoch_ = "";
+      userID_ = 0;
+      epoch_ = 0;
       report_ = "";
     }
 
@@ -90,16 +80,14 @@ public final class ServerService {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
+            case 8: {
 
-              userID_ = s;
+              userID_ = input.readInt32();
               break;
             }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
+            case 16: {
 
-              epoch_ = s;
+              epoch_ = input.readInt32();
               break;
             }
             case 26: {
@@ -141,71 +129,21 @@ public final class ServerService {
     }
 
     public static final int USERID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object userID_;
+    private int userID_;
     /**
-     * <code>string userID = 1;</code>
+     * <code>int32 userID = 1;</code>
      */
-    public java.lang.String getUserID() {
-      java.lang.Object ref = userID_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        userID_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string userID = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getUserIDBytes() {
-      java.lang.Object ref = userID_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        userID_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getUserID() {
+      return userID_;
     }
 
     public static final int EPOCH_FIELD_NUMBER = 2;
-    private volatile java.lang.Object epoch_;
+    private int epoch_;
     /**
-     * <code>string epoch = 2;</code>
+     * <code>int32 epoch = 2;</code>
      */
-    public java.lang.String getEpoch() {
-      java.lang.Object ref = epoch_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        epoch_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string epoch = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getEpochBytes() {
-      java.lang.Object ref = epoch_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        epoch_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getEpoch() {
+      return epoch_;
     }
 
     public static final int REPORT_FIELD_NUMBER = 3;
@@ -256,11 +194,11 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getUserIDBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, userID_);
+      if (userID_ != 0) {
+        output.writeInt32(1, userID_);
       }
-      if (!getEpochBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, epoch_);
+      if (epoch_ != 0) {
+        output.writeInt32(2, epoch_);
       }
       if (!getReportBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, report_);
@@ -274,11 +212,13 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
-      if (!getUserIDBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, userID_);
+      if (userID_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, userID_);
       }
-      if (!getEpochBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, epoch_);
+      if (epoch_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, epoch_);
       }
       if (!getReportBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, report_);
@@ -299,10 +239,10 @@ public final class ServerService {
       com.server.grpc.ServerService.subLocRepReq other = (com.server.grpc.ServerService.subLocRepReq) obj;
 
       boolean result = true;
-      result = result && getUserID()
-          .equals(other.getUserID());
-      result = result && getEpoch()
-          .equals(other.getEpoch());
+      result = result && (getUserID()
+          == other.getUserID());
+      result = result && (getEpoch()
+          == other.getEpoch());
       result = result && getReport()
           .equals(other.getReport());
       result = result && unknownFields.equals(other.unknownFields);
@@ -317,9 +257,9 @@ public final class ServerService {
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + USERID_FIELD_NUMBER;
-      hash = (53 * hash) + getUserID().hashCode();
+      hash = (53 * hash) + getUserID();
       hash = (37 * hash) + EPOCH_FIELD_NUMBER;
-      hash = (53 * hash) + getEpoch().hashCode();
+      hash = (53 * hash) + getEpoch();
       hash = (37 * hash) + REPORT_FIELD_NUMBER;
       hash = (53 * hash) + getReport().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -455,9 +395,9 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        userID_ = "";
+        userID_ = 0;
 
-        epoch_ = "";
+        epoch_ = 0;
 
         report_ = "";
 
@@ -538,13 +478,11 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.subLocRepReq other) {
         if (other == com.server.grpc.ServerService.subLocRepReq.getDefaultInstance()) return this;
-        if (!other.getUserID().isEmpty()) {
-          userID_ = other.userID_;
-          onChanged();
+        if (other.getUserID() != 0) {
+          setUserID(other.getUserID());
         }
-        if (!other.getEpoch().isEmpty()) {
-          epoch_ = other.epoch_;
-          onChanged();
+        if (other.getEpoch() != 0) {
+          setEpoch(other.getEpoch());
         }
         if (!other.getReport().isEmpty()) {
           report_ = other.report_;
@@ -579,140 +517,54 @@ public final class ServerService {
         return this;
       }
 
-      private java.lang.Object userID_ = "";
+      private int userID_ ;
       /**
-       * <code>string userID = 1;</code>
+       * <code>int32 userID = 1;</code>
        */
-      public java.lang.String getUserID() {
-        java.lang.Object ref = userID_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          userID_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getUserID() {
+        return userID_;
       }
       /**
-       * <code>string userID = 1;</code>
+       * <code>int32 userID = 1;</code>
        */
-      public com.google.protobuf.ByteString
-          getUserIDBytes() {
-        java.lang.Object ref = userID_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          userID_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string userID = 1;</code>
-       */
-      public Builder setUserID(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      public Builder setUserID(int value) {
+        
         userID_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string userID = 1;</code>
+       * <code>int32 userID = 1;</code>
        */
       public Builder clearUserID() {
         
-        userID_ = getDefaultInstance().getUserID();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string userID = 1;</code>
-       */
-      public Builder setUserIDBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        userID_ = value;
+        userID_ = 0;
         onChanged();
         return this;
       }
 
-      private java.lang.Object epoch_ = "";
+      private int epoch_ ;
       /**
-       * <code>string epoch = 2;</code>
+       * <code>int32 epoch = 2;</code>
        */
-      public java.lang.String getEpoch() {
-        java.lang.Object ref = epoch_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          epoch_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getEpoch() {
+        return epoch_;
       }
       /**
-       * <code>string epoch = 2;</code>
+       * <code>int32 epoch = 2;</code>
        */
-      public com.google.protobuf.ByteString
-          getEpochBytes() {
-        java.lang.Object ref = epoch_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          epoch_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string epoch = 2;</code>
-       */
-      public Builder setEpoch(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      public Builder setEpoch(int value) {
+        
         epoch_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string epoch = 2;</code>
+       * <code>int32 epoch = 2;</code>
        */
       public Builder clearEpoch() {
         
-        epoch_ = getDefaultInstance().getEpoch();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string epoch = 2;</code>
-       */
-      public Builder setEpochBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        epoch_ = value;
+        epoch_ = 0;
         onChanged();
         return this;
       }
@@ -1456,24 +1308,14 @@ public final class ServerService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string userID = 1;</code>
+     * <code>int32 userID = 1;</code>
      */
-    java.lang.String getUserID();
-    /**
-     * <code>string userID = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getUserIDBytes();
+    int getUserID();
 
     /**
-     * <code>string epoch = 2;</code>
+     * <code>int32 epoch = 2;</code>
      */
-    java.lang.String getEpoch();
-    /**
-     * <code>string epoch = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getEpochBytes();
+    int getEpoch();
   }
   /**
    * Protobuf type {@code obtLocRepReq}
@@ -1488,8 +1330,8 @@ public final class ServerService {
       super(builder);
     }
     private obtLocRepReq() {
-      userID_ = "";
-      epoch_ = "";
+      userID_ = 0;
+      epoch_ = 0;
     }
 
     @java.lang.Override
@@ -1516,16 +1358,14 @@ public final class ServerService {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
+            case 8: {
 
-              userID_ = s;
+              userID_ = input.readInt32();
               break;
             }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
+            case 16: {
 
-              epoch_ = s;
+              epoch_ = input.readInt32();
               break;
             }
             default: {
@@ -1561,71 +1401,21 @@ public final class ServerService {
     }
 
     public static final int USERID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object userID_;
+    private int userID_;
     /**
-     * <code>string userID = 1;</code>
+     * <code>int32 userID = 1;</code>
      */
-    public java.lang.String getUserID() {
-      java.lang.Object ref = userID_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        userID_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string userID = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getUserIDBytes() {
-      java.lang.Object ref = userID_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        userID_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getUserID() {
+      return userID_;
     }
 
     public static final int EPOCH_FIELD_NUMBER = 2;
-    private volatile java.lang.Object epoch_;
+    private int epoch_;
     /**
-     * <code>string epoch = 2;</code>
+     * <code>int32 epoch = 2;</code>
      */
-    public java.lang.String getEpoch() {
-      java.lang.Object ref = epoch_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        epoch_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string epoch = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getEpochBytes() {
-      java.lang.Object ref = epoch_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        epoch_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getEpoch() {
+      return epoch_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -1642,11 +1432,11 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getUserIDBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, userID_);
+      if (userID_ != 0) {
+        output.writeInt32(1, userID_);
       }
-      if (!getEpochBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, epoch_);
+      if (epoch_ != 0) {
+        output.writeInt32(2, epoch_);
       }
       unknownFields.writeTo(output);
     }
@@ -1657,11 +1447,13 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
-      if (!getUserIDBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, userID_);
+      if (userID_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, userID_);
       }
-      if (!getEpochBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, epoch_);
+      if (epoch_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, epoch_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1679,10 +1471,10 @@ public final class ServerService {
       com.server.grpc.ServerService.obtLocRepReq other = (com.server.grpc.ServerService.obtLocRepReq) obj;
 
       boolean result = true;
-      result = result && getUserID()
-          .equals(other.getUserID());
-      result = result && getEpoch()
-          .equals(other.getEpoch());
+      result = result && (getUserID()
+          == other.getUserID());
+      result = result && (getEpoch()
+          == other.getEpoch());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1695,9 +1487,9 @@ public final class ServerService {
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + USERID_FIELD_NUMBER;
-      hash = (53 * hash) + getUserID().hashCode();
+      hash = (53 * hash) + getUserID();
       hash = (37 * hash) + EPOCH_FIELD_NUMBER;
-      hash = (53 * hash) + getEpoch().hashCode();
+      hash = (53 * hash) + getEpoch();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1831,9 +1623,9 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        userID_ = "";
+        userID_ = 0;
 
-        epoch_ = "";
+        epoch_ = 0;
 
         return this;
       }
@@ -1911,13 +1703,11 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.obtLocRepReq other) {
         if (other == com.server.grpc.ServerService.obtLocRepReq.getDefaultInstance()) return this;
-        if (!other.getUserID().isEmpty()) {
-          userID_ = other.userID_;
-          onChanged();
+        if (other.getUserID() != 0) {
+          setUserID(other.getUserID());
         }
-        if (!other.getEpoch().isEmpty()) {
-          epoch_ = other.epoch_;
-          onChanged();
+        if (other.getEpoch() != 0) {
+          setEpoch(other.getEpoch());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1948,140 +1738,54 @@ public final class ServerService {
         return this;
       }
 
-      private java.lang.Object userID_ = "";
+      private int userID_ ;
       /**
-       * <code>string userID = 1;</code>
+       * <code>int32 userID = 1;</code>
        */
-      public java.lang.String getUserID() {
-        java.lang.Object ref = userID_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          userID_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getUserID() {
+        return userID_;
       }
       /**
-       * <code>string userID = 1;</code>
+       * <code>int32 userID = 1;</code>
        */
-      public com.google.protobuf.ByteString
-          getUserIDBytes() {
-        java.lang.Object ref = userID_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          userID_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string userID = 1;</code>
-       */
-      public Builder setUserID(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      public Builder setUserID(int value) {
+        
         userID_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string userID = 1;</code>
+       * <code>int32 userID = 1;</code>
        */
       public Builder clearUserID() {
         
-        userID_ = getDefaultInstance().getUserID();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string userID = 1;</code>
-       */
-      public Builder setUserIDBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        userID_ = value;
+        userID_ = 0;
         onChanged();
         return this;
       }
 
-      private java.lang.Object epoch_ = "";
+      private int epoch_ ;
       /**
-       * <code>string epoch = 2;</code>
+       * <code>int32 epoch = 2;</code>
        */
-      public java.lang.String getEpoch() {
-        java.lang.Object ref = epoch_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          epoch_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getEpoch() {
+        return epoch_;
       }
       /**
-       * <code>string epoch = 2;</code>
+       * <code>int32 epoch = 2;</code>
        */
-      public com.google.protobuf.ByteString
-          getEpochBytes() {
-        java.lang.Object ref = epoch_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          epoch_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string epoch = 2;</code>
-       */
-      public Builder setEpoch(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      public Builder setEpoch(int value) {
+        
         epoch_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string epoch = 2;</code>
+       * <code>int32 epoch = 2;</code>
        */
       public Builder clearEpoch() {
         
-        epoch_ = getDefaultInstance().getEpoch();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string epoch = 2;</code>
-       */
-      public Builder setEpochBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        epoch_ = value;
+        epoch_ = 0;
         onChanged();
         return this;
       }
@@ -2143,14 +1847,9 @@ public final class ServerService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string userID = 1;</code>
+     * <code>int32 userID = 1;</code>
      */
-    java.lang.String getUserID();
-    /**
-     * <code>string userID = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getUserIDBytes();
+    int getUserID();
 
     /**
      * <code>.Position pos = 2;</code>
@@ -2178,7 +1877,7 @@ public final class ServerService {
       super(builder);
     }
     private obtLocRepReply() {
-      userID_ = "";
+      userID_ = 0;
     }
 
     @java.lang.Override
@@ -2205,10 +1904,9 @@ public final class ServerService {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
+            case 8: {
 
-              userID_ = s;
+              userID_ = input.readInt32();
               break;
             }
             case 18: {
@@ -2257,37 +1955,12 @@ public final class ServerService {
     }
 
     public static final int USERID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object userID_;
+    private int userID_;
     /**
-     * <code>string userID = 1;</code>
+     * <code>int32 userID = 1;</code>
      */
-    public java.lang.String getUserID() {
-      java.lang.Object ref = userID_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        userID_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string userID = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getUserIDBytes() {
-      java.lang.Object ref = userID_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        userID_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getUserID() {
+      return userID_;
     }
 
     public static final int POS_FIELD_NUMBER = 2;
@@ -2325,8 +1998,8 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getUserIDBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, userID_);
+      if (userID_ != 0) {
+        output.writeInt32(1, userID_);
       }
       if (pos_ != null) {
         output.writeMessage(2, getPos());
@@ -2340,8 +2013,9 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
-      if (!getUserIDBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, userID_);
+      if (userID_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, userID_);
       }
       if (pos_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -2363,8 +2037,8 @@ public final class ServerService {
       com.server.grpc.ServerService.obtLocRepReply other = (com.server.grpc.ServerService.obtLocRepReply) obj;
 
       boolean result = true;
-      result = result && getUserID()
-          .equals(other.getUserID());
+      result = result && (getUserID()
+          == other.getUserID());
       result = result && (hasPos() == other.hasPos());
       if (hasPos()) {
         result = result && getPos()
@@ -2382,7 +2056,7 @@ public final class ServerService {
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + USERID_FIELD_NUMBER;
-      hash = (53 * hash) + getUserID().hashCode();
+      hash = (53 * hash) + getUserID();
       if (hasPos()) {
         hash = (37 * hash) + POS_FIELD_NUMBER;
         hash = (53 * hash) + getPos().hashCode();
@@ -2520,7 +2194,7 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        userID_ = "";
+        userID_ = 0;
 
         if (posBuilder_ == null) {
           pos_ = null;
@@ -2608,9 +2282,8 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.obtLocRepReply other) {
         if (other == com.server.grpc.ServerService.obtLocRepReply.getDefaultInstance()) return this;
-        if (!other.getUserID().isEmpty()) {
-          userID_ = other.userID_;
-          onChanged();
+        if (other.getUserID() != 0) {
+          setUserID(other.getUserID());
         }
         if (other.hasPos()) {
           mergePos(other.getPos());
@@ -2644,71 +2317,28 @@ public final class ServerService {
         return this;
       }
 
-      private java.lang.Object userID_ = "";
+      private int userID_ ;
       /**
-       * <code>string userID = 1;</code>
+       * <code>int32 userID = 1;</code>
        */
-      public java.lang.String getUserID() {
-        java.lang.Object ref = userID_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          userID_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getUserID() {
+        return userID_;
       }
       /**
-       * <code>string userID = 1;</code>
+       * <code>int32 userID = 1;</code>
        */
-      public com.google.protobuf.ByteString
-          getUserIDBytes() {
-        java.lang.Object ref = userID_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          userID_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string userID = 1;</code>
-       */
-      public Builder setUserID(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      public Builder setUserID(int value) {
+        
         userID_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string userID = 1;</code>
+       * <code>int32 userID = 1;</code>
        */
       public Builder clearUserID() {
         
-        userID_ = getDefaultInstance().getUserID();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string userID = 1;</code>
-       */
-      public Builder setUserIDBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        userID_ = value;
+        userID_ = 0;
         onChanged();
         return this;
       }
@@ -2900,14 +2530,9 @@ public final class ServerService {
     com.server.grpc.ServerService.PositionOrBuilder getPosOrBuilder();
 
     /**
-     * <code>string epoch = 2;</code>
+     * <code>int32 epoch = 2;</code>
      */
-    java.lang.String getEpoch();
-    /**
-     * <code>string epoch = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getEpochBytes();
+    int getEpoch();
   }
   /**
    * Protobuf type {@code obtUseLocReq}
@@ -2922,7 +2547,7 @@ public final class ServerService {
       super(builder);
     }
     private obtUseLocReq() {
-      epoch_ = "";
+      epoch_ = 0;
     }
 
     @java.lang.Override
@@ -2962,10 +2587,9 @@ public final class ServerService {
 
               break;
             }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
+            case 16: {
 
-              epoch_ = s;
+              epoch_ = input.readInt32();
               break;
             }
             default: {
@@ -3022,37 +2646,12 @@ public final class ServerService {
     }
 
     public static final int EPOCH_FIELD_NUMBER = 2;
-    private volatile java.lang.Object epoch_;
+    private int epoch_;
     /**
-     * <code>string epoch = 2;</code>
+     * <code>int32 epoch = 2;</code>
      */
-    public java.lang.String getEpoch() {
-      java.lang.Object ref = epoch_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        epoch_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string epoch = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getEpochBytes() {
-      java.lang.Object ref = epoch_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        epoch_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getEpoch() {
+      return epoch_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3072,8 +2671,8 @@ public final class ServerService {
       if (pos_ != null) {
         output.writeMessage(1, getPos());
       }
-      if (!getEpochBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, epoch_);
+      if (epoch_ != 0) {
+        output.writeInt32(2, epoch_);
       }
       unknownFields.writeTo(output);
     }
@@ -3088,8 +2687,9 @@ public final class ServerService {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getPos());
       }
-      if (!getEpochBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, epoch_);
+      if (epoch_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, epoch_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3112,8 +2712,8 @@ public final class ServerService {
         result = result && getPos()
             .equals(other.getPos());
       }
-      result = result && getEpoch()
-          .equals(other.getEpoch());
+      result = result && (getEpoch()
+          == other.getEpoch());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -3130,7 +2730,7 @@ public final class ServerService {
         hash = (53 * hash) + getPos().hashCode();
       }
       hash = (37 * hash) + EPOCH_FIELD_NUMBER;
-      hash = (53 * hash) + getEpoch().hashCode();
+      hash = (53 * hash) + getEpoch();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3270,7 +2870,7 @@ public final class ServerService {
           pos_ = null;
           posBuilder_ = null;
         }
-        epoch_ = "";
+        epoch_ = 0;
 
         return this;
       }
@@ -3355,9 +2955,8 @@ public final class ServerService {
         if (other.hasPos()) {
           mergePos(other.getPos());
         }
-        if (!other.getEpoch().isEmpty()) {
-          epoch_ = other.epoch_;
-          onChanged();
+        if (other.getEpoch() != 0) {
+          setEpoch(other.getEpoch());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3505,71 +3104,28 @@ public final class ServerService {
         return posBuilder_;
       }
 
-      private java.lang.Object epoch_ = "";
+      private int epoch_ ;
       /**
-       * <code>string epoch = 2;</code>
+       * <code>int32 epoch = 2;</code>
        */
-      public java.lang.String getEpoch() {
-        java.lang.Object ref = epoch_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          epoch_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getEpoch() {
+        return epoch_;
       }
       /**
-       * <code>string epoch = 2;</code>
+       * <code>int32 epoch = 2;</code>
        */
-      public com.google.protobuf.ByteString
-          getEpochBytes() {
-        java.lang.Object ref = epoch_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          epoch_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string epoch = 2;</code>
-       */
-      public Builder setEpoch(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      public Builder setEpoch(int value) {
+        
         epoch_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string epoch = 2;</code>
+       * <code>int32 epoch = 2;</code>
        */
       public Builder clearEpoch() {
         
-        epoch_ = getDefaultInstance().getEpoch();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string epoch = 2;</code>
-       */
-      public Builder setEpochBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        epoch_ = value;
+        epoch_ = 0;
         onChanged();
         return this;
       }
@@ -3631,14 +3187,9 @@ public final class ServerService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string epoch = 1;</code>
+     * <code>int32 epoch = 1;</code>
      */
-    java.lang.String getEpoch();
-    /**
-     * <code>string epoch = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getEpochBytes();
+    int getEpoch();
 
     /**
      * <code>repeated string userList = 2;</code>
@@ -3672,7 +3223,7 @@ public final class ServerService {
       super(builder);
     }
     private obtUseLocRep() {
-      epoch_ = "";
+      epoch_ = 0;
       userList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
@@ -3700,10 +3251,9 @@ public final class ServerService {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
+            case 8: {
 
-              epoch_ = s;
+              epoch_ = input.readInt32();
               break;
             }
             case 18: {
@@ -3752,37 +3302,12 @@ public final class ServerService {
 
     private int bitField0_;
     public static final int EPOCH_FIELD_NUMBER = 1;
-    private volatile java.lang.Object epoch_;
+    private int epoch_;
     /**
-     * <code>string epoch = 1;</code>
+     * <code>int32 epoch = 1;</code>
      */
-    public java.lang.String getEpoch() {
-      java.lang.Object ref = epoch_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        epoch_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string epoch = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getEpochBytes() {
-      java.lang.Object ref = epoch_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        epoch_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public int getEpoch() {
+      return epoch_;
     }
 
     public static final int USERLIST_FIELD_NUMBER = 2;
@@ -3828,8 +3353,8 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getEpochBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, epoch_);
+      if (epoch_ != 0) {
+        output.writeInt32(1, epoch_);
       }
       for (int i = 0; i < userList_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, userList_.getRaw(i));
@@ -3843,8 +3368,9 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
-      if (!getEpochBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, epoch_);
+      if (epoch_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, epoch_);
       }
       {
         int dataSize = 0;
@@ -3870,8 +3396,8 @@ public final class ServerService {
       com.server.grpc.ServerService.obtUseLocRep other = (com.server.grpc.ServerService.obtUseLocRep) obj;
 
       boolean result = true;
-      result = result && getEpoch()
-          .equals(other.getEpoch());
+      result = result && (getEpoch()
+          == other.getEpoch());
       result = result && getUserListList()
           .equals(other.getUserListList());
       result = result && unknownFields.equals(other.unknownFields);
@@ -3886,7 +3412,7 @@ public final class ServerService {
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + EPOCH_FIELD_NUMBER;
-      hash = (53 * hash) + getEpoch().hashCode();
+      hash = (53 * hash) + getEpoch();
       if (getUserListCount() > 0) {
         hash = (37 * hash) + USERLIST_FIELD_NUMBER;
         hash = (53 * hash) + getUserListList().hashCode();
@@ -4024,7 +3550,7 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        epoch_ = "";
+        epoch_ = 0;
 
         userList_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -4111,9 +3637,8 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.obtUseLocRep other) {
         if (other == com.server.grpc.ServerService.obtUseLocRep.getDefaultInstance()) return this;
-        if (!other.getEpoch().isEmpty()) {
-          epoch_ = other.epoch_;
-          onChanged();
+        if (other.getEpoch() != 0) {
+          setEpoch(other.getEpoch());
         }
         if (!other.userList_.isEmpty()) {
           if (userList_.isEmpty()) {
@@ -4155,71 +3680,28 @@ public final class ServerService {
       }
       private int bitField0_;
 
-      private java.lang.Object epoch_ = "";
+      private int epoch_ ;
       /**
-       * <code>string epoch = 1;</code>
+       * <code>int32 epoch = 1;</code>
        */
-      public java.lang.String getEpoch() {
-        java.lang.Object ref = epoch_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          epoch_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      public int getEpoch() {
+        return epoch_;
       }
       /**
-       * <code>string epoch = 1;</code>
+       * <code>int32 epoch = 1;</code>
        */
-      public com.google.protobuf.ByteString
-          getEpochBytes() {
-        java.lang.Object ref = epoch_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          epoch_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string epoch = 1;</code>
-       */
-      public Builder setEpoch(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
+      public Builder setEpoch(int value) {
+        
         epoch_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string epoch = 1;</code>
+       * <code>int32 epoch = 1;</code>
        */
       public Builder clearEpoch() {
         
-        epoch_ = getDefaultInstance().getEpoch();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string epoch = 1;</code>
-       */
-      public Builder setEpochBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        epoch_ = value;
+        epoch_ = 0;
         onChanged();
         return this;
       }
@@ -4954,14 +4436,14 @@ public final class ServerService {
   static {
     java.lang.String[] descriptorData = {
       "\n\023serverService.proto\"=\n\014subLocRepReq\022\016\n" +
-      "\006userID\030\001 \001(\t\022\r\n\005epoch\030\002 \001(\t\022\016\n\006report\030\003" +
+      "\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\022\016\n\006report\030\003" +
       " \001(\t\"9\n\016subLocRepReply\022\024\n\014replymessage\030\001" +
       " \001(\t\022\021\n\treplycode\030\002 \001(\005\"-\n\014obtLocRepReq\022" +
-      "\016\n\006userID\030\001 \001(\t\022\r\n\005epoch\030\002 \001(\t\"8\n\016obtLoc" +
-      "RepReply\022\016\n\006userID\030\001 \001(\t\022\026\n\003pos\030\002 \001(\0132\t." +
+      "\016\n\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\"8\n\016obtLoc" +
+      "RepReply\022\016\n\006userID\030\001 \001(\005\022\026\n\003pos\030\002 \001(\0132\t." +
       "Position\"5\n\014obtUseLocReq\022\026\n\003pos\030\001 \001(\0132\t." +
-      "Position\022\r\n\005epoch\030\002 \001(\t\"/\n\014obtUseLocRep\022" +
-      "\r\n\005epoch\030\001 \001(\t\022\020\n\010userList\030\002 \003(\t\" \n\010Posi" +
+      "Position\022\r\n\005epoch\030\002 \001(\005\"/\n\014obtUseLocRep\022" +
+      "\r\n\005epoch\030\001 \001(\005\022\020\n\010userList\030\002 \003(\t\" \n\010Posi" +
       "tion\022\t\n\001X\030\001 \001(\005\022\t\n\001Y\030\002 \001(\0052\266\001\n\rserverSer" +
       "vice\0226\n\024submitLocationReport\022\r.subLocRep" +
       "Req\032\017.subLocRepReply\0226\n\024obtainLocationRe" +

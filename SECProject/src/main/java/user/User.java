@@ -11,6 +11,10 @@ import com.user.grpc.UserService.LocProofReq;
 import com.user.grpc.UserService.Position;
 import com.user.grpc.userServiceGrpc;
 import com.user.grpc.userServiceGrpc.userServiceStub;
+import com.server.grpc.serverServiceGrpc;
+import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
+import com.server.grpc.ServerService.subLocRepReq;
+import com.server.grpc.ServerService.subLocRepReply;
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 import crypto.RSAProvider;
@@ -97,7 +101,7 @@ public class User {
 	 * 	that the user is actually near him).
 	 * 
 	 * ************************************************************************************/
-	public List<String> sndProofRequest1(List<ManagedChannel> channels, int ID, int epoch, Point2D proverPos) throws Exception {
+	public List<String> sndProofRequest(List<ManagedChannel> channels, int ID, int epoch, Point2D proverPos) throws Exception {
 
 		final CountDownLatch finishLatch = new CountDownLatch(channels.size());
 		List<String> proofs = new ArrayList<>();
@@ -137,6 +141,39 @@ public class User {
 		for(ManagedChannel channel : channels)
 			channel.shutdown();
 		return proofs;
+	}
+
+	/**************************************************************************************
+	 * 										-submitLocationReport()
+	 *	- send location report to the server
+	 *
+	 * -input
+	 * 		- proofs: list of user's proofs gathered using sndProofRequest() method
+	 * 		- ID: ID of the user who report his location
+	 * 		- epoch: epoch which user want to report his location
+	 * 		- x,y: Location of user to report
+	 *
+	 * - return: List<string>( where each string is the proof of the witness
+	 * 	that the user is actually near him).
+	 *
+	 * ************************************************************************************/
+	public void submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position) {
+		Position.Builder pos = Position.newBuilder().setX(position.getX()).setY(position.getY());
+
+		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(
+				ManagedChannelBuilder.forAddress("127.0.0.1", TrackerLocationSystem.getServerPort())
+						.usePlaintext().build()
+		).withWaitForReady();
+
+		subLocRepReq submitRequest = subLocRepReq.newBuilder().setUserID(ID).setEpoch(epoch)
+				.setReport("Location: " + pos.toString() + ", proofs:" + proofs.toString())
+				.build();
+
+		subLocRepReply submitReply = serverStub.submitLocationReport(submitRequest);
+
+		System.out.println("[" + ID + "] Got submit reply with code " + submitReply.getReplycode() +
+				           ": " + submitReply.getReplymessage());
+
 	}
 	
 	
@@ -208,8 +245,9 @@ public class User {
 						myCurrentEpoch = myCurrentEpoch%10 + 1;
 						myCurrentPoosition = TrackerLocationSystem.getMyPosInEpoc(myID, myCurrentEpoch).getPosition();
 						List<ManagedChannel> closerChannel = getCloserUsers(myCurrentEpoch);
-						proofs = sndProofRequest1( closerChannel, myID, myCurrentEpoch, myCurrentPoosition);
+						proofs = sndProofRequest( closerChannel, myID, myCurrentEpoch, myCurrentPoosition);
 						System.out.println("ID = "+ myID +" users near me at epoch= " +myCurrentEpoch +"  are : "+proofs);
+						submitLocationReport(proofs, myID, myCurrentEpoch, myCurrentPoosition);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
