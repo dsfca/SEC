@@ -6,7 +6,8 @@ service serverService{
 	
 	rpc submitLocationReport(subLocRepReq) returns (subLocRepReply);
 	rpc obtainLocationReport(obtLocRepReq) returns (obtLocRepReply);
-	
+
+	rpc obtainLocationReportHA(obtLocRepReq) returns (obtLocRepReply);
 	rpc obtainUsersAtLocation(obtUseLocReq) returns (obtUseLocRep); 
 }
 

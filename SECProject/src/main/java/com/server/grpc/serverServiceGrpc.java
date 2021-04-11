@@ -91,6 +91,38 @@ public final class serverServiceGrpc {
      return getObtainLocationReportMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.obtLocRepReq,
+      com.server.grpc.ServerService.obtLocRepReply> getObtainLocationReportHAMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "obtainLocationReportHA",
+      requestType = com.server.grpc.ServerService.obtLocRepReq.class,
+      responseType = com.server.grpc.ServerService.obtLocRepReply.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.server.grpc.ServerService.obtLocRepReq,
+      com.server.grpc.ServerService.obtLocRepReply> getObtainLocationReportHAMethod() {
+    io.grpc.MethodDescriptor<com.server.grpc.ServerService.obtLocRepReq, com.server.grpc.ServerService.obtLocRepReply> getObtainLocationReportHAMethod;
+    if ((getObtainLocationReportHAMethod = serverServiceGrpc.getObtainLocationReportHAMethod) == null) {
+      synchronized (serverServiceGrpc.class) {
+        if ((getObtainLocationReportHAMethod = serverServiceGrpc.getObtainLocationReportHAMethod) == null) {
+          serverServiceGrpc.getObtainLocationReportHAMethod = getObtainLocationReportHAMethod = 
+              io.grpc.MethodDescriptor.<com.server.grpc.ServerService.obtLocRepReq, com.server.grpc.ServerService.obtLocRepReply>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "serverService", "obtainLocationReportHA"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.obtLocRepReq.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.obtLocRepReply.getDefaultInstance()))
+                  .setSchemaDescriptor(new serverServiceMethodDescriptorSupplier("obtainLocationReportHA"))
+                  .build();
+          }
+        }
+     }
+     return getObtainLocationReportHAMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.obtUseLocReq,
       com.server.grpc.ServerService.obtUseLocRep> getObtainUsersAtLocationMethod;
 
@@ -166,6 +198,13 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public void obtainLocationReportHA(com.server.grpc.ServerService.obtLocRepReq request,
+        io.grpc.stub.StreamObserver<com.server.grpc.ServerService.obtLocRepReply> responseObserver) {
+      asyncUnimplementedUnaryCall(getObtainLocationReportHAMethod(), responseObserver);
+    }
+
+    /**
+     */
     public void obtainUsersAtLocation(com.server.grpc.ServerService.obtUseLocReq request,
         io.grpc.stub.StreamObserver<com.server.grpc.ServerService.obtUseLocRep> responseObserver) {
       asyncUnimplementedUnaryCall(getObtainUsersAtLocationMethod(), responseObserver);
@@ -187,6 +226,13 @@ public final class serverServiceGrpc {
                 com.server.grpc.ServerService.obtLocRepReq,
                 com.server.grpc.ServerService.obtLocRepReply>(
                   this, METHODID_OBTAIN_LOCATION_REPORT)))
+          .addMethod(
+            getObtainLocationReportHAMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                com.server.grpc.ServerService.obtLocRepReq,
+                com.server.grpc.ServerService.obtLocRepReply>(
+                  this, METHODID_OBTAIN_LOCATION_REPORT_HA)))
           .addMethod(
             getObtainUsersAtLocationMethod(),
             asyncUnaryCall(
@@ -234,6 +280,14 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public void obtainLocationReportHA(com.server.grpc.ServerService.obtLocRepReq request,
+        io.grpc.stub.StreamObserver<com.server.grpc.ServerService.obtLocRepReply> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getObtainLocationReportHAMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
     public void obtainUsersAtLocation(com.server.grpc.ServerService.obtUseLocReq request,
         io.grpc.stub.StreamObserver<com.server.grpc.ServerService.obtUseLocRep> responseObserver) {
       asyncUnaryCall(
@@ -271,6 +325,13 @@ public final class serverServiceGrpc {
     public com.server.grpc.ServerService.obtLocRepReply obtainLocationReport(com.server.grpc.ServerService.obtLocRepReq request) {
       return blockingUnaryCall(
           getChannel(), getObtainLocationReportMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.server.grpc.ServerService.obtLocRepReply obtainLocationReportHA(com.server.grpc.ServerService.obtLocRepReq request) {
+      return blockingUnaryCall(
+          getChannel(), getObtainLocationReportHAMethod(), getCallOptions(), request);
     }
 
     /**
@@ -317,6 +378,14 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<com.server.grpc.ServerService.obtLocRepReply> obtainLocationReportHA(
+        com.server.grpc.ServerService.obtLocRepReq request) {
+      return futureUnaryCall(
+          getChannel().newCall(getObtainLocationReportHAMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<com.server.grpc.ServerService.obtUseLocRep> obtainUsersAtLocation(
         com.server.grpc.ServerService.obtUseLocReq request) {
       return futureUnaryCall(
@@ -326,7 +395,8 @@ public final class serverServiceGrpc {
 
   private static final int METHODID_SUBMIT_LOCATION_REPORT = 0;
   private static final int METHODID_OBTAIN_LOCATION_REPORT = 1;
-  private static final int METHODID_OBTAIN_USERS_AT_LOCATION = 2;
+  private static final int METHODID_OBTAIN_LOCATION_REPORT_HA = 2;
+  private static final int METHODID_OBTAIN_USERS_AT_LOCATION = 3;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -351,6 +421,10 @@ public final class serverServiceGrpc {
           break;
         case METHODID_OBTAIN_LOCATION_REPORT:
           serviceImpl.obtainLocationReport((com.server.grpc.ServerService.obtLocRepReq) request,
+              (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.obtLocRepReply>) responseObserver);
+          break;
+        case METHODID_OBTAIN_LOCATION_REPORT_HA:
+          serviceImpl.obtainLocationReportHA((com.server.grpc.ServerService.obtLocRepReq) request,
               (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.obtLocRepReply>) responseObserver);
           break;
         case METHODID_OBTAIN_USERS_AT_LOCATION:
@@ -420,6 +494,7 @@ public final class serverServiceGrpc {
               .setSchemaDescriptor(new serverServiceFileDescriptorSupplier())
               .addMethod(getSubmitLocationReportMethod())
               .addMethod(getObtainLocationReportMethod())
+              .addMethod(getObtainLocationReportHAMethod())
               .addMethod(getObtainUsersAtLocationMethod())
               .build();
         }

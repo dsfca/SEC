@@ -41,9 +41,8 @@ public class ServerImp extends serverServiceImplBase {
 
     /**************************************************************************************
      *                                  - obtainLocationReport()
-     *  RPC: server received request from a user or HA to provide user location in specific epoch.
-     *  In case RPC is called by low privileged user, return only his own location history.
-     *  In case RPC is called by HA, history of any user can be returned.
+     *  RPC: server received request from a user to provide user location in specific epoch.
+     *  return only his own location history.
      *  This method handles the requests and sends a reply
      *  - input:
      *      - request: the obtainLocationReportRequest defined in serverService.proto
@@ -53,6 +52,28 @@ public class ServerImp extends serverServiceImplBase {
     @Override
     public void obtainLocationReport(obtLocRepReq request, StreamObserver<obtLocRepReply> responseObserver) {
         System.out.println("[Server] Location report request from " + request.getUserID() +
+                " at epoch " + request.getEpoch());
+
+        ServerService.obtLocRepReply.Builder response = obtainReportHandler(request);
+
+        responseObserver.onNext(response.build());
+        responseObserver.onCompleted();
+
+    }
+
+    /**************************************************************************************
+     *                                  - obtainLocationReportHA()
+     *  RPC: server received request from the HA to provide user location in specific epoch
+     *  History of any user can be returned.
+     *  This method handles the requests and sends a reply
+     *  - input:
+     *      - request: the obtainLocationReportRequest defined in serverService.proto
+     *      - responseObserver: allows to respond to specific user
+     *
+     * ************************************************************************************/
+    @Override
+    public void obtainLocationReportHA(obtLocRepReq request, StreamObserver<obtLocRepReply> responseObserver) {
+        System.out.println("[Server] Location report request from HA to user" + request.getUserID() +
                 " at epoch " + request.getEpoch());
 
         ServerService.obtLocRepReply.Builder response = obtainReportHandler(request);

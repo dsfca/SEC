@@ -4444,12 +4444,14 @@ public final class ServerService {
       "Position\"5\n\014obtUseLocReq\022\026\n\003pos\030\001 \001(\0132\t." +
       "Position\022\r\n\005epoch\030\002 \001(\005\"/\n\014obtUseLocRep\022" +
       "\r\n\005epoch\030\001 \001(\005\022\020\n\010userList\030\002 \003(\t\" \n\010Posi" +
-      "tion\022\t\n\001X\030\001 \001(\005\022\t\n\001Y\030\002 \001(\0052\266\001\n\rserverSer" +
+      "tion\022\t\n\001X\030\001 \001(\005\022\t\n\001Y\030\002 \001(\0052\360\001\n\rserverSer" +
       "vice\0226\n\024submitLocationReport\022\r.subLocRep" +
       "Req\032\017.subLocRepReply\0226\n\024obtainLocationRe" +
-      "port\022\r.obtLocRepReq\032\017.obtLocRepReply\0225\n\025" +
-      "obtainUsersAtLocation\022\r.obtUseLocReq\032\r.o" +
-      "btUseLocRepB\021\n\017com.server.grpcb\006proto3"
+      "port\022\r.obtLocRepReq\032\017.obtLocRepReply\0228\n\026" +
+      "obtainLocationReportHA\022\r.obtLocRepReq\032\017." +
+      "obtLocRepReply\0225\n\025obtainUsersAtLocation\022" +
+      "\r.obtUseLocReq\032\r.obtUseLocRepB\021\n\017com.ser" +
+      "ver.grpcb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
