@@ -14,6 +14,11 @@ public class Server {
         init();
     }
 
+    /**************************************************************************************
+     * 											-init()
+     * - init server; use localhost as IP
+     *
+     * ************************************************************************************/
     private void init() {
         Runnable r = new Runnable() {
             @Override
