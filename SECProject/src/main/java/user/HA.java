@@ -63,34 +63,40 @@ public class HA {
         return reply.getUserListList();
     }
 
-
     public static void main(String[] args) throws Exception {
+
+        String help = "Accept only following formats:\n\tgetReport <ID> <epoch>\n\tgetUsers <X> <Y> <epoch>";
 
         HA userHa = new HA(Integer.parseInt(args[0]));
 
         String cmd, arg1, arg2, arg3;
         Scanner sn = new Scanner(System.in);
 
+        System.out.println(help);
+
         while(true){
             cmd = sn.next().toLowerCase(Locale.ROOT);
-            arg1 = sn.next().toLowerCase(Locale.ROOT);
-            arg2 = sn.next().toLowerCase(Locale.ROOT);
-            arg3 = sn.next().toLowerCase(Locale.ROOT);
 
-            if (cmd.equals("getReport")) {
+            if (cmd.equals("getreport")) {
+                arg1 = sn.next().toLowerCase(Locale.ROOT);
+                arg2 = sn.next().toLowerCase(Locale.ROOT);
+
                 userHa.obtainLocationReport(Integer.parseInt(arg1), Integer.parseInt(arg2));
 
-            } else if (cmd.equals("getUsers")) {
+
+            } else if (cmd.equals("getusers")) {
+                arg1 = sn.next().toLowerCase(Locale.ROOT);
+                arg2 = sn.next().toLowerCase(Locale.ROOT);
+                arg3 = sn.next().toLowerCase(Locale.ROOT);
+
                 Point2D pos = new Point2D(Integer.parseInt(arg1), Integer.parseInt(arg2));
                 userHa.obtainUsersAtLocation(pos, Integer.parseInt(arg3));
+
             } else {
-                System.out.println("Accept only following formats:\n" +
-                                    "getReport <ID> <epoch>\n" +
-                                    "getUsers <X> <Y> <epoch>");
+                System.out.println(help);
             }
 
             sn.nextLine();
-
         }
     }
 }
