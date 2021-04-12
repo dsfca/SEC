@@ -74,14 +74,20 @@ public class HA {
 
         System.out.println(help);
 
-        while(true){
+        while(true) {
             cmd = sn.next().toLowerCase(Locale.ROOT);
 
             if (cmd.equals("getreport")) {
                 arg1 = sn.next().toLowerCase(Locale.ROOT);
                 arg2 = sn.next().toLowerCase(Locale.ROOT);
 
-                userHa.obtainLocationReport(Integer.parseInt(arg1), Integer.parseInt(arg2));
+                try {
+                    Point2D reply = userHa.obtainLocationReport(Integer.parseInt(arg1), Integer.parseInt(arg2));
+                    System.out.println("Server replied: " + reply.toString());
+                } catch (Exception e) {
+                    System.out.println(help);
+                }
+
 
 
             } else if (cmd.equals("getusers")) {
@@ -89,8 +95,15 @@ public class HA {
                 arg2 = sn.next().toLowerCase(Locale.ROOT);
                 arg3 = sn.next().toLowerCase(Locale.ROOT);
 
-                Point2D pos = new Point2D(Integer.parseInt(arg1), Integer.parseInt(arg2));
-                userHa.obtainUsersAtLocation(pos, Integer.parseInt(arg3));
+                try {
+                    Point2D pos = new Point2D(Integer.parseInt(arg1), Integer.parseInt(arg2));
+                    List<String> reply = userHa.obtainUsersAtLocation(pos, Integer.parseInt(arg3));
+                    System.out.println("Server replied: " + reply.toString());
+
+                } catch (Exception e) {
+                    System.out.println(help);
+
+                }
 
             } else {
                 System.out.println(help);

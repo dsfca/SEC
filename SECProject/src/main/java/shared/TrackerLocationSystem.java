@@ -195,15 +195,17 @@ public class TrackerLocationSystem {
 	 *  
 	 * ************************************************************************************/
 	public static void main(String args[]) {
-		int num_users, G_width, G_height, server_port;
+		int num_users, G_width, G_height;
 		try {
 			num_users = Integer.parseInt(args[0]);
 			G_width = Integer.parseInt(args[1]);
 			G_height = Integer.parseInt(args[2]);
-		    server_port = Integer.parseInt(args[3]);
-		    
+			serverPort = Integer.parseInt(args[3]);
+
 		    ini_pos_file(num_users, 10, G_width, G_height);
 			start_users(num_users, G_width, G_height);
+
+			Server server = new Server(serverPort);
 			
 			
 		} catch (Exception e) {

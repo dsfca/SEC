@@ -37,7 +37,7 @@ public class User {
 	private int myCurrentEpoch = 0;
 	private Point2D myCurrentPoosition; 
 	
-	
+	private boolean isByzantine;
 	
 	/**************************************************************************************
 	* 											-User class constructor()
@@ -51,8 +51,7 @@ public class User {
 		init();
 		initThreadToSndReqProof();
 	}
-	
-	
+
 	/**************************************************************************************
 	 * 											-init()
 	 * - init user server to receive proof location request in port given in the constructor
