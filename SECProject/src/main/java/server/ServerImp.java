@@ -223,9 +223,11 @@ public class ServerImp extends serverServiceImplBase {
     
     /**************************************************************************************
      * 											- dHKeyExchange()
-     * -
+     * -remote procedural call to exchange Diffie Helmann key between user and server 
      *  - input:
-     *      - request: 
+     *      - request: request of the user (contain public key(p^a mod g)
+     *       	signed with user private key and big integers p and g)
+     *      
      *
      * ************************************************************************************/
     @Override
