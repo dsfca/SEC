@@ -8,6 +8,7 @@ import com.user.grpc.UserService.LocProofReq;
 import com.user.grpc.userServiceGrpc.userServiceImplBase;
 
 import crypto.RSAProvider;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import shared.Point2D;
 import shared.TrackerLocationSystem;
@@ -48,13 +49,21 @@ public class UserServiceImp extends userServiceImplBase  {
 			
 			PublicKey provPubKey = TrackerLocationSystem.getUserPublicKey(proverID);
 			Boolean reqIsAuth = RSAProvider.istextAuthentic(req_conc, req_dig_sig, provPubKey);
-			
-			if(reqIsAuth) {
-				LocProofRep.Builder response = locationProofHandler(proverID,epoch, proverPt);
-				responseObserver.onNext(response.build());
-				responseObserver.onCompleted();	
+
+			if (!reqIsAuth) {
+				responseObserver.onError(Status.UNAUTHENTICATED.asRuntimeException());
+				return;
 			}
-		}catch (Exception e) {
+			if (!proverPt.equals(TrackerLocationSystem.getPosInEpoc(proverID, epoch).getPosition())) {
+				responseObserver.onError(Status.FAILED_PRECONDITION.asRuntimeException());
+				return;
+			}
+
+			LocProofRep.Builder response = locationProofHandler(proverID,epoch, proverPt);
+			responseObserver.onNext(response.build());
+			responseObserver.onCompleted();
+
+		} catch (Exception e) {
 			//something went wrong
 			LocProofRep.Builder response = LocProofRep.newBuilder();
 			response.setError(true);
@@ -106,7 +115,7 @@ public class UserServiceImp extends userServiceImplBase  {
 	 * ************************************************************************************/
 	private String getProof(int proverID, Point2D prov_pos, int epoch) {
 		// get witness point in the epoch (epoch)
-		UserLocation me =TrackerLocationSystem.getMyPosInEpoc(ID, epoch);
+		UserLocation me =TrackerLocationSystem.getPosInEpoc(ID, epoch);
 		Point2D myPointInEpoch = me.getPosition();
 		//compute the distance between prover and witness
 		double dist = prov_pos.distance(myPointInEpoch);

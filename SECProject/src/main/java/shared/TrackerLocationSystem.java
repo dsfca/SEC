@@ -108,6 +108,10 @@ public class TrackerLocationSystem {
 	public static synchronized int getServerPort() {
 		return serverPort;
 	}
+
+	public static synchronized void setServerPort(int port) {
+		serverPort = port;
+	}
 	
 	/**************************************************************************************
 	 * 										-getUserPublicKey()
@@ -144,7 +148,7 @@ public class TrackerLocationSystem {
 	 * -returns: void
 	 *  
 	 * ************************************************************************************/
-	private static void ini_pos_file(int n_user, int n_epoch, int G_width, int G_height) {
+	public static void ini_pos_file(int n_user, int n_epoch, int G_width, int G_height) {
 		boolean append = false;
 		for(int i = 1; i <= n_epoch; i++) {
 			for(int j = 0; j < n_user; j++) {
@@ -158,7 +162,7 @@ public class TrackerLocationSystem {
 	}
 	
 	/**************************************************************************************
-	 * 										-getMyPosInEpoc():
+	 * 										-getPosInEpoc():
 	 * - return the user location at a given epoch
 	 * -input
 	 * 		- myID: the Id of the user that want to get its position. 
@@ -167,7 +171,7 @@ public class TrackerLocationSystem {
 	 * - return: UserLocation
 	 * 
 	 * ************************************************************************************/
-	public static UserLocation getMyPosInEpoc(int myId, int epoch) {
+	public static UserLocation getPosInEpoc(int myId, int epoch) {
 		try {
 			List<UserLocation> users = TrackerLocationSystem.getAllUsersInEpoch(epoch);
 			for(UserLocation u: users) {

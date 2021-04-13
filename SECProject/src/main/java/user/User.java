@@ -37,8 +37,6 @@ public class User {
 	private int myCurrentEpoch = 0;
 	private Point2D myCurrentPoosition; 
 	
-	private boolean isByzantine;
-	
 	/**************************************************************************************
 	* 											-User class constructor()
 	* - 
@@ -50,6 +48,12 @@ public class User {
 		PRIVATE_KEY_PATH = "resources/private_keys/user" + myID + "_private.key";
 		init();
 		initThreadToSndReqProof();
+	}
+
+	public User(int ID, int port, String pkeyPath) {
+		this.myID = ID;
+		this.port = port;
+		PRIVATE_KEY_PATH = pkeyPath;
 	}
 
 	/**************************************************************************************
@@ -128,7 +132,7 @@ public class User {
 			}
 		};
 		userServiceStub userAsyncStub;
-		Position.Builder pos = Position.newBuilder().setX(proverPos.getX()).setY(proverPos.getY());	
+		Position.Builder pos = Position.newBuilder().setX(proverPos.getX()).setY(proverPos.getY());
 		for(ManagedChannel channel : channels) {
 			String sig = get_sig_of(ID +" "+ epoch +" "+ proverPos.toString());
 			userAsyncStub = userServiceGrpc.newStub(channel).withDeadlineAfter(5, TimeUnit.SECONDS);
@@ -159,16 +163,17 @@ public class User {
 	public void submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position) {
 		Position.Builder pos = Position.newBuilder().setX(position.getX()).setY(position.getY());
 
-		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(
-				ManagedChannelBuilder.forAddress("127.0.0.1", TrackerLocationSystem.getServerPort())
-						.usePlaintext().build()
-		).withWaitForReady();
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", TrackerLocationSystem.getServerPort())
+				.usePlaintext().build();
+		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel).withWaitForReady();
 
 		subLocRepReq submitRequest = subLocRepReq.newBuilder().setUserID(ID).setEpoch(epoch)
 				.setReport("Location: " + pos.toString() + ", proofs:" + proofs.toString())
 				.build();
 
 		subLocRepReply submitReply = serverStub.submitLocationReport(submitRequest);
+
+		channel.shutdown();
 
 		System.out.println("[" + ID + "] Got submit reply with code " + submitReply.getReplycode() +
 				           ": " + submitReply.getReplymessage());
@@ -203,7 +208,7 @@ public class User {
 	public List<ManagedChannel> getCloserUsers(int epoch) throws IOException{
 		List<UserLocation> usersInEpoch = TrackerLocationSystem.getAllUsersInEpoch(epoch);
 		List<ManagedChannel> closerChannel = new ArrayList<>();
-		UserLocation myPosInEpoch = TrackerLocationSystem.getMyPosInEpoc(myID, epoch);
+		UserLocation myPosInEpoch = TrackerLocationSystem.getPosInEpoc(myID, epoch);
 		for(UserLocation u: usersInEpoch) {
 			if(u.getUserId() != myID) {
 				Point2D u_point = u.getPosition();
@@ -238,11 +243,11 @@ public class User {
 					List<String> proofs;
 					int sleepTime;
 					while(true) {
-						sleepTime = (int)(Math.random()*15000 + 45000); //time to sleep between 45s-1min
+						sleepTime = (int)(Math.random()*15000 + 10000); //time to sleep between 10s-35s
 						System.out.println("**************************** waiting " + sleepTime + " to send proof my location**********************************");
 						Thread.sleep(sleepTime);
 						myCurrentEpoch = myCurrentEpoch%10 + 1;
-						myCurrentPoosition = TrackerLocationSystem.getMyPosInEpoc(myID, myCurrentEpoch).getPosition();
+						myCurrentPoosition = TrackerLocationSystem.getPosInEpoc(myID, myCurrentEpoch).getPosition();
 						List<ManagedChannel> closerChannel = getCloserUsers(myCurrentEpoch);
 						proofs = sndProofRequest( closerChannel, myID, myCurrentEpoch, myCurrentPoosition);
 						System.out.println("ID = "+ myID +" users near me at epoch= " +myCurrentEpoch +"  are : "+proofs);
