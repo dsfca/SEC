@@ -155,6 +155,38 @@ public final class serverServiceGrpc {
      return getObtainUsersAtLocationMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.DHKeyExcReq,
+      com.server.grpc.ServerService.DHKeyExcRep> getDHKeyExchangeMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "DHKeyExchange",
+      requestType = com.server.grpc.ServerService.DHKeyExcReq.class,
+      responseType = com.server.grpc.ServerService.DHKeyExcRep.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.server.grpc.ServerService.DHKeyExcReq,
+      com.server.grpc.ServerService.DHKeyExcRep> getDHKeyExchangeMethod() {
+    io.grpc.MethodDescriptor<com.server.grpc.ServerService.DHKeyExcReq, com.server.grpc.ServerService.DHKeyExcRep> getDHKeyExchangeMethod;
+    if ((getDHKeyExchangeMethod = serverServiceGrpc.getDHKeyExchangeMethod) == null) {
+      synchronized (serverServiceGrpc.class) {
+        if ((getDHKeyExchangeMethod = serverServiceGrpc.getDHKeyExchangeMethod) == null) {
+          serverServiceGrpc.getDHKeyExchangeMethod = getDHKeyExchangeMethod = 
+              io.grpc.MethodDescriptor.<com.server.grpc.ServerService.DHKeyExcReq, com.server.grpc.ServerService.DHKeyExcRep>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "serverService", "DHKeyExchange"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.DHKeyExcReq.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.DHKeyExcRep.getDefaultInstance()))
+                  .setSchemaDescriptor(new serverServiceMethodDescriptorSupplier("DHKeyExchange"))
+                  .build();
+          }
+        }
+     }
+     return getDHKeyExchangeMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -210,6 +242,13 @@ public final class serverServiceGrpc {
       asyncUnimplementedUnaryCall(getObtainUsersAtLocationMethod(), responseObserver);
     }
 
+    /**
+     */
+    public void dHKeyExchange(com.server.grpc.ServerService.DHKeyExcReq request,
+        io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep> responseObserver) {
+      asyncUnimplementedUnaryCall(getDHKeyExchangeMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -240,6 +279,13 @@ public final class serverServiceGrpc {
                 com.server.grpc.ServerService.obtUseLocReq,
                 com.server.grpc.ServerService.obtUseLocRep>(
                   this, METHODID_OBTAIN_USERS_AT_LOCATION)))
+          .addMethod(
+            getDHKeyExchangeMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                com.server.grpc.ServerService.DHKeyExcReq,
+                com.server.grpc.ServerService.DHKeyExcRep>(
+                  this, METHODID_DHKEY_EXCHANGE)))
           .build();
     }
   }
@@ -293,6 +339,14 @@ public final class serverServiceGrpc {
       asyncUnaryCall(
           getChannel().newCall(getObtainUsersAtLocationMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void dHKeyExchange(com.server.grpc.ServerService.DHKeyExcReq request,
+        io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getDHKeyExchangeMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -339,6 +393,13 @@ public final class serverServiceGrpc {
     public com.server.grpc.ServerService.obtUseLocRep obtainUsersAtLocation(com.server.grpc.ServerService.obtUseLocReq request) {
       return blockingUnaryCall(
           getChannel(), getObtainUsersAtLocationMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.server.grpc.ServerService.DHKeyExcRep dHKeyExchange(com.server.grpc.ServerService.DHKeyExcReq request) {
+      return blockingUnaryCall(
+          getChannel(), getDHKeyExchangeMethod(), getCallOptions(), request);
     }
   }
 
@@ -391,12 +452,21 @@ public final class serverServiceGrpc {
       return futureUnaryCall(
           getChannel().newCall(getObtainUsersAtLocationMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.server.grpc.ServerService.DHKeyExcRep> dHKeyExchange(
+        com.server.grpc.ServerService.DHKeyExcReq request) {
+      return futureUnaryCall(
+          getChannel().newCall(getDHKeyExchangeMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_SUBMIT_LOCATION_REPORT = 0;
   private static final int METHODID_OBTAIN_LOCATION_REPORT = 1;
   private static final int METHODID_OBTAIN_LOCATION_REPORT_HA = 2;
   private static final int METHODID_OBTAIN_USERS_AT_LOCATION = 3;
+  private static final int METHODID_DHKEY_EXCHANGE = 4;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -430,6 +500,10 @@ public final class serverServiceGrpc {
         case METHODID_OBTAIN_USERS_AT_LOCATION:
           serviceImpl.obtainUsersAtLocation((com.server.grpc.ServerService.obtUseLocReq) request,
               (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.obtUseLocRep>) responseObserver);
+          break;
+        case METHODID_DHKEY_EXCHANGE:
+          serviceImpl.dHKeyExchange((com.server.grpc.ServerService.DHKeyExcReq) request,
+              (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -496,6 +570,7 @@ public final class serverServiceGrpc {
               .addMethod(getObtainLocationReportMethod())
               .addMethod(getObtainLocationReportHAMethod())
               .addMethod(getObtainUsersAtLocationMethod())
+              .addMethod(getDHKeyExchangeMethod())
               .build();
         }
       }

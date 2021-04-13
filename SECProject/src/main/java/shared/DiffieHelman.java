@@ -17,6 +17,9 @@ import javax.crypto.KeyAgreement;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.google.protobuf.ByteString;
+import com.server.grpc.ServerService.BInteger;
+
 
 public class DiffieHelman {
 	private static final int AES_KEY_SIZE = 128;
@@ -96,6 +99,19 @@ public class DiffieHelman {
 		KeyFactory keyFacPub = KeyFactory.getInstance("DH");
         PublicKey pub = keyFacPub.generatePublic(pubSpec);
         return pub;
+	}
+	
+	public static BInteger write(BigInteger val) {
+		
+		   BInteger.Builder builder = BInteger.newBuilder();
+		    ByteString bytes = ByteString.copyFrom(val.toByteArray());
+		    builder.setValue(bytes);
+		    return builder.build();
+		  }
+
+	public static BigInteger read(BInteger message) {
+		 ByteString bytes = message.getValue();
+		 return new BigInteger(bytes.toByteArray());
 	}
 
 }

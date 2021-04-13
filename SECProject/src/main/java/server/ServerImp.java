@@ -1,6 +1,8 @@
 package server;
 
 import com.server.grpc.ServerService;
+import com.server.grpc.ServerService.DHKeyExcRep;
+import com.server.grpc.ServerService.DHKeyExcReq;
 import com.server.grpc.ServerService.Position;
 import com.server.grpc.ServerService.subLocRepReply;
 import com.server.grpc.ServerService.subLocRepReq;
@@ -11,15 +13,28 @@ import com.server.grpc.ServerService.obtUseLocRep;
 
 
 import com.server.grpc.serverServiceGrpc.serverServiceImplBase;
-import io.grpc.stub.StreamObserver;
 
+import crypto.RSAProvider;
+import io.grpc.stub.StreamObserver;
+import shared.DiffieHelman;
+import shared.TrackerLocationSystem;
+
+import java.math.BigInteger;
+import java.security.Key;
+import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ServerImp extends serverServiceImplBase {
 
-    /**************************************************************************************
+    private static final String PRIVATE_KEY_PATH = "resources/private_keys/server_private.key";
+    private Map<Integer, Key> sharedKeys = new HashMap<>();
+
+	/**************************************************************************************
      *                                  - submitLocationReport()
      *  RPC: server received location report from a user; handle it and send reply
      *  - input:
@@ -205,5 +220,60 @@ public class ServerImp extends serverServiceImplBase {
         // TODO get users at epoch; beware of byzantines
         return new ArrayList<>();
     }
-
+    
+    /**************************************************************************************
+     * 											- dHKeyExchange()
+     * -remote procedural call to exchange Diffie Helmann key between user and server 
+     *  - input:
+     *      - request: request of the user (contain public key(p^a mod g)
+     *       	signed with user private key and big integers p and g)
+     *      
+     *
+     * ************************************************************************************/
+    @Override
+    public void dHKeyExchange(DHKeyExcReq request, StreamObserver<DHKeyExcRep> responseObserver) {
+    	try {   		
+    		BigInteger p = DiffieHelman.read(request.getP());
+    		BigInteger g = DiffieHelman.read(request.getG());
+    		DiffieHelman df = new DiffieHelman(p, g);
+			PublicKey key = TrackerLocationSystem.getUserPublicKey(request.getUserID());
+			String userPbkDigSig = request.getDigSigPubKey();
+			String userPubKey = request.getMyDHPubKey();
+		 	Key secretKey = TrackerLocationSystem.createSecretKey(df, userPbkDigSig, userPubKey, key);
+		 	putOrUpdateSharedKeys(request.getUserID(), secretKey);
+		 	System.out.println("server agree key: " + new String(secretKey.getEncoded()));
+		 	PublicKey myPubkey = df.getPublicKey();
+		 	String pbkB64 = Base64.getEncoder().encodeToString(myPubkey.getEncoded());
+		 	String digSigMyDHpubkey = TrackerLocationSystem.getDHkeySigned(myPubkey, PRIVATE_KEY_PATH);
+		 	
+		 	DHKeyExcRep.Builder rep = DHKeyExcRep.newBuilder().setDigSigPubkey(digSigMyDHpubkey)
+		 			.setMyPubKey(pbkB64);
+		 	
+		 	responseObserver.onNext(rep.build());
+		 	responseObserver.onCompleted();
+		 	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+    }
+    
+    
+    /**************************************************************************************
+     * 											- putOrUpdateSharedKeys()
+     * -
+     *  - input:update the shared key between user id and server if both already
+     *  	 have a shared key otherwise it(server) adds them.
+     *      - id: 
+     *		
+     *		-key:
+     * ************************************************************************************/
+    public void putOrUpdateSharedKeys(int id , Key key) {
+    	if(sharedKeys.get(id) != null)
+    		sharedKeys.replace(id, key);
+    	else
+    		sharedKeys.put(id, key);
+    }
+    
 }
