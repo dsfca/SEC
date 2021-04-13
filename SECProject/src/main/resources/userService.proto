@@ -16,10 +16,8 @@ message LocProofReq{
 }
 
 message LocProofRep{
-	bool error = 1;
 	string proof = 2;
 	string proof_dig_sig = 3;
-	string messageError = 4;
 	int32 witnessID = 5;
 }
 

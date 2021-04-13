@@ -8,6 +8,8 @@ import com.user.grpc.UserService.LocProofReq;
 import com.user.grpc.userServiceGrpc.userServiceImplBase;
 
 import crypto.RSAProvider;
+import io.grpc.InternalStatus;
+import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import shared.Point2D;
@@ -40,6 +42,7 @@ public class UserServiceImp extends userServiceImplBase  {
 	@Override
 	public void requestLocationProof(LocProofReq request, StreamObserver<LocProofRep> responseObserver) {
 		try {
+
 			int proverID =  request.getProverID();
 			int epoch = request.getEpoch();
 			Point2D proverPt = new Point2D(request.getLoc().getX(), request.getLoc().getY());
@@ -65,11 +68,7 @@ public class UserServiceImp extends userServiceImplBase  {
 
 		} catch (Exception e) {
 			//something went wrong
-			LocProofRep.Builder response = LocProofRep.newBuilder();
-			response.setError(true);
-			response.setMessageError(e.getMessage());
-			responseObserver.onNext(response.build());
-			responseObserver.onCompleted();
+			responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
 		}
 		
 	}
@@ -91,7 +90,6 @@ public class UserServiceImp extends userServiceImplBase  {
 		String proof = getProof(proverID, proverPos, epoch);
 		PrivateKey key = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
 		String proof_dig_sig = RSAProvider.getTexthashEnWithPriKey(proof, key);
-		response.setError(false);
 		response.setProof(proof);
 		response.setProofDigSig(proof_dig_sig);
 		response.setWitnessID(ID);
@@ -115,7 +113,7 @@ public class UserServiceImp extends userServiceImplBase  {
 	 * ************************************************************************************/
 	private String getProof(int proverID, Point2D prov_pos, int epoch) {
 		// get witness point in the epoch (epoch)
-		UserLocation me =TrackerLocationSystem.getPosInEpoc(ID, epoch);
+		UserLocation me = TrackerLocationSystem.getPosInEpoc(ID, epoch);
 		Point2D myPointInEpoch = me.getPosition();
 		//compute the distance between prover and witness
 		double dist = prov_pos.distance(myPointInEpoch);

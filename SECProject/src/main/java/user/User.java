@@ -112,16 +112,13 @@ public class User {
 		
 			@Override
 			public void onNext(LocProofRep reply) {
-				if(reply.getError())
-					System.err.println(reply.getMessageError());
-				else 
-					proofs.add(reply.getProof());
+				proofs.add(reply.getProof());
 			}
 
 			@Override
 			public void onError(Throwable t) {
 				Status status = Status.fromThrowable(t);
-				System.out.println("[" + ID + "] Error: " + status);
+				System.out.println("[user" + ID + "] Error: " + status);
 				finishLatch.countDown();
 			}
 
