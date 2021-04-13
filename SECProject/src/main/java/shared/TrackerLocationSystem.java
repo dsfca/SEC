@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.security.Key;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import server.Server;
 
@@ -180,6 +183,25 @@ public class TrackerLocationSystem {
 		return null;
 	}
 	
+	public static String getDHkeySigned(PublicKey dfPubKey, String privateKeyPath ) throws Exception {
+		byte[] myDHpbkbytes = dfPubKey.getEncoded();
+		String pbkB64 = Base64.getEncoder().encodeToString(myDHpbkbytes);
+		PrivateKey privkey = RSAProvider.readPrivKey(privateKeyPath);
+		String digSigMyDHpubkey = RSAProvider.getTexthashEnWithPriKey(pbkB64, privkey);
+		return digSigMyDHpubkey;
+	}
+	
+	public static Key createSecretKey(DiffieHelman df, String DHpubkeyDigSig, String DHpubKey, PublicKey key) throws Exception {
+		boolean isServDHPbkDigSigValid = RSAProvider.istextAuthentic(DHpubKey, DHpubkeyDigSig, key);
+		if(isServDHPbkDigSigValid) {
+			byte[] serverPbkContent = Base64.getDecoder().decode(DHpubKey);
+			PublicKey serverDHPubKey = DiffieHelman.generatePublicKey(serverPbkContent);
+			return df.agreeSecretKey(serverDHPubKey, true);
+		}
+		else 
+			throw new IllegalArgumentException("digital signature of the server key is not valid");
+	}
+	
 	
 	/**************************************************************************************
 	 * 										-main()
@@ -195,12 +217,14 @@ public class TrackerLocationSystem {
 	 *  
 	 * ************************************************************************************/
 	public static void main(String args[]) {
-		int num_users, G_width, G_height, server_port;
+		int num_users, G_width, G_height;
 		try {
 			num_users = Integer.parseInt(args[0]);
 			G_width = Integer.parseInt(args[1]);
 			G_height = Integer.parseInt(args[2]);
-		    server_port = Integer.parseInt(args[3]);
+			serverPort = Integer.parseInt(args[3]);
+			
+			start_server(serverPort);
 		    
 		    ini_pos_file(num_users, 10, G_width, G_height);
 			start_users(num_users, G_width, G_height);

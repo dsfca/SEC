@@ -9,6 +9,8 @@ service serverService{
 
 	rpc obtainLocationReportHA(obtLocRepReq) returns (obtLocRepReply);
 	rpc obtainUsersAtLocation(obtUseLocReq) returns (obtUseLocRep); 
+	
+	rpc DHKeyExchange(DHKeyExcReq) returns (DHKeyExcRep);
 }
 
 message subLocRepReq{
@@ -50,3 +52,23 @@ message Position{
 	int32 X = 1;
 	int32 Y = 2;
 }
+
+
+message DHKeyExcReq{
+	int32 userID = 1;
+	BInteger p = 2;
+	BInteger g = 3;
+	string MyDHPubKey = 4;
+	string digSigPubKey = 5;
+}
+
+message DHKeyExcRep{
+	string myPubKey = 1;
+	string digSigPubkey = 2;
+}
+
+message BInteger {
+   bytes value = 1;
+}
+
+

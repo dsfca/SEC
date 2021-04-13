@@ -1,8 +1,11 @@
 package user;
 
 import java.io.IOException;
+import java.security.Key;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +17,9 @@ import com.user.grpc.userServiceGrpc.userServiceStub;
 import com.server.grpc.serverServiceGrpc;
 import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
 import com.server.grpc.ServerService.subLocRepReq;
+import com.server.grpc.ServerService.BInteger;
+import com.server.grpc.ServerService.DHKeyExcRep;
+import com.server.grpc.ServerService.DHKeyExcReq;
 import com.server.grpc.ServerService.subLocRepReply;
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
@@ -22,6 +28,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import shared.DiffieHelman;
 import shared.Point2D;
 import shared.TrackerLocationSystem;
 
@@ -190,6 +197,35 @@ public class User {
 	}
 	
 	
+	
+	
+	public Key  DHkeyExchange() throws Exception {
+		DiffieHelman df = new DiffieHelman();
+		PublicKey dfPubKey = df.getPublicKey();
+		String pbkB64 = Base64.getEncoder().encodeToString(dfPubKey.getEncoded());
+		String digSigMyDHpubkey = TrackerLocationSystem.getDHkeySigned(dfPubKey, PRIVATE_KEY_PATH);	
+		System.out.println("user"+ myID + " DH publik key = " + digSigMyDHpubkey);
+		System.out.println("user"+ myID + " publik key = " + pbkB64);
+		BInteger p =DiffieHelman.write(df.getP());
+		BInteger g =DiffieHelman.write(df.getG());
+		
+		DHKeyExcReq req = DHKeyExcReq.newBuilder().setP(p).setG(g).setMyDHPubKey(pbkB64)
+				.setDigSigPubKey(digSigMyDHpubkey).setUserID(myID).build();
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", TrackerLocationSystem.getServerPort()).usePlaintext().build();
+		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
+		
+		DHKeyExcRep rep = serverStub.dHKeyExchange(req);
+		String servPubKeyPath = "resources/public_keys/server_public.key";
+		PublicKey key = RSAProvider.readPubKey(servPubKeyPath);
+		String servPbkDigSig = rep.getDigSigPubkey();
+		String servPubKey = rep.getMyPubKey();
+		channel.shutdown();
+		return TrackerLocationSystem.createSecretKey(df, servPbkDigSig, servPubKey, key);	
+	}
+	
+	
+	
+	
 	/**************************************************************************************
 	 * 											-getCloserUsers()
 	 * - returns the channel of the user that are closer to him in a given epoch 
@@ -238,6 +274,7 @@ public class User {
 				try {
 					List<String> proofs;
 					int sleepTime;
+					Key userNServerSharedKey;
 					while(true) {
 						sleepTime = (int)(Math.random()*15000 + 45000); //time to sleep between 45s-1min
 						System.out.println("**************************** waiting " + sleepTime + " to send proof my location**********************************");
@@ -247,7 +284,11 @@ public class User {
 						List<ManagedChannel> closerChannel = getCloserUsers(myCurrentEpoch);
 						proofs = sndProofRequest( closerChannel, myID, myCurrentEpoch, myCurrentPoosition);
 						System.out.println("ID = "+ myID +" users near me at epoch= " +myCurrentEpoch +"  are : "+proofs);
-						submitLocationReport(proofs, myID, myCurrentEpoch, myCurrentPoosition);
+						if(myCurrentEpoch % 2 == 0) {
+							userNServerSharedKey = DHkeyExchange();
+							System.out.println("user agree key :" + new String(userNServerSharedKey.getEncoded()));
+						}
+					//	submitLocationReport(proofs, myID, myCurrentEpoch, myCurrentPoosition);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
