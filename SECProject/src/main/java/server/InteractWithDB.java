@@ -8,6 +8,8 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.server.grpc.ServerService.Position;
 
+import shared.Point2D;
+
 import org.bson.Document;
 import org.ini4j.Ini;
 
@@ -25,7 +27,8 @@ public class InteractWithDB {
 	static Ini ini;
 	static MongoDatabase mongo_db;
 	static MongoClient mongo_client;
-	static MongoCollection<Document> mongo_collection;
+	static MongoCollection<Document> mongo_collection_all;
+	static MongoCollection<Document> mongo_collection_validated;
 	
 
 	
@@ -42,14 +45,21 @@ public class InteractWithDB {
 		return ini.get("Mongo","mongo_database", String.class);
 	}
 	
-	public String getCollection() {
-		return ini.get("Mongo","mongo_collection", String.class);
+	public String getAllCollection() {
+		return ini.get("Mongo","mongo_collection_all", String.class);
 	}
+	
+	public String getValidatedCollection() {
+		return ini.get("Mongo","mongo_collection_validated", String.class);
+	}
+	
+	
 	
 	public void connectToMongo() {
 		mongo_client = new MongoClient(new MongoClientURI(getHost()));
 		mongo_db = mongo_client.getDatabase(getDatabase());
-		mongo_collection = mongo_db.getCollection(getCollection());
+		mongo_collection_all = mongo_db.getCollection(getAllCollection());
+		mongo_collection_validated = mongo_db.getCollection(getValidatedCollection());
 		//System.out.println(mongo_db.getName());
 	}
 
@@ -58,8 +68,8 @@ public class InteractWithDB {
 	 * @param username
 	 * @return
 	 */
-	public boolean existsUsername(String username) {
-		MongoCursor<Document> cursor = mongo_collection.find().iterator();
+	/*public boolean existsUsername(String username) {
+		MongoCursor<Document> cursor = mongo_collection_validated.find().iterator();
 
 		while (cursor.hasNext()) {
 			if(cursor.next().get("username").equals(username)) {
@@ -67,47 +77,57 @@ public class InteractWithDB {
 			}
 		}
 		return false;
-	}
+	}*/
 	
-	
-	public void addReportToDatabase(String user, int epoch, int x, int y) {
-		 Document document = new Document();
-		 document.append("user", user);
-		 document.append("epoch",epoch);
-		 String position = x + ", " + y;
-		 document.append("position", position);
-		 mongo_collection.insertOne(document);
+	//ADDS A REPORT TO COLLECTION "ALL_LOCATIONS"
+	public void addReportToDatabase(int user1, int user2, Point2D pos1, Point2D pos2, int epoch, boolean near) {
+		Document document = new Document();
+		document.append("user1", user1);
+		document.append("user2", user2);
+		document.append("pos1", pos1);
+		document.append("pos2", pos2);
+		document.append("epoch", epoch);
+		document.append("near", near);
+		mongo_collection_all.insertOne(document);
 	}
 	
 	/**
-	 * Get location documents given a specific epoch
+	 * Get location document given a specific epoch
 	 * @param epoch
 	 * @return
 	 */
-	public ArrayList<String> getLocationsGivenEpoch(int epoch) {
-		MongoCursor<Document> cursor = mongo_collection.find().iterator();
-		ArrayList <String> locations = new ArrayList <String> ();
+	public Point2D getLocationsGivenEpoch(int user, int epoch) {
+		MongoCursor<Document> cursor = mongo_collection_validated.find().iterator();
+		Point2D location = null;
 		
 		while (cursor.hasNext()) {
 			Document current  = cursor.next();
-			if(current.get("epoch").equals(epoch)) {
+			if(current.get("epoch").equals(epoch) && current.get("user").equals(user)) {
 				System.out.println(current.toString());
-				locations.add(current.toString());
+				String location_string = current.get("location").toString();
+				location = new Point2D(Integer.valueOf(location_string.substring(1, 2)), Integer.valueOf(location_string.substring(3, 4)));
 			}
 		}
-		return locations;
+		return location;
 	}
 	
-	public void cleanDatabase() {
-		mongo_collection.drop();
+	//ERASES COLLECTION "VALIDATED" CONTENT
+	public void cleanValidatedCollection() {
+		mongo_collection_validated.drop();
 	}
+	
+	//ERASES COLLECTION "ALL_LOCATIONS" CONTENT
+		public void cleanAllLocationsCollection() {
+			mongo_collection_all.drop();
+		}
 	
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		InteractWithDB it = new InteractWithDB("conn_mongo.ini");
-		it.cleanDatabase();
-		it.addReportToDatabase("user1", 0, 0, 0);
-		ArrayList <String> locations = it.getLocationsGivenEpoch(0);
+		InteractWithDB it = new InteractWithDB("variables.ini");
+		it.cleanValidatedCollection();
+		it.cleanAllLocationsCollection();
+		//it.addReportToDatabase("user1", 0, 0, 0);
+		//ArrayList <String> locations = it.getLocationsGivenEpoch(0);
 	}
 
 }
