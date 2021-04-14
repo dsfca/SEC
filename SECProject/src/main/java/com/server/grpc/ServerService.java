@@ -29,14 +29,29 @@ public final class ServerService {
     int getEpoch();
 
     /**
-     * <code>string report = 3;</code>
+     * <code>string secureReport = 3;</code>
      */
-    java.lang.String getReport();
+    java.lang.String getSecureReport();
     /**
-     * <code>string report = 3;</code>
+     * <code>string secureReport = 3;</code>
      */
     com.google.protobuf.ByteString
-        getReportBytes();
+        getSecureReportBytes();
+
+    /**
+     * <code>string ReportDigitalSignature = 4;</code>
+     */
+    java.lang.String getReportDigitalSignature();
+    /**
+     * <code>string ReportDigitalSignature = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getReportDigitalSignatureBytes();
+
+    /**
+     * <code>int32 Nonce = 5;</code>
+     */
+    int getNonce();
   }
   /**
    * Protobuf type {@code subLocRepReq}
@@ -53,7 +68,9 @@ public final class ServerService {
     private subLocRepReq() {
       userID_ = 0;
       epoch_ = 0;
-      report_ = "";
+      secureReport_ = "";
+      reportDigitalSignature_ = "";
+      nonce_ = 0;
     }
 
     @java.lang.Override
@@ -93,7 +110,18 @@ public final class ServerService {
             case 26: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              report_ = s;
+              secureReport_ = s;
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              reportDigitalSignature_ = s;
+              break;
+            }
+            case 40: {
+
+              nonce_ = input.readInt32();
               break;
             }
             default: {
@@ -146,38 +174,81 @@ public final class ServerService {
       return epoch_;
     }
 
-    public static final int REPORT_FIELD_NUMBER = 3;
-    private volatile java.lang.Object report_;
+    public static final int SECUREREPORT_FIELD_NUMBER = 3;
+    private volatile java.lang.Object secureReport_;
     /**
-     * <code>string report = 3;</code>
+     * <code>string secureReport = 3;</code>
      */
-    public java.lang.String getReport() {
-      java.lang.Object ref = report_;
+    public java.lang.String getSecureReport() {
+      java.lang.Object ref = secureReport_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        report_ = s;
+        secureReport_ = s;
         return s;
       }
     }
     /**
-     * <code>string report = 3;</code>
+     * <code>string secureReport = 3;</code>
      */
     public com.google.protobuf.ByteString
-        getReportBytes() {
-      java.lang.Object ref = report_;
+        getSecureReportBytes() {
+      java.lang.Object ref = secureReport_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        report_ = b;
+        secureReport_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int REPORTDIGITALSIGNATURE_FIELD_NUMBER = 4;
+    private volatile java.lang.Object reportDigitalSignature_;
+    /**
+     * <code>string ReportDigitalSignature = 4;</code>
+     */
+    public java.lang.String getReportDigitalSignature() {
+      java.lang.Object ref = reportDigitalSignature_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        reportDigitalSignature_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string ReportDigitalSignature = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getReportDigitalSignatureBytes() {
+      java.lang.Object ref = reportDigitalSignature_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        reportDigitalSignature_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int NONCE_FIELD_NUMBER = 5;
+    private int nonce_;
+    /**
+     * <code>int32 Nonce = 5;</code>
+     */
+    public int getNonce() {
+      return nonce_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -200,8 +271,14 @@ public final class ServerService {
       if (epoch_ != 0) {
         output.writeInt32(2, epoch_);
       }
-      if (!getReportBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, report_);
+      if (!getSecureReportBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, secureReport_);
+      }
+      if (!getReportDigitalSignatureBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, reportDigitalSignature_);
+      }
+      if (nonce_ != 0) {
+        output.writeInt32(5, nonce_);
       }
       unknownFields.writeTo(output);
     }
@@ -220,8 +297,15 @@ public final class ServerService {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(2, epoch_);
       }
-      if (!getReportBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, report_);
+      if (!getSecureReportBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, secureReport_);
+      }
+      if (!getReportDigitalSignatureBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, reportDigitalSignature_);
+      }
+      if (nonce_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(5, nonce_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -243,8 +327,12 @@ public final class ServerService {
           == other.getUserID());
       result = result && (getEpoch()
           == other.getEpoch());
-      result = result && getReport()
-          .equals(other.getReport());
+      result = result && getSecureReport()
+          .equals(other.getSecureReport());
+      result = result && getReportDigitalSignature()
+          .equals(other.getReportDigitalSignature());
+      result = result && (getNonce()
+          == other.getNonce());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -260,8 +348,12 @@ public final class ServerService {
       hash = (53 * hash) + getUserID();
       hash = (37 * hash) + EPOCH_FIELD_NUMBER;
       hash = (53 * hash) + getEpoch();
-      hash = (37 * hash) + REPORT_FIELD_NUMBER;
-      hash = (53 * hash) + getReport().hashCode();
+      hash = (37 * hash) + SECUREREPORT_FIELD_NUMBER;
+      hash = (53 * hash) + getSecureReport().hashCode();
+      hash = (37 * hash) + REPORTDIGITALSIGNATURE_FIELD_NUMBER;
+      hash = (53 * hash) + getReportDigitalSignature().hashCode();
+      hash = (37 * hash) + NONCE_FIELD_NUMBER;
+      hash = (53 * hash) + getNonce();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -399,7 +491,11 @@ public final class ServerService {
 
         epoch_ = 0;
 
-        report_ = "";
+        secureReport_ = "";
+
+        reportDigitalSignature_ = "";
+
+        nonce_ = 0;
 
         return this;
       }
@@ -429,7 +525,9 @@ public final class ServerService {
         com.server.grpc.ServerService.subLocRepReq result = new com.server.grpc.ServerService.subLocRepReq(this);
         result.userID_ = userID_;
         result.epoch_ = epoch_;
-        result.report_ = report_;
+        result.secureReport_ = secureReport_;
+        result.reportDigitalSignature_ = reportDigitalSignature_;
+        result.nonce_ = nonce_;
         onBuilt();
         return result;
       }
@@ -484,9 +582,16 @@ public final class ServerService {
         if (other.getEpoch() != 0) {
           setEpoch(other.getEpoch());
         }
-        if (!other.getReport().isEmpty()) {
-          report_ = other.report_;
+        if (!other.getSecureReport().isEmpty()) {
+          secureReport_ = other.secureReport_;
           onChanged();
+        }
+        if (!other.getReportDigitalSignature().isEmpty()) {
+          reportDigitalSignature_ = other.reportDigitalSignature_;
+          onChanged();
+        }
+        if (other.getNonce() != 0) {
+          setNonce(other.getNonce());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -569,71 +674,166 @@ public final class ServerService {
         return this;
       }
 
-      private java.lang.Object report_ = "";
+      private java.lang.Object secureReport_ = "";
       /**
-       * <code>string report = 3;</code>
+       * <code>string secureReport = 3;</code>
        */
-      public java.lang.String getReport() {
-        java.lang.Object ref = report_;
+      public java.lang.String getSecureReport() {
+        java.lang.Object ref = secureReport_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          report_ = s;
+          secureReport_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string report = 3;</code>
+       * <code>string secureReport = 3;</code>
        */
       public com.google.protobuf.ByteString
-          getReportBytes() {
-        java.lang.Object ref = report_;
+          getSecureReportBytes() {
+        java.lang.Object ref = secureReport_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          report_ = b;
+          secureReport_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string report = 3;</code>
+       * <code>string secureReport = 3;</code>
        */
-      public Builder setReport(
+      public Builder setSecureReport(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        report_ = value;
+        secureReport_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string report = 3;</code>
+       * <code>string secureReport = 3;</code>
        */
-      public Builder clearReport() {
+      public Builder clearSecureReport() {
         
-        report_ = getDefaultInstance().getReport();
+        secureReport_ = getDefaultInstance().getSecureReport();
         onChanged();
         return this;
       }
       /**
-       * <code>string report = 3;</code>
+       * <code>string secureReport = 3;</code>
        */
-      public Builder setReportBytes(
+      public Builder setSecureReportBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        report_ = value;
+        secureReport_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object reportDigitalSignature_ = "";
+      /**
+       * <code>string ReportDigitalSignature = 4;</code>
+       */
+      public java.lang.String getReportDigitalSignature() {
+        java.lang.Object ref = reportDigitalSignature_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          reportDigitalSignature_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string ReportDigitalSignature = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getReportDigitalSignatureBytes() {
+        java.lang.Object ref = reportDigitalSignature_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          reportDigitalSignature_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string ReportDigitalSignature = 4;</code>
+       */
+      public Builder setReportDigitalSignature(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        reportDigitalSignature_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string ReportDigitalSignature = 4;</code>
+       */
+      public Builder clearReportDigitalSignature() {
+        
+        reportDigitalSignature_ = getDefaultInstance().getReportDigitalSignature();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string ReportDigitalSignature = 4;</code>
+       */
+      public Builder setReportDigitalSignatureBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        reportDigitalSignature_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int nonce_ ;
+      /**
+       * <code>int32 Nonce = 5;</code>
+       */
+      public int getNonce() {
+        return nonce_;
+      }
+      /**
+       * <code>int32 Nonce = 5;</code>
+       */
+      public Builder setNonce(int value) {
+        
+        nonce_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 Nonce = 5;</code>
+       */
+      public Builder clearNonce() {
+        
+        nonce_ = 0;
         onChanged();
         return this;
       }
@@ -6754,29 +6954,30 @@ public final class ServerService {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023serverService.proto\"=\n\014subLocRepReq\022\016\n" +
-      "\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\022\016\n\006report\030\003" +
-      " \001(\t\"9\n\016subLocRepReply\022\024\n\014replymessage\030\001" +
-      " \001(\t\022\021\n\treplycode\030\002 \001(\005\"-\n\014obtLocRepReq\022" +
-      "\016\n\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\"8\n\016obtLoc" +
-      "RepReply\022\016\n\006userID\030\001 \001(\005\022\026\n\003pos\030\002 \001(\0132\t." +
-      "Position\"5\n\014obtUseLocReq\022\026\n\003pos\030\001 \001(\0132\t." +
-      "Position\022\r\n\005epoch\030\002 \001(\005\"/\n\014obtUseLocRep\022" +
-      "\r\n\005epoch\030\001 \001(\005\022\020\n\010userList\030\002 \003(\t\" \n\010Posi" +
-      "tion\022\t\n\001X\030\001 \001(\005\022\t\n\001Y\030\002 \001(\005\"s\n\013DHKeyExcRe" +
-      "q\022\016\n\006userID\030\001 \001(\005\022\024\n\001p\030\002 \001(\0132\t.BInteger\022" +
-      "\024\n\001g\030\003 \001(\0132\t.BInteger\022\022\n\nMyDHPubKey\030\004 \001(" +
-      "\t\022\024\n\014digSigPubKey\030\005 \001(\t\"5\n\013DHKeyExcRep\022\020" +
-      "\n\010myPubKey\030\001 \001(\t\022\024\n\014digSigPubkey\030\002 \001(\t\"\031" +
-      "\n\010BInteger\022\r\n\005value\030\001 \001(\0142\235\002\n\rserverServ" +
-      "ice\0226\n\024submitLocationReport\022\r.subLocRepR" +
-      "eq\032\017.subLocRepReply\0226\n\024obtainLocationRep" +
-      "ort\022\r.obtLocRepReq\032\017.obtLocRepReply\0228\n\026o" +
-      "btainLocationReportHA\022\r.obtLocRepReq\032\017.o" +
-      "btLocRepReply\0225\n\025obtainUsersAtLocation\022\r" +
-      ".obtUseLocReq\032\r.obtUseLocRep\022+\n\rDHKeyExc" +
-      "hange\022\014.DHKeyExcReq\032\014.DHKeyExcRepB\021\n\017com" +
-      ".server.grpcb\006proto3"
+      "\n\023serverService.proto\"r\n\014subLocRepReq\022\016\n" +
+      "\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\022\024\n\014secureRe" +
+      "port\030\003 \001(\t\022\036\n\026ReportDigitalSignature\030\004 \001" +
+      "(\t\022\r\n\005Nonce\030\005 \001(\005\"9\n\016subLocRepReply\022\024\n\014r" +
+      "eplymessage\030\001 \001(\t\022\021\n\treplycode\030\002 \001(\005\"-\n\014" +
+      "obtLocRepReq\022\016\n\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 " +
+      "\001(\005\"8\n\016obtLocRepReply\022\016\n\006userID\030\001 \001(\005\022\026\n" +
+      "\003pos\030\002 \001(\0132\t.Position\"5\n\014obtUseLocReq\022\026\n" +
+      "\003pos\030\001 \001(\0132\t.Position\022\r\n\005epoch\030\002 \001(\005\"/\n\014" +
+      "obtUseLocRep\022\r\n\005epoch\030\001 \001(\005\022\020\n\010userList\030" +
+      "\002 \003(\t\" \n\010Position\022\t\n\001X\030\001 \001(\005\022\t\n\001Y\030\002 \001(\005\"" +
+      "s\n\013DHKeyExcReq\022\016\n\006userID\030\001 \001(\005\022\024\n\001p\030\002 \001(" +
+      "\0132\t.BInteger\022\024\n\001g\030\003 \001(\0132\t.BInteger\022\022\n\nMy" +
+      "DHPubKey\030\004 \001(\t\022\024\n\014digSigPubKey\030\005 \001(\t\"5\n\013" +
+      "DHKeyExcRep\022\020\n\010myPubKey\030\001 \001(\t\022\024\n\014digSigP" +
+      "ubkey\030\002 \001(\t\"\031\n\010BInteger\022\r\n\005value\030\001 \001(\0142\235" +
+      "\002\n\rserverService\0226\n\024submitLocationReport" +
+      "\022\r.subLocRepReq\032\017.subLocRepReply\0226\n\024obta" +
+      "inLocationReport\022\r.obtLocRepReq\032\017.obtLoc" +
+      "RepReply\0228\n\026obtainLocationReportHA\022\r.obt" +
+      "LocRepReq\032\017.obtLocRepReply\0225\n\025obtainUser" +
+      "sAtLocation\022\r.obtUseLocReq\032\r.obtUseLocRe" +
+      "p\022+\n\rDHKeyExchange\022\014.DHKeyExcReq\032\014.DHKey" +
+      "ExcRepB\021\n\017com.server.grpcb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6795,7 +6996,7 @@ public final class ServerService {
     internal_static_subLocRepReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_subLocRepReq_descriptor,
-        new java.lang.String[] { "UserID", "Epoch", "Report", });
+        new java.lang.String[] { "UserID", "Epoch", "SecureReport", "ReportDigitalSignature", "Nonce", });
     internal_static_subLocRepReply_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_subLocRepReply_fieldAccessorTable = new

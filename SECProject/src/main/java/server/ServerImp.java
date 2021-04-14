@@ -14,6 +14,7 @@ import com.server.grpc.ServerService.obtUseLocRep;
 
 import com.server.grpc.serverServiceGrpc.serverServiceImplBase;
 
+import crypto.AESProvider;
 import crypto.RSAProvider;
 import io.grpc.stub.StreamObserver;
 import shared.DiffieHelman;
@@ -27,6 +28,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.crypto.Cipher;
 
 
 public class ServerImp extends serverServiceImplBase {
@@ -44,13 +47,25 @@ public class ServerImp extends serverServiceImplBase {
      * ************************************************************************************/
     @Override
     public void submitLocationReport(subLocRepReq request, StreamObserver<subLocRepReply> responseObserver) {
-        System.out.println("[Server] Report submit request from " + request.getUserID() +
-                " at epoch " + request.getEpoch());
-
-        ServerService.subLocRepReply.Builder response = submitReportHandler(request);
-
-        responseObserver.onNext(response.build());
-        responseObserver.onCompleted();
+    	try {
+	        System.out.println("[Server] Report submit request from " + request.getUserID() +
+	                " at epoch " + request.getEpoch());
+	        Key sharedKey = sharedKeys.get(request.getUserID());  
+	        PublicKey userPubkey = TrackerLocationSystem.getUserPublicKey(request.getUserID());
+	        
+	        String secureReport = request.getSecureReport();
+	        String reportDigSig = request.getReportDigitalSignature();
+	        
+	        String reportPlaintext = AESProvider.AESCypherDecypher(sharedKey, secureReport, Cipher.DECRYPT_MODE);
+	        boolean reportIsAuth = RSAProvider.istextAuthentic(reportPlaintext, reportDigSig, userPubkey);
+	        if(reportIsAuth) {
+		        ServerService.subLocRepReply.Builder response = submitReportHandler(request);
+		        responseObserver.onNext(response.build());
+		        responseObserver.onCompleted();
+	        }
+    	}catch (Exception e) {
+			
+		}
 
     }
 

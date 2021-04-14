@@ -889,11 +889,6 @@ public final class UserService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>bool error = 1;</code>
-     */
-    boolean getError();
-
-    /**
      * <code>string proof = 2;</code>
      */
     java.lang.String getProof();
@@ -914,16 +909,6 @@ public final class UserService {
         getProofDigSigBytes();
 
     /**
-     * <code>string messageError = 4;</code>
-     */
-    java.lang.String getMessageError();
-    /**
-     * <code>string messageError = 4;</code>
-     */
-    com.google.protobuf.ByteString
-        getMessageErrorBytes();
-
-    /**
      * <code>int32 witnessID = 5;</code>
      */
     int getWitnessID();
@@ -941,10 +926,8 @@ public final class UserService {
       super(builder);
     }
     private LocProofRep() {
-      error_ = false;
       proof_ = "";
       proofDigSig_ = "";
-      messageError_ = "";
       witnessID_ = 0;
     }
 
@@ -972,11 +955,6 @@ public final class UserService {
             case 0:
               done = true;
               break;
-            case 8: {
-
-              error_ = input.readBool();
-              break;
-            }
             case 18: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -987,12 +965,6 @@ public final class UserService {
               java.lang.String s = input.readStringRequireUtf8();
 
               proofDigSig_ = s;
-              break;
-            }
-            case 34: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              messageError_ = s;
               break;
             }
             case 40: {
@@ -1030,15 +1002,6 @@ public final class UserService {
       return com.user.grpc.UserService.internal_static_LocProofRep_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.user.grpc.UserService.LocProofRep.class, com.user.grpc.UserService.LocProofRep.Builder.class);
-    }
-
-    public static final int ERROR_FIELD_NUMBER = 1;
-    private boolean error_;
-    /**
-     * <code>bool error = 1;</code>
-     */
-    public boolean getError() {
-      return error_;
     }
 
     public static final int PROOF_FIELD_NUMBER = 2;
@@ -1109,40 +1072,6 @@ public final class UserService {
       }
     }
 
-    public static final int MESSAGEERROR_FIELD_NUMBER = 4;
-    private volatile java.lang.Object messageError_;
-    /**
-     * <code>string messageError = 4;</code>
-     */
-    public java.lang.String getMessageError() {
-      java.lang.Object ref = messageError_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        messageError_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string messageError = 4;</code>
-     */
-    public com.google.protobuf.ByteString
-        getMessageErrorBytes() {
-      java.lang.Object ref = messageError_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        messageError_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
     public static final int WITNESSID_FIELD_NUMBER = 5;
     private int witnessID_;
     /**
@@ -1166,17 +1095,11 @@ public final class UserService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (error_ != false) {
-        output.writeBool(1, error_);
-      }
       if (!getProofBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, proof_);
       }
       if (!getProofDigSigBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, proofDigSig_);
-      }
-      if (!getMessageErrorBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, messageError_);
       }
       if (witnessID_ != 0) {
         output.writeInt32(5, witnessID_);
@@ -1190,18 +1113,11 @@ public final class UserService {
       if (size != -1) return size;
 
       size = 0;
-      if (error_ != false) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(1, error_);
-      }
       if (!getProofBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, proof_);
       }
       if (!getProofDigSigBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, proofDigSig_);
-      }
-      if (!getMessageErrorBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, messageError_);
       }
       if (witnessID_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -1223,14 +1139,10 @@ public final class UserService {
       com.user.grpc.UserService.LocProofRep other = (com.user.grpc.UserService.LocProofRep) obj;
 
       boolean result = true;
-      result = result && (getError()
-          == other.getError());
       result = result && getProof()
           .equals(other.getProof());
       result = result && getProofDigSig()
           .equals(other.getProofDigSig());
-      result = result && getMessageError()
-          .equals(other.getMessageError());
       result = result && (getWitnessID()
           == other.getWitnessID());
       result = result && unknownFields.equals(other.unknownFields);
@@ -1244,15 +1156,10 @@ public final class UserService {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + ERROR_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getError());
       hash = (37 * hash) + PROOF_FIELD_NUMBER;
       hash = (53 * hash) + getProof().hashCode();
       hash = (37 * hash) + PROOF_DIG_SIG_FIELD_NUMBER;
       hash = (53 * hash) + getProofDigSig().hashCode();
-      hash = (37 * hash) + MESSAGEERROR_FIELD_NUMBER;
-      hash = (53 * hash) + getMessageError().hashCode();
       hash = (37 * hash) + WITNESSID_FIELD_NUMBER;
       hash = (53 * hash) + getWitnessID();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -1388,13 +1295,9 @@ public final class UserService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        error_ = false;
-
         proof_ = "";
 
         proofDigSig_ = "";
-
-        messageError_ = "";
 
         witnessID_ = 0;
 
@@ -1424,10 +1327,8 @@ public final class UserService {
       @java.lang.Override
       public com.user.grpc.UserService.LocProofRep buildPartial() {
         com.user.grpc.UserService.LocProofRep result = new com.user.grpc.UserService.LocProofRep(this);
-        result.error_ = error_;
         result.proof_ = proof_;
         result.proofDigSig_ = proofDigSig_;
-        result.messageError_ = messageError_;
         result.witnessID_ = witnessID_;
         onBuilt();
         return result;
@@ -1477,19 +1378,12 @@ public final class UserService {
 
       public Builder mergeFrom(com.user.grpc.UserService.LocProofRep other) {
         if (other == com.user.grpc.UserService.LocProofRep.getDefaultInstance()) return this;
-        if (other.getError() != false) {
-          setError(other.getError());
-        }
         if (!other.getProof().isEmpty()) {
           proof_ = other.proof_;
           onChanged();
         }
         if (!other.getProofDigSig().isEmpty()) {
           proofDigSig_ = other.proofDigSig_;
-          onChanged();
-        }
-        if (!other.getMessageError().isEmpty()) {
-          messageError_ = other.messageError_;
           onChanged();
         }
         if (other.getWitnessID() != 0) {
@@ -1521,32 +1415,6 @@ public final class UserService {
             mergeFrom(parsedMessage);
           }
         }
-        return this;
-      }
-
-      private boolean error_ ;
-      /**
-       * <code>bool error = 1;</code>
-       */
-      public boolean getError() {
-        return error_;
-      }
-      /**
-       * <code>bool error = 1;</code>
-       */
-      public Builder setError(boolean value) {
-        
-        error_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>bool error = 1;</code>
-       */
-      public Builder clearError() {
-        
-        error_ = false;
-        onChanged();
         return this;
       }
 
@@ -1684,75 +1552,6 @@ public final class UserService {
   checkByteStringIsUtf8(value);
         
         proofDigSig_ = value;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object messageError_ = "";
-      /**
-       * <code>string messageError = 4;</code>
-       */
-      public java.lang.String getMessageError() {
-        java.lang.Object ref = messageError_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          messageError_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string messageError = 4;</code>
-       */
-      public com.google.protobuf.ByteString
-          getMessageErrorBytes() {
-        java.lang.Object ref = messageError_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          messageError_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string messageError = 4;</code>
-       */
-      public Builder setMessageError(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        messageError_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string messageError = 4;</code>
-       */
-      public Builder clearMessageError() {
-        
-        messageError_ = getDefaultInstance().getMessageError();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string messageError = 4;</code>
-       */
-      public Builder setMessageErrorBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        messageError_ = value;
         onChanged();
         return this;
       }
@@ -2400,13 +2199,12 @@ public final class UserService {
     java.lang.String[] descriptorData = {
       "\n\021userService.proto\"X\n\013LocProofReq\022\020\n\010pr" +
       "overID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\022\026\n\003loc\030\003 \001(\013" +
-      "2\t.Position\022\020\n\010dig_sign\030\004 \001(\t\"k\n\013LocProo" +
-      "fRep\022\r\n\005error\030\001 \001(\010\022\r\n\005proof\030\002 \001(\t\022\025\n\rpr" +
-      "oof_dig_sig\030\003 \001(\t\022\024\n\014messageError\030\004 \001(\t\022" +
-      "\021\n\twitnessID\030\005 \001(\005\" \n\010Position\022\t\n\001X\030\001 \001(" +
-      "\005\022\t\n\001Y\030\002 \001(\0052A\n\013userService\0222\n\024requestLo" +
-      "cationProof\022\014.LocProofReq\032\014.LocProofRepB" +
-      "\017\n\rcom.user.grpcb\006proto3"
+      "2\t.Position\022\020\n\010dig_sign\030\004 \001(\t\"F\n\013LocProo" +
+      "fRep\022\r\n\005proof\030\002 \001(\t\022\025\n\rproof_dig_sig\030\003 \001" +
+      "(\t\022\021\n\twitnessID\030\005 \001(\005\" \n\010Position\022\t\n\001X\030\001" +
+      " \001(\005\022\t\n\001Y\030\002 \001(\0052A\n\013userService\0222\n\024reques" +
+      "tLocationProof\022\014.LocProofReq\032\014.LocProofR" +
+      "epB\017\n\rcom.user.grpcb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2431,7 +2229,7 @@ public final class UserService {
     internal_static_LocProofRep_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_LocProofRep_descriptor,
-        new java.lang.String[] { "Error", "Proof", "ProofDigSig", "MessageError", "WitnessID", });
+        new java.lang.String[] { "Proof", "ProofDigSig", "WitnessID", });
     internal_static_Position_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_Position_fieldAccessorTable = new

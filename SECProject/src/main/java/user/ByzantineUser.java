@@ -106,9 +106,9 @@ public class ByzantineUser {
 
             @Override
             public void onNext(LocProofRep reply) {
-                if(reply.getError())
-                    System.err.println(reply.getMessageError());
-                else
+        //        if(reply.getError())
+          ///          System.err.println(reply.getMessageError());
+            //    else
                     proofs.add(reply.getProof());
             }
 
@@ -162,7 +162,7 @@ public class ByzantineUser {
         serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel).withWaitForReady();
 
         subLocRepReq submitRequest = subLocRepReq.newBuilder().setUserID(ID).setEpoch(epoch)
-                .setReport("Location: " + pos.toString() + ", proofs:" + proofs.toString())
+                .setSecureReport("Location: " + pos.toString() + ", proofs:" + proofs.toString())
                 .build();
 
         subLocRepReply submitReply = serverStub.submitLocationReport(submitRequest);

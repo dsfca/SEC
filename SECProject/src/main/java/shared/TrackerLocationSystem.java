@@ -11,8 +11,15 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import server.Server;
+import java.util.Random;
 
+import javax.crypto.Cipher;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import server.Server;
+import crypto.AESProvider;
 import crypto.RSAProvider;
 import user.User;
 import user.UserLocation;
@@ -206,6 +213,17 @@ public class TrackerLocationSystem {
 			throw new IllegalArgumentException("digital signature of the server key is not valid");
 	}
 	
+	
+	public static JsonObject getSecureText(Key key, PrivateKey prvkey, String plaintext) throws Exception {
+		String cipherText = AESProvider.getCipherOfPlainText(plaintext, key);
+		String textDigSig = RSAProvider.getTexthashEnWithPriKey(plaintext, prvkey);
+		JsonObject secureText = JsonParser.parseString("{}").getAsJsonObject();
+		{
+			secureText.addProperty("ciphertext",cipherText);
+			secureText.addProperty("textDigitalSignature", textDigSig);
+		}
+		return secureText;
+	}
 	
 	/**************************************************************************************
 	 * 										-main()

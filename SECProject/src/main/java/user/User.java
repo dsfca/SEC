@@ -7,6 +7,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import com.user.grpc.UserService.LocProofRep;
@@ -17,6 +18,7 @@ import com.user.grpc.userServiceGrpc.userServiceStub;
 import com.server.grpc.serverServiceGrpc;
 import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
 import com.server.grpc.ServerService.subLocRepReq;
+import com.google.gson.JsonObject;
 import com.server.grpc.ServerService.BInteger;
 import com.server.grpc.ServerService.DHKeyExcRep;
 import com.server.grpc.ServerService.DHKeyExcReq;
@@ -162,17 +164,24 @@ public class User {
 	 *
 	 * - return: List<string>( where each string is the proof of the witness
 	 * 	that the user is actually near him).
+	 * @throws Exception 
 	 *
 	 * ************************************************************************************/
-	public void submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position) {
+	public void submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position, Key sharedKey) throws Exception {
+		PrivateKey prvkey = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
 		Position.Builder pos = Position.newBuilder().setX(position.getX()).setY(position.getY());
-
+		String report = proofs.toString();
+		JsonObject secureReport = TrackerLocationSystem.getSecureText(sharedKey, prvkey, report);
+		String reportCipher = secureReport.get("ciphertext").getAsString();
+		String reportDigSig = secureReport.get("textDigitalSignature").getAsString();
+		int myNonce = new Random().nextInt();
+		
 		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", TrackerLocationSystem.getServerPort())
 				.usePlaintext().build();
 		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel).withWaitForReady();
 
 		subLocRepReq submitRequest = subLocRepReq.newBuilder().setUserID(ID).setEpoch(epoch)
-				.setReport("Location: " + pos.toString() + ", proofs:" + proofs.toString())
+				.setSecureReport(reportCipher).setReportDigitalSignature(reportDigSig).setNonce(myNonce)
 				.build();
 
 		subLocRepReply submitReply = serverStub.submitLocationReport(submitRequest);
@@ -199,14 +208,21 @@ public class User {
 	
 	
 	
-	
+	/**************************************************************************************
+	* 											-DHkeyExchange()
+	* -creates diffie helmann parameters (p, g and p^a mod g) signe
+	*  it with its private key and sends it to the server and wait for server response.
+	*  once it gets server reply it validate the signature of the server DH public key(p^b mod g)
+	*  and compute the secret key.
+	*  
+	* -return: secret key that client and server agree on.
+	* 
+	* ************************************************************************************/
 	public Key  DHkeyExchange() throws Exception {
 		DiffieHelman df = new DiffieHelman();
 		PublicKey dfPubKey = df.getPublicKey();
 		String pbkB64 = Base64.getEncoder().encodeToString(dfPubKey.getEncoded());
 		String digSigMyDHpubkey = TrackerLocationSystem.getDHkeySigned(dfPubKey, PRIVATE_KEY_PATH);	
-		System.out.println("user"+ myID + " DH publik key = " + digSigMyDHpubkey);
-		System.out.println("user"+ myID + " publik key = " + pbkB64);
 		BInteger p =DiffieHelman.write(df.getP());
 		BInteger g =DiffieHelman.write(df.getG());
 		
@@ -275,7 +291,7 @@ public class User {
 				try {
 					List<String> proofs;
 					int sleepTime;
-					Key userNServerSharedKey;
+					Key userNServerSharedKey = null;
 					while(true) {
 						sleepTime = (int)(Math.random()*15000 + 10000); //time to sleep between 10s-35s
 						System.out.println("**************************** waiting " + sleepTime + " to send proof my location**********************************");
@@ -285,11 +301,11 @@ public class User {
 						List<ManagedChannel> closerChannel = getCloserUsers(myCurrentEpoch);
 						proofs = sndProofRequest( closerChannel, myID, myCurrentEpoch, myCurrentPoosition);
 						System.out.println("ID = "+ myID +" users near me at epoch= " +myCurrentEpoch +"  are : "+proofs);
-						if(myCurrentEpoch % 2 == 0) {
+						if(myCurrentEpoch % 5 == 0 || userNServerSharedKey == null) {
 							userNServerSharedKey = DHkeyExchange();
 							System.out.println("user agree key :" + new String(userNServerSharedKey.getEncoded()));
 						}
-					//	submitLocationReport(proofs, myID, myCurrentEpoch, myCurrentPoosition);
+						submitLocationReport(proofs, myID, myCurrentEpoch, myCurrentPoosition, userNServerSharedKey);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
