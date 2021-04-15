@@ -49,7 +49,17 @@ public final class ServerService {
         getReportDigitalSignatureBytes();
 
     /**
-     * <code>int32 Nonce = 5;</code>
+     * <code>string WitnessDigSig = 5;</code>
+     */
+    java.lang.String getWitnessDigSig();
+    /**
+     * <code>string WitnessDigSig = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getWitnessDigSigBytes();
+
+    /**
+     * <code>int32 Nonce = 6;</code>
      */
     int getNonce();
   }
@@ -70,6 +80,7 @@ public final class ServerService {
       epoch_ = 0;
       secureReport_ = "";
       reportDigitalSignature_ = "";
+      witnessDigSig_ = "";
       nonce_ = 0;
     }
 
@@ -119,7 +130,13 @@ public final class ServerService {
               reportDigitalSignature_ = s;
               break;
             }
-            case 40: {
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              witnessDigSig_ = s;
+              break;
+            }
+            case 48: {
 
               nonce_ = input.readInt32();
               break;
@@ -242,10 +259,44 @@ public final class ServerService {
       }
     }
 
-    public static final int NONCE_FIELD_NUMBER = 5;
+    public static final int WITNESSDIGSIG_FIELD_NUMBER = 5;
+    private volatile java.lang.Object witnessDigSig_;
+    /**
+     * <code>string WitnessDigSig = 5;</code>
+     */
+    public java.lang.String getWitnessDigSig() {
+      java.lang.Object ref = witnessDigSig_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        witnessDigSig_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string WitnessDigSig = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getWitnessDigSigBytes() {
+      java.lang.Object ref = witnessDigSig_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        witnessDigSig_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int NONCE_FIELD_NUMBER = 6;
     private int nonce_;
     /**
-     * <code>int32 Nonce = 5;</code>
+     * <code>int32 Nonce = 6;</code>
      */
     public int getNonce() {
       return nonce_;
@@ -277,8 +328,11 @@ public final class ServerService {
       if (!getReportDigitalSignatureBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, reportDigitalSignature_);
       }
+      if (!getWitnessDigSigBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, witnessDigSig_);
+      }
       if (nonce_ != 0) {
-        output.writeInt32(5, nonce_);
+        output.writeInt32(6, nonce_);
       }
       unknownFields.writeTo(output);
     }
@@ -303,9 +357,12 @@ public final class ServerService {
       if (!getReportDigitalSignatureBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, reportDigitalSignature_);
       }
+      if (!getWitnessDigSigBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, witnessDigSig_);
+      }
       if (nonce_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(5, nonce_);
+          .computeInt32Size(6, nonce_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -331,6 +388,8 @@ public final class ServerService {
           .equals(other.getSecureReport());
       result = result && getReportDigitalSignature()
           .equals(other.getReportDigitalSignature());
+      result = result && getWitnessDigSig()
+          .equals(other.getWitnessDigSig());
       result = result && (getNonce()
           == other.getNonce());
       result = result && unknownFields.equals(other.unknownFields);
@@ -352,6 +411,8 @@ public final class ServerService {
       hash = (53 * hash) + getSecureReport().hashCode();
       hash = (37 * hash) + REPORTDIGITALSIGNATURE_FIELD_NUMBER;
       hash = (53 * hash) + getReportDigitalSignature().hashCode();
+      hash = (37 * hash) + WITNESSDIGSIG_FIELD_NUMBER;
+      hash = (53 * hash) + getWitnessDigSig().hashCode();
       hash = (37 * hash) + NONCE_FIELD_NUMBER;
       hash = (53 * hash) + getNonce();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -495,6 +556,8 @@ public final class ServerService {
 
         reportDigitalSignature_ = "";
 
+        witnessDigSig_ = "";
+
         nonce_ = 0;
 
         return this;
@@ -527,6 +590,7 @@ public final class ServerService {
         result.epoch_ = epoch_;
         result.secureReport_ = secureReport_;
         result.reportDigitalSignature_ = reportDigitalSignature_;
+        result.witnessDigSig_ = witnessDigSig_;
         result.nonce_ = nonce_;
         onBuilt();
         return result;
@@ -588,6 +652,10 @@ public final class ServerService {
         }
         if (!other.getReportDigitalSignature().isEmpty()) {
           reportDigitalSignature_ = other.reportDigitalSignature_;
+          onChanged();
+        }
+        if (!other.getWitnessDigSig().isEmpty()) {
+          witnessDigSig_ = other.witnessDigSig_;
           onChanged();
         }
         if (other.getNonce() != 0) {
@@ -812,15 +880,84 @@ public final class ServerService {
         return this;
       }
 
+      private java.lang.Object witnessDigSig_ = "";
+      /**
+       * <code>string WitnessDigSig = 5;</code>
+       */
+      public java.lang.String getWitnessDigSig() {
+        java.lang.Object ref = witnessDigSig_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          witnessDigSig_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string WitnessDigSig = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getWitnessDigSigBytes() {
+        java.lang.Object ref = witnessDigSig_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          witnessDigSig_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string WitnessDigSig = 5;</code>
+       */
+      public Builder setWitnessDigSig(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        witnessDigSig_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string WitnessDigSig = 5;</code>
+       */
+      public Builder clearWitnessDigSig() {
+        
+        witnessDigSig_ = getDefaultInstance().getWitnessDigSig();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string WitnessDigSig = 5;</code>
+       */
+      public Builder setWitnessDigSigBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        witnessDigSig_ = value;
+        onChanged();
+        return this;
+      }
+
       private int nonce_ ;
       /**
-       * <code>int32 Nonce = 5;</code>
+       * <code>int32 Nonce = 6;</code>
        */
       public int getNonce() {
         return nonce_;
       }
       /**
-       * <code>int32 Nonce = 5;</code>
+       * <code>int32 Nonce = 6;</code>
        */
       public Builder setNonce(int value) {
         
@@ -829,7 +966,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>int32 Nonce = 5;</code>
+       * <code>int32 Nonce = 6;</code>
        */
       public Builder clearNonce() {
         
@@ -6954,30 +7091,31 @@ public final class ServerService {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023serverService.proto\"r\n\014subLocRepReq\022\016\n" +
-      "\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\022\024\n\014secureRe" +
-      "port\030\003 \001(\t\022\036\n\026ReportDigitalSignature\030\004 \001" +
-      "(\t\022\r\n\005Nonce\030\005 \001(\005\"9\n\016subLocRepReply\022\024\n\014r" +
-      "eplymessage\030\001 \001(\t\022\021\n\treplycode\030\002 \001(\005\"-\n\014" +
-      "obtLocRepReq\022\016\n\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 " +
-      "\001(\005\"8\n\016obtLocRepReply\022\016\n\006userID\030\001 \001(\005\022\026\n" +
-      "\003pos\030\002 \001(\0132\t.Position\"5\n\014obtUseLocReq\022\026\n" +
-      "\003pos\030\001 \001(\0132\t.Position\022\r\n\005epoch\030\002 \001(\005\"/\n\014" +
-      "obtUseLocRep\022\r\n\005epoch\030\001 \001(\005\022\020\n\010userList\030" +
-      "\002 \003(\t\" \n\010Position\022\t\n\001X\030\001 \001(\005\022\t\n\001Y\030\002 \001(\005\"" +
-      "s\n\013DHKeyExcReq\022\016\n\006userID\030\001 \001(\005\022\024\n\001p\030\002 \001(" +
-      "\0132\t.BInteger\022\024\n\001g\030\003 \001(\0132\t.BInteger\022\022\n\nMy" +
-      "DHPubKey\030\004 \001(\t\022\024\n\014digSigPubKey\030\005 \001(\t\"5\n\013" +
-      "DHKeyExcRep\022\020\n\010myPubKey\030\001 \001(\t\022\024\n\014digSigP" +
-      "ubkey\030\002 \001(\t\"\031\n\010BInteger\022\r\n\005value\030\001 \001(\0142\235" +
-      "\002\n\rserverService\0226\n\024submitLocationReport" +
-      "\022\r.subLocRepReq\032\017.subLocRepReply\0226\n\024obta" +
-      "inLocationReport\022\r.obtLocRepReq\032\017.obtLoc" +
-      "RepReply\0228\n\026obtainLocationReportHA\022\r.obt" +
-      "LocRepReq\032\017.obtLocRepReply\0225\n\025obtainUser" +
-      "sAtLocation\022\r.obtUseLocReq\032\r.obtUseLocRe" +
-      "p\022+\n\rDHKeyExchange\022\014.DHKeyExcReq\032\014.DHKey" +
-      "ExcRepB\021\n\017com.server.grpcb\006proto3"
+      "\n\023serverService.proto\"\211\001\n\014subLocRepReq\022\016" +
+      "\n\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\022\024\n\014secureR" +
+      "eport\030\003 \001(\t\022\036\n\026ReportDigitalSignature\030\004 " +
+      "\001(\t\022\025\n\rWitnessDigSig\030\005 \001(\t\022\r\n\005Nonce\030\006 \001(" +
+      "\005\"9\n\016subLocRepReply\022\024\n\014replymessage\030\001 \001(" +
+      "\t\022\021\n\treplycode\030\002 \001(\005\"-\n\014obtLocRepReq\022\016\n\006" +
+      "userID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\"8\n\016obtLocRep" +
+      "Reply\022\016\n\006userID\030\001 \001(\005\022\026\n\003pos\030\002 \001(\0132\t.Pos" +
+      "ition\"5\n\014obtUseLocReq\022\026\n\003pos\030\001 \001(\0132\t.Pos" +
+      "ition\022\r\n\005epoch\030\002 \001(\005\"/\n\014obtUseLocRep\022\r\n\005" +
+      "epoch\030\001 \001(\005\022\020\n\010userList\030\002 \003(\t\" \n\010Positio" +
+      "n\022\t\n\001X\030\001 \001(\005\022\t\n\001Y\030\002 \001(\005\"s\n\013DHKeyExcReq\022\016" +
+      "\n\006userID\030\001 \001(\005\022\024\n\001p\030\002 \001(\0132\t.BInteger\022\024\n\001" +
+      "g\030\003 \001(\0132\t.BInteger\022\022\n\nMyDHPubKey\030\004 \001(\t\022\024" +
+      "\n\014digSigPubKey\030\005 \001(\t\"5\n\013DHKeyExcRep\022\020\n\010m" +
+      "yPubKey\030\001 \001(\t\022\024\n\014digSigPubkey\030\002 \001(\t\"\031\n\010B" +
+      "Integer\022\r\n\005value\030\001 \001(\0142\235\002\n\rserverService" +
+      "\0226\n\024submitLocationReport\022\r.subLocRepReq\032" +
+      "\017.subLocRepReply\0226\n\024obtainLocationReport" +
+      "\022\r.obtLocRepReq\032\017.obtLocRepReply\0228\n\026obta" +
+      "inLocationReportHA\022\r.obtLocRepReq\032\017.obtL" +
+      "ocRepReply\0225\n\025obtainUsersAtLocation\022\r.ob" +
+      "tUseLocReq\032\r.obtUseLocRep\022+\n\rDHKeyExchan" +
+      "ge\022\014.DHKeyExcReq\032\014.DHKeyExcRepB\021\n\017com.se" +
+      "rver.grpcb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6996,7 +7134,7 @@ public final class ServerService {
     internal_static_subLocRepReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_subLocRepReq_descriptor,
-        new java.lang.String[] { "UserID", "Epoch", "SecureReport", "ReportDigitalSignature", "Nonce", });
+        new java.lang.String[] { "UserID", "Epoch", "SecureReport", "ReportDigitalSignature", "WitnessDigSig", "Nonce", });
     internal_static_subLocRepReply_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_subLocRepReply_fieldAccessorTable = new

@@ -121,7 +121,17 @@ public class User {
 		
 			@Override
 			public void onNext(LocProofRep reply) {
-				proofs.add(reply.getProof());
+				try {
+					String witnessProof = reply.getProof();
+					String witnessProofDigSig = reply.getProofDigSig();
+					PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(reply.getWitnessID());
+					boolean proofIsAuth = RSAProvider.istextAuthentic(witnessProof, witnessProofDigSig, witPubKey);
+					if(proofIsAuth)
+						proofs.add(reply.getProof());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
 			}
 
 			@Override
