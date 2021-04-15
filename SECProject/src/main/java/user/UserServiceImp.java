@@ -8,8 +8,6 @@ import com.user.grpc.UserService.LocProofReq;
 import com.user.grpc.userServiceGrpc.userServiceImplBase;
 
 import crypto.RSAProvider;
-import io.grpc.InternalStatus;
-import io.grpc.Metadata;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import shared.Point2D;
@@ -87,9 +85,11 @@ public class UserServiceImp extends userServiceImplBase  {
 	 * ************************************************************************************/
 	private LocProofRep.Builder locationProofHandler(int proverID, int epoch, Point2D proverPos) throws Exception{
 		LocProofRep.Builder response = LocProofRep.newBuilder();
-		String proof = getProof(proverID, proverPos, epoch);
 		PrivateKey key = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
+		String proof = getProof(proverID, proverPos, epoch);
 		String proof_dig_sig = RSAProvider.getTexthashEnWithPriKey(proof, key);
+		proof = proof +" "+ proof_dig_sig;
+		proof_dig_sig = RSAProvider.getTexthashEnWithPriKey(proof, key);
 		response.setProof(proof);
 		response.setProofDigSig(proof_dig_sig);
 		response.setWitnessID(ID);
@@ -121,7 +121,7 @@ public class UserServiceImp extends userServiceImplBase  {
 		boolean isNear = dist <= 2;
 		//compute the result: proverID witnessID proverPoint witnessPoint distace T/F
 		// T- if prover is near witness and F - other wise
-		String proof = proverID + " " + ID + " " + prov_pos.toString() + " "+ myPointInEpoch.toString() + " " + dist + " " + isNear;
+		String proof = proverID + " " + ID + " " + prov_pos.toString() + " "+ myPointInEpoch.toString() + " " + epoch + " " + isNear;
 		return proof;
 	}
 	

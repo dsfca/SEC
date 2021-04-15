@@ -56,15 +56,23 @@ public class ServerImp extends serverServiceImplBase {
 	        String secureReport = request.getSecureReport();
 	        String reportDigSig = request.getReportDigitalSignature();
 	        
-	        String reportPlaintext = AESProvider.AESCypherDecypher(sharedKey, secureReport, Cipher.DECRYPT_MODE);
+	        String reportPlaintext = AESProvider.getPlainTextOfCipherText(secureReport, sharedKey);
 	        boolean reportIsAuth = RSAProvider.istextAuthentic(reportPlaintext, reportDigSig, userPubkey);
 	        if(reportIsAuth) {
-		        ServerService.subLocRepReply.Builder response = submitReportHandler(request);
+		        ServerService.subLocRepReply.Builder response = submitReportHandler(reportPlaintext);
 		        responseObserver.onNext(response.build());
 		        responseObserver.onCompleted();
-	        }
+	        }else {
+				throw new Exception("request is not authentic");
+			}
+	        
     	}catch (Exception e) {
-			
+    		subLocRepReply.Builder response = subLocRepReply.newBuilder();
+    		response.setReplycode(replyCode.NOK.ordinal());
+    		response.setReplymessage(e.getMessage());
+    		responseObserver.onNext(response.build());
+		    responseObserver.onCompleted();
+			e.printStackTrace();
 		}
 
     }
@@ -144,13 +152,17 @@ public class ServerImp extends serverServiceImplBase {
      *      - request: The submit request received from a user
      *
      * ************************************************************************************/
-    private subLocRepReply.Builder submitReportHandler(subLocRepReq request) {
+    private subLocRepReply.Builder submitReportHandler(String report) {
+    	report = report.replace("[", "").replace("]", "");
+    	String[] reportList = report.split(",");
+    	List<ProofReport> proofReports = getProofReports(reportList); 
+    	System.out.println("report received is: " + proofReports);
         subLocRepReply.Builder response = subLocRepReply.newBuilder();
 
         /**
          * TODO: the code below is just an example of possible reaction to request
          * */
-        if (!checkEpoch(request.getEpoch())) {
+        if (false) {
             response.setReplycode(replyCode.WRONG_EPOCH.ordinal());
             response.setReplymessage("Provided report is not valid for current epoch");
         }
@@ -166,7 +178,18 @@ public class ServerImp extends serverServiceImplBase {
         return response;
     }
 
-    private boolean submitReport() {
+    private List<ProofReport> getProofReports(String[] reportList) {
+    	List<ProofReport> reports = new ArrayList<>();
+    	for(int i=0; i < reportList.length; i++) {
+    		ProofReport proof = new ProofReport(reportList[i]);
+    		reports.add(proof);
+    	}
+		return reports;
+	}
+
+
+
+	private boolean submitReport() {
         // TODO add report to database
         return true;
     }

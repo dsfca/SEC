@@ -889,14 +889,19 @@ public final class UserService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string proof = 2;</code>
+     * <code>string proof = 1;</code>
      */
     java.lang.String getProof();
     /**
-     * <code>string proof = 2;</code>
+     * <code>string proof = 1;</code>
      */
     com.google.protobuf.ByteString
         getProofBytes();
+
+    /**
+     * <code>int32 witnessID = 2;</code>
+     */
+    int getWitnessID();
 
     /**
      * <code>string proof_dig_sig = 3;</code>
@@ -907,11 +912,6 @@ public final class UserService {
      */
     com.google.protobuf.ByteString
         getProofDigSigBytes();
-
-    /**
-     * <code>int32 witnessID = 5;</code>
-     */
-    int getWitnessID();
   }
   /**
    * Protobuf type {@code LocProofRep}
@@ -927,8 +927,8 @@ public final class UserService {
     }
     private LocProofRep() {
       proof_ = "";
-      proofDigSig_ = "";
       witnessID_ = 0;
+      proofDigSig_ = "";
     }
 
     @java.lang.Override
@@ -955,21 +955,21 @@ public final class UserService {
             case 0:
               done = true;
               break;
-            case 18: {
+            case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
               proof_ = s;
+              break;
+            }
+            case 16: {
+
+              witnessID_ = input.readInt32();
               break;
             }
             case 26: {
               java.lang.String s = input.readStringRequireUtf8();
 
               proofDigSig_ = s;
-              break;
-            }
-            case 40: {
-
-              witnessID_ = input.readInt32();
               break;
             }
             default: {
@@ -1004,10 +1004,10 @@ public final class UserService {
               com.user.grpc.UserService.LocProofRep.class, com.user.grpc.UserService.LocProofRep.Builder.class);
     }
 
-    public static final int PROOF_FIELD_NUMBER = 2;
+    public static final int PROOF_FIELD_NUMBER = 1;
     private volatile java.lang.Object proof_;
     /**
-     * <code>string proof = 2;</code>
+     * <code>string proof = 1;</code>
      */
     public java.lang.String getProof() {
       java.lang.Object ref = proof_;
@@ -1022,7 +1022,7 @@ public final class UserService {
       }
     }
     /**
-     * <code>string proof = 2;</code>
+     * <code>string proof = 1;</code>
      */
     public com.google.protobuf.ByteString
         getProofBytes() {
@@ -1036,6 +1036,15 @@ public final class UserService {
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int WITNESSID_FIELD_NUMBER = 2;
+    private int witnessID_;
+    /**
+     * <code>int32 witnessID = 2;</code>
+     */
+    public int getWitnessID() {
+      return witnessID_;
     }
 
     public static final int PROOF_DIG_SIG_FIELD_NUMBER = 3;
@@ -1072,15 +1081,6 @@ public final class UserService {
       }
     }
 
-    public static final int WITNESSID_FIELD_NUMBER = 5;
-    private int witnessID_;
-    /**
-     * <code>int32 witnessID = 5;</code>
-     */
-    public int getWitnessID() {
-      return witnessID_;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1096,13 +1096,13 @@ public final class UserService {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getProofBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, proof_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, proof_);
+      }
+      if (witnessID_ != 0) {
+        output.writeInt32(2, witnessID_);
       }
       if (!getProofDigSigBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, proofDigSig_);
-      }
-      if (witnessID_ != 0) {
-        output.writeInt32(5, witnessID_);
       }
       unknownFields.writeTo(output);
     }
@@ -1114,14 +1114,14 @@ public final class UserService {
 
       size = 0;
       if (!getProofBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, proof_);
-      }
-      if (!getProofDigSigBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, proofDigSig_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, proof_);
       }
       if (witnessID_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(5, witnessID_);
+          .computeInt32Size(2, witnessID_);
+      }
+      if (!getProofDigSigBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, proofDigSig_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1141,10 +1141,10 @@ public final class UserService {
       boolean result = true;
       result = result && getProof()
           .equals(other.getProof());
-      result = result && getProofDigSig()
-          .equals(other.getProofDigSig());
       result = result && (getWitnessID()
           == other.getWitnessID());
+      result = result && getProofDigSig()
+          .equals(other.getProofDigSig());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -1158,10 +1158,10 @@ public final class UserService {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + PROOF_FIELD_NUMBER;
       hash = (53 * hash) + getProof().hashCode();
-      hash = (37 * hash) + PROOF_DIG_SIG_FIELD_NUMBER;
-      hash = (53 * hash) + getProofDigSig().hashCode();
       hash = (37 * hash) + WITNESSID_FIELD_NUMBER;
       hash = (53 * hash) + getWitnessID();
+      hash = (37 * hash) + PROOF_DIG_SIG_FIELD_NUMBER;
+      hash = (53 * hash) + getProofDigSig().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1297,9 +1297,9 @@ public final class UserService {
         super.clear();
         proof_ = "";
 
-        proofDigSig_ = "";
-
         witnessID_ = 0;
+
+        proofDigSig_ = "";
 
         return this;
       }
@@ -1328,8 +1328,8 @@ public final class UserService {
       public com.user.grpc.UserService.LocProofRep buildPartial() {
         com.user.grpc.UserService.LocProofRep result = new com.user.grpc.UserService.LocProofRep(this);
         result.proof_ = proof_;
-        result.proofDigSig_ = proofDigSig_;
         result.witnessID_ = witnessID_;
+        result.proofDigSig_ = proofDigSig_;
         onBuilt();
         return result;
       }
@@ -1382,12 +1382,12 @@ public final class UserService {
           proof_ = other.proof_;
           onChanged();
         }
+        if (other.getWitnessID() != 0) {
+          setWitnessID(other.getWitnessID());
+        }
         if (!other.getProofDigSig().isEmpty()) {
           proofDigSig_ = other.proofDigSig_;
           onChanged();
-        }
-        if (other.getWitnessID() != 0) {
-          setWitnessID(other.getWitnessID());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1420,7 +1420,7 @@ public final class UserService {
 
       private java.lang.Object proof_ = "";
       /**
-       * <code>string proof = 2;</code>
+       * <code>string proof = 1;</code>
        */
       public java.lang.String getProof() {
         java.lang.Object ref = proof_;
@@ -1435,7 +1435,7 @@ public final class UserService {
         }
       }
       /**
-       * <code>string proof = 2;</code>
+       * <code>string proof = 1;</code>
        */
       public com.google.protobuf.ByteString
           getProofBytes() {
@@ -1451,7 +1451,7 @@ public final class UserService {
         }
       }
       /**
-       * <code>string proof = 2;</code>
+       * <code>string proof = 1;</code>
        */
       public Builder setProof(
           java.lang.String value) {
@@ -1464,7 +1464,7 @@ public final class UserService {
         return this;
       }
       /**
-       * <code>string proof = 2;</code>
+       * <code>string proof = 1;</code>
        */
       public Builder clearProof() {
         
@@ -1473,7 +1473,7 @@ public final class UserService {
         return this;
       }
       /**
-       * <code>string proof = 2;</code>
+       * <code>string proof = 1;</code>
        */
       public Builder setProofBytes(
           com.google.protobuf.ByteString value) {
@@ -1483,6 +1483,32 @@ public final class UserService {
   checkByteStringIsUtf8(value);
         
         proof_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int witnessID_ ;
+      /**
+       * <code>int32 witnessID = 2;</code>
+       */
+      public int getWitnessID() {
+        return witnessID_;
+      }
+      /**
+       * <code>int32 witnessID = 2;</code>
+       */
+      public Builder setWitnessID(int value) {
+        
+        witnessID_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 witnessID = 2;</code>
+       */
+      public Builder clearWitnessID() {
+        
+        witnessID_ = 0;
         onChanged();
         return this;
       }
@@ -1552,32 +1578,6 @@ public final class UserService {
   checkByteStringIsUtf8(value);
         
         proofDigSig_ = value;
-        onChanged();
-        return this;
-      }
-
-      private int witnessID_ ;
-      /**
-       * <code>int32 witnessID = 5;</code>
-       */
-      public int getWitnessID() {
-        return witnessID_;
-      }
-      /**
-       * <code>int32 witnessID = 5;</code>
-       */
-      public Builder setWitnessID(int value) {
-        
-        witnessID_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 witnessID = 5;</code>
-       */
-      public Builder clearWitnessID() {
-        
-        witnessID_ = 0;
         onChanged();
         return this;
       }
@@ -2200,8 +2200,8 @@ public final class UserService {
       "\n\021userService.proto\"X\n\013LocProofReq\022\020\n\010pr" +
       "overID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005\022\026\n\003loc\030\003 \001(\013" +
       "2\t.Position\022\020\n\010dig_sign\030\004 \001(\t\"F\n\013LocProo" +
-      "fRep\022\r\n\005proof\030\002 \001(\t\022\025\n\rproof_dig_sig\030\003 \001" +
-      "(\t\022\021\n\twitnessID\030\005 \001(\005\" \n\010Position\022\t\n\001X\030\001" +
+      "fRep\022\r\n\005proof\030\001 \001(\t\022\021\n\twitnessID\030\002 \001(\005\022\025" +
+      "\n\rproof_dig_sig\030\003 \001(\t\" \n\010Position\022\t\n\001X\030\001" +
       " \001(\005\022\t\n\001Y\030\002 \001(\0052A\n\013userService\0222\n\024reques" +
       "tLocationProof\022\014.LocProofReq\032\014.LocProofR" +
       "epB\017\n\rcom.user.grpcb\006proto3"
@@ -2229,7 +2229,7 @@ public final class UserService {
     internal_static_LocProofRep_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_LocProofRep_descriptor,
-        new java.lang.String[] { "Proof", "ProofDigSig", "WitnessID", });
+        new java.lang.String[] { "Proof", "WitnessID", "ProofDigSig", });
     internal_static_Position_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_Position_fieldAccessorTable = new

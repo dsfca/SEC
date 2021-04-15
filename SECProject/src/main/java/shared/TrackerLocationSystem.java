@@ -34,7 +34,7 @@ public class TrackerLocationSystem {
 	public TrackerLocationSystem(int num_users, int G_width, int G_height, int server_port) throws Exception {
 		TrackerLocationSystem.serverPort = server_port;
 
-		start_server(server_port);
+		//start_server(server_port);
 		start_users(num_users, G_width, G_height);
 	}
 	
@@ -253,7 +253,7 @@ public class TrackerLocationSystem {
 		    ini_pos_file(num_users, 10, G_width, G_height);
 			start_users(num_users, G_width, G_height);
 
-			Server server = new Server(serverPort);
+			//Server server = new Server(serverPort);
 			
 			
 		} catch (Exception e) {
