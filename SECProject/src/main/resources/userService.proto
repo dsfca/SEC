@@ -16,9 +16,9 @@ message LocProofReq{
 }
 
 message LocProofRep{
-	string proof = 2;
+	string proof = 1;
+	int32 witnessID = 2;
 	string proof_dig_sig = 3;
-	int32 witnessID = 5;
 }
 
 message Position{

@@ -18,7 +18,8 @@ message subLocRepReq{
 	int32 epoch = 2;
 	string secureReport = 3;
 	string ReportDigitalSignature= 4;
-	int32 Nonce = 5;
+	string WitnessDigSig = 5;
+	int32 Nonce = 6;
 	
 }
 
