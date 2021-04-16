@@ -72,7 +72,7 @@ public class InteractWithDB {
 	
 	
 	//ADDS PROOF TO DATABSE - COLLECTION "ALL_LOCATIONS"
-	public void addReportToDatabase(int user1, int user2, Point2D pos1, Point2D pos2, int epoch, boolean near) {
+	public void addReportToDatabase(int user1, int user2, Point2D pos1, Point2D pos2, int epoch, boolean near, String proof1, String proof2) {
 		Document document = new Document();
 		document.append("user1", user1);
 		document.append("user2", user2);
@@ -80,6 +80,8 @@ public class InteractWithDB {
 		document.append("pos2", pos2);
 		document.append("epoch", epoch);
 		document.append("near", near);
+		document.append("Digi_sig_u1", proof1);
+		document.append("Digi_sig_u2", proof2);
 		mongo_collection_all.insertOne(document);
 	}
 	
