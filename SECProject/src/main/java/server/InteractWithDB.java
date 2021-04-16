@@ -8,7 +8,9 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.server.grpc.ServerService.Position;
 
+import io.grpc.ManagedChannel;
 import shared.Point2D;
+import shared.TrackerLocationSystem;
 
 import org.bson.Document;
 import org.ini4j.Ini;
@@ -17,7 +19,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.Key;
 import java.util.ArrayList;
+import java.util.List;
 
 /**WATCH NOTIFICATIONS BELLOW IN: 
 							- getLocationsGivenEpoch()							
@@ -35,7 +39,7 @@ public class InteractWithDB {
 
 	
 	public InteractWithDB(String mongo_ini) throws FileNotFoundException, IOException {
-		InteractWithDB.ini = new Ini(new File(mongo_ini));
+		this.ini = new Ini(new File(mongo_ini));
 		connectToMongo();
 	}
 	
@@ -130,12 +134,13 @@ public class InteractWithDB {
 	public void cleanValidatedCollection() {
 		mongo_collection_validated.drop();
 	}
-	
+
 	//CLEAN COLLECTION "ALL_LOCATIONS" CONTENT
-		public void cleanAllLocationsCollection() {
-			mongo_collection_all.drop();
-		}
+	public void cleanAllLocationsCollection() {
+		mongo_collection_all.drop();
+	}
 	
+
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		InteractWithDB it = new InteractWithDB("variables.ini");
