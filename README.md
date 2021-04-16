@@ -28,9 +28,12 @@ To execure the main function in this class you need to pass as argument the foll
 there are 3 test at path src/test/java (userTest-> represent normal operation of user like submitreport and obtain location of its own position,
 BizantineTest-> attacker that try to attack the system and HATest-> to query the server. 
 
-Note: each user is operating on port 9090 + ID where the ID is the user ID.
+Note1: each user is operating on port 9090 + ID where the ID is the user ID.
 The grid is changed for every time that the TrackerLocationSystem is executed.
 So to confirm the results that you get from tests you will need to verify the grids.
+
+Note2: You need to have mongodb installed to store the request locations.
+before executes the program, open a terminal and execute the following command:mongod
 
 
 
