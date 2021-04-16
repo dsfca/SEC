@@ -11,12 +11,12 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Random;
 
-import javax.crypto.Cipher;
+import org.ini4j.Ini;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.server.grpc.ServerService.subLocRepReply;
 
 import server.Server;
 import crypto.AESProvider;
@@ -26,28 +26,39 @@ import user.UserLocation;
 
 public class TrackerLocationSystem {
 	
-	private static List<User> users = new ArrayList<User>();
+	private  List<User> users = new ArrayList<User>();
 	private static final String pos_file_path = "resources/Grid.txt";
-	private static int currentEpoch = 0;
-	private static int serverPort;
+	private int num_users;
+	private int G_width;
+	private int G_height;
+	private int serverPort;
 
-	public TrackerLocationSystem(int num_users, int G_width, int G_height, int server_port) throws Exception {
-		TrackerLocationSystem.serverPort = server_port;
-
-		//start_server(server_port);
+	public TrackerLocationSystem(int num_users, int G_width, int G_height) throws Exception {
+		this.num_users = num_users;
+		this.G_width = G_width;
+		this.G_height = G_height;
+		this.serverPort = new Ini(new File("variables.ini")).get("Server","server_port", Integer.class);
+	}
+	
+	public void start() throws Exception {
+		Server server = new Server(serverPort);
+		server.init();
+		ini_pos_file(num_users, 10, G_width, G_height);
 		start_users(num_users, G_width, G_height);
 	}
 	
-	public static void start_users(int num_users, int g_width, int g_height) throws Exception {
+	public void start_users(int num_users, int g_width, int g_height) throws Exception {
 		for(int i = 0; i < num_users; i++) {
 			User user = new User(i);
 			users.add(user);
 		}
 	}
-
-	public static void start_server(int port) {
-		Server server = new Server(port);
+	
+	public List<User> getUsers(){
+		return users;
 	}
+
+	
 	
 	/**************************************************************************************
 	 * 										-update_user_pos()
@@ -111,17 +122,6 @@ public class TrackerLocationSystem {
 		return locations;
 	}
 
-	public static synchronized int getCurrentEpoch() {
-		return currentEpoch;
-	}
-
-	public static synchronized int getServerPort() {
-		return serverPort;
-	}
-
-	public static synchronized void setServerPort(int port) {
-		serverPort = port;
-	}
 	
 	/**************************************************************************************
 	 * 										-getUserPublicKey()
@@ -244,17 +244,18 @@ public class TrackerLocationSystem {
 			num_users = Integer.parseInt(args[0]);
 			G_width = Integer.parseInt(args[1]);
 			G_height = Integer.parseInt(args[2]);
-			serverPort = Integer.parseInt(args[3]);
 
-			
-			start_server(serverPort);
-		    
-
-		    ini_pos_file(num_users, 10, G_width, G_height);
-			start_users(num_users, G_width, G_height);
-
-			//Server server = new Server(serverPort);
-			
+			TrackerLocationSystem trl = new TrackerLocationSystem(num_users, G_width, G_height);
+			trl.start();
+			while(true) {
+				Thread.sleep(10000);
+				int id = (int)(Math.random()*num_users);
+				int epoch = (int)(Math.random()*10);
+				System.out.println("user with ID = " + id + " proving its location on epoch = "+ epoch);
+				User u = trl.getUsers().get(id);
+				subLocRepReply serverReply = u.proveLocation(epoch);
+				System.out.println("user ID = "+id+", server code: "+ serverReply.getReplycode() + ", server message:"+ serverReply.getReplymessage());
+			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();

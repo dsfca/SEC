@@ -7,8 +7,8 @@ service serverService{
 	rpc submitLocationReport(subLocRepReq) returns (subLocRepReply);
 	rpc obtainLocationReport(obtLocRepReq) returns (obtLocRepReply);
 
-	rpc obtainLocationReportHA(obtLocRepReq) returns (obtLocRepReply);
-	rpc obtainUsersAtLocation(obtUseLocReq) returns (obtUseLocRep); 
+	rpc obtainLocationReportHA(obtUseLocHAReq) returns (obtUseLocHARep);
+	rpc obtainUsersAtLocation(usersLocationReq) returns (usersLocationRep); 
 	
 	rpc DHKeyExchange(DHKeyExcReq) returns (DHKeyExcRep);
 }
@@ -30,24 +30,34 @@ message subLocRepReply{
 
 message obtLocRepReq{
 	int32 userID = 1;
-	int32 epoch = 2;
-	
+	string secureRequest = 2;
+	string reqDigSig = 3;
 }
 
 message obtLocRepReply{
-	int32 userID = 1;
-	Position pos = 2;
+	bool onError = 1;
+	int32 userID = 2;
+	Position pos = 3;
+	string errormessage = 4;
 }
 
-message obtUseLocReq{
-	Position pos = 1;
+message obtUseLocHAReq{
+	int32 userID = 1;
 	int32 epoch = 2;
 }
 
-message obtUseLocRep{
-	int32 epoch = 1;
-	repeated string userList = 2;
+message obtUseLocHARep{
+	int32 userID = 1;
+	Position position = 2;
 	
+}
+
+message usersLocationReq{
+	
+}
+
+message usersLocationRep{
+
 }
 
 
@@ -68,6 +78,8 @@ message DHKeyExcReq{
 message DHKeyExcRep{
 	string myPubKey = 1;
 	string digSigPubkey = 2;
+	bool onError = 3;
+	string errorMessage = 4;
 }
 
 message BInteger {

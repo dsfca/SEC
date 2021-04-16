@@ -2,8 +2,6 @@ package user;
 
 import com.server.grpc.ServerService.obtLocRepReq;
 import com.server.grpc.ServerService.obtLocRepReply;
-import com.server.grpc.ServerService.obtUseLocReq;
-import com.server.grpc.ServerService.obtUseLocRep;
 import com.server.grpc.ServerService.Position;
 import com.server.grpc.serverServiceGrpc;
 import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
@@ -38,13 +36,13 @@ public class HA {
      *      - epoch: epoch to check
      *
      * ************************************************************************************/
-    public Point2D obtainLocationReport(int userId, int epoch) {
+ /*   public Point2D obtainLocationReport(int userId, int epoch) {
 
-        obtLocRepReq reportRequest = obtLocRepReq.newBuilder().setUserID(userId).setEpoch(epoch).build();
-        obtLocRepReply reply = serverStub.obtainLocationReportHA(reportRequest);
+     //   obtLocRepReq reportRequest = obtLocRepReq.newBuilder().setUserID(userId).setEpoch(epoch).build();
+      //  obtLocRepReply reply = serverStub.obtainLocationReportHA(reportRequest);
 
         return new Point2D(reply.getPos().getX(), reply.getPos().getY());
-    }
+    }*/
 
     /**************************************************************************************
      * 											-obtainUsersAtLocation()
@@ -54,16 +52,16 @@ public class HA {
      *      - epoch: epoch to search
      *
      * ************************************************************************************/
-    public List<String> obtainUsersAtLocation(Point2D position, int epoch) {
+ /*   public List<String> obtainUsersAtLocation(Point2D position, int epoch) {
 
         Position pos = Position.newBuilder().setX(position.getX()).setY(position.getY()).build();
         obtUseLocReq locationRequest = obtUseLocReq.newBuilder().setPos(pos).setEpoch(epoch).build();
         obtUseLocRep reply = serverStub.obtainUsersAtLocation(locationRequest);
 
         return reply.getUserListList();
-    }
+    }*/
 
-    public static void main(String[] args) throws Exception {
+ /*   public static void main(String[] args) throws Exception {
 
         String help = "Accept only following formats:\n\tgetReport <ID> <epoch>\n\tgetUsers <X> <Y> <epoch>";
 
@@ -111,5 +109,5 @@ public class HA {
 
             sn.nextLine();
         }
-    }
+    }*/
 }
