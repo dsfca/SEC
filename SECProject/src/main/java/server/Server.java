@@ -14,8 +14,6 @@ public class Server {
 
     public Server(int port) {
         this.port = port;
-
-        init();
     }
 
     /**************************************************************************************
@@ -23,7 +21,7 @@ public class Server {
      * - init server; use localhost as IP
      *
      * ************************************************************************************/
-    private void init() {
+    public void init() {
         Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -48,6 +46,9 @@ public class Server {
   //SERVER ATTRIBUTES GET FROM INI FILE 
     public static void main(String [] args) throws InvalidFileFormatException, IOException {
     	Server server = new Server(new Ini(new File("variables.ini")).get("Server","server_port", Integer.class));
+    	server.init();
+    	
+    	System.out.println("sbtring".substring(2,3));
     }
 
 }
