@@ -11,9 +11,11 @@ import org.ini4j.InvalidFileFormatException;
 public class Server {
 
     private int port;
+    private DealWithRequest serverDealWithReq;
 
     public Server(int port) {
         this.port = port;
+        serverDealWithReq = new DealWithRequest();
     }
 
     /**************************************************************************************
@@ -25,7 +27,7 @@ public class Server {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                io.grpc.Server server = ServerBuilder.forPort(port).addService(new ServerImp()).build();
+                io.grpc.Server server = ServerBuilder.forPort(port).addService(new ServerImp(serverDealWithReq)).build();
                 try {
                     server.start();
                     System.out.println("Server started at " + server.getPort());

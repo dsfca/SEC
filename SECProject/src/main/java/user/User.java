@@ -50,7 +50,6 @@ public class User {
 
 	private int myID;
 	private int port;
-	//private int myCurrentEpoch = 0;
 	private Point2D myCurrentPoosition;
 	private Key sharedKey;
 	private int serverPort;
@@ -66,7 +65,7 @@ public class User {
 		PRIVATE_KEY_PATH = "resources/private_keys/user" + myID + "_private.key";
 		serverPort = new Ini(new File("variables.ini")).get("Server","server_port", Integer.class);
 		init();
-		//initThreadToSndReqProof();
+		initThreadToSndReqProof();
 	}
 
 	public User(int ID, int port, String pkeyPath) {
@@ -188,7 +187,6 @@ public class User {
 	 * ************************************************************************************/
 	public subLocRepReply submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position, Key sharedKey) throws Exception {
 		PrivateKey prvkey = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
-		//Position.Builder pos = Position.newBuilder().setX(position.getX()).setY(position.getY());
 		String report = proofs.toString();
 		JsonObject secureReport = TrackerLocationSystem.getSecureText(sharedKey, prvkey, report);
 		String reportCipher = secureReport.get("ciphertext").getAsString();
@@ -298,8 +296,13 @@ public class User {
 		if(epoch % 5 == 0 || sharedKey == null) {
 			sharedKey = DHkeyExchange();
 		}
+		
 		subLocRepReply serverReply = submitLocationReport(proofs, myID, epoch, myCurrentPoosition, sharedKey);
-		return serverReply;
+		if(serverReply.getReplycode() == 0) {
+			return serverReply;
+		}else {
+			throw new Exception("userID = " +myID+ ": "+serverReply.getReplymessage() );
+		}
 	}
 	
 	/**************************************************************************************
@@ -319,21 +322,27 @@ public class User {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
+			int sleepTime, myCurrentEpoch = 0;
+			while(true) {
 				try {
-					int sleepTime, myCurrentEpoch = 0;
-					while(true) {
 						sleepTime = (int)(Math.random()*15000 + 10000); //time to sleep between 10s-35s
 						Thread.sleep(sleepTime);
 						myCurrentEpoch = myCurrentEpoch%10 + 1;
 						subLocRepReply serverReply = proveLocation(myCurrentEpoch);
 						System.out.println("user ID = "+myID+", server code: "+ serverReply.getReplycode() + ", server message:"+ serverReply.getReplymessage());
-					}
+						Thread.sleep(1000);
+						obtLocRepReply reply =  obtainLocationReport(myCurrentEpoch);
+						if(reply.getOnError())
+							System.out.println("user "+ myID + reply.getErrormessage());
+						else
+							System.out.println("user "+ myID +" position at epoch "+ myCurrentEpoch +": (" +reply.getPos().getX() + ", "+ reply.getPos().getY() +")");
 				} catch (Exception e) {
-					e.printStackTrace();
+					System.out.println(e.getMessage());
 				}
 				
 			}
-		};
+		}
+	};
 		
 	new Thread(r).start();
 	}
@@ -351,6 +360,7 @@ public class User {
 				setReqDigSig(digSig).build();
 		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
 		obtLocRepReply rep = serverStub.obtainLocationReport(req);
+		channel.shutdown();
 		return rep;
 	}
 	

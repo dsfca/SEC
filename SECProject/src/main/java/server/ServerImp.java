@@ -3,10 +3,8 @@ package server;
 import com.server.grpc.ServerService;
 import com.server.grpc.ServerService.DHKeyExcRep;
 import com.server.grpc.ServerService.DHKeyExcReq;
-import com.server.grpc.ServerService.Position;
 import com.server.grpc.ServerService.subLocRepReply;
 import com.server.grpc.ServerService.subLocRepReq;
-import com.server.grpc.ServerService.usersLocationReq;
 import com.server.grpc.ServerService.obtLocRepReq;
 import com.server.grpc.ServerService.obtLocRepReply;
 
@@ -17,35 +15,24 @@ import crypto.AESProvider;
 import crypto.RSAProvider;
 import io.grpc.stub.StreamObserver;
 import shared.DiffieHelman;
-import shared.Point2D;
 import shared.TrackerLocationSystem;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.PublicKey;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 
 public class ServerImp extends serverServiceImplBase {
 
     private static final String PRIVATE_KEY_PATH = "resources/private_keys/server_private.key";
-    private Map<Integer, Key> sharedKeys = new HashMap<>();
-    private Map<Integer, List<Integer>> usersNonce = new HashMap<>();
-    private InteractWithDB DB;
+    private DealWithRequest dealWithReq;
     
-    public ServerImp()  {
-    	try {
-			DB = new InteractWithDB("variables.ini");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    public ServerImp(DealWithRequest dwr) {
+		dealWithReq = dwr;
 	}
+    
 
 	/**************************************************************************************
      *                                  - submitLocationReport()
@@ -58,7 +45,7 @@ public class ServerImp extends serverServiceImplBase {
     @Override
     public void submitLocationReport(subLocRepReq request, StreamObserver<subLocRepReply> responseObserver) {
     	try {
-	        Key sharedKey = sharedKeys.get(request.getUserID());  
+	        Key sharedKey = dealWithReq.getSharedKey(request.getUserID());  
 	        PublicKey userPubkey = TrackerLocationSystem.getUserPublicKey(request.getUserID());
 	        
 	        String secureReport = request.getSecureReport();
@@ -68,7 +55,7 @@ public class ServerImp extends serverServiceImplBase {
 	        boolean reportIsAuth = RSAProvider.istextAuthentic(reportPlaintext, reportDigSig, userPubkey);
 	        if(reportIsAuth) {
 	        	int nonce = request.getNonce();
-		        ServerService.subLocRepReply.Builder response = submitReportHandler(request.getUserID(), reportPlaintext, nonce);
+		        ServerService.subLocRepReply.Builder response =dealWithReq.submitReportHandler(request.getUserID(), reportPlaintext, nonce);
 		        responseObserver.onNext(response.build());
 		        responseObserver.onCompleted();
 	        }else {
@@ -81,7 +68,6 @@ public class ServerImp extends serverServiceImplBase {
     		response.setReplymessage(e.getMessage());
     		responseObserver.onNext(response.build());
 		    responseObserver.onCompleted();
-			e.printStackTrace();
 		}
 
     }
@@ -99,7 +85,7 @@ public class ServerImp extends serverServiceImplBase {
     @Override
     public void obtainLocationReport(obtLocRepReq request, StreamObserver<obtLocRepReply> responseObserver) {
     	try {
-    		Key sharedKey = sharedKeys.get(request.getUserID());
+    		Key sharedKey = dealWithReq.getSharedKey(request.getUserID());
     		PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(request.getUserID());
         	String cipherText = request.getSecureRequest();
 			String requestPlainText = AESProvider.getPlainTextOfCipherText(cipherText, sharedKey);
@@ -111,7 +97,7 @@ public class ServerImp extends serverServiceImplBase {
 		        String[] reqSplit = requestPlainText.split(" ");
 		        int epoch = Integer.parseInt(reqSplit[1]);
 		        int nonce = Integer.parseInt(reqSplit[2]);
-		        ServerService.obtLocRepReply.Builder response = obtainReportHandler(request.getUserID(), epoch, nonce);
+		        ServerService.obtLocRepReply.Builder response =dealWithReq.obtainReportHandler(request.getUserID(), epoch, nonce);
 		        responseObserver.onNext(response.build());
 		        responseObserver.onCompleted();
 			}else {
@@ -162,93 +148,14 @@ public class ServerImp extends serverServiceImplBase {
     }*/
 
 
-    /** Possible reply codes to add into submitReportReply */
-    private enum replyCode {OK, WRONG_EPOCH, NOK}
-    /**************************************************************************************
-     * 											- reportHandler()
-     *  Handles submitLocationReportRequest received in submitLocationReport() method.
-     *  It should validate the request and define appropriate content of subLocRepReply
-     *  - input:
-     *      - request: The submit request received from a user
-     * @throws Exception 
-     *
-     * ************************************************************************************/
-    private subLocRepReply.Builder submitReportHandler(int id, String report, int nonce) throws Exception {
-    	List<Integer> userNonces = usersNonce.get(id);
-    	subLocRepReply.Builder response = subLocRepReply.newBuilder();
-    	if(userNonces == null)
-    		userNonces = new ArrayList<>();
-    	if(!userNonces.contains(nonce)) {
-    		userNonces.add(nonce);
-	    	report = report.replace("[", "").replace("]", "");
-	    	String[] reportList = report.split(",");
-	    	List<ProofReport> proofReports = getProofReports(reportList); 
-	    	Point2D proverPos = null;
-	    	int epoch = 0;
-	        
-	    	if(!proofReports.isEmpty()) {
-		    	for(ProofReport pr : proofReports) {
-		    		PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(pr.getWitnessID());
-		    		if(pr.proofDigSigIsValid(witPubKey))
-		    		DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),
-		    				pr.getWitnessPoint(), pr.getEpoch(), pr.isWitnessIsNearProof(), pr.getWitnessDigSig());
-		    		
-		    		proverPos = pr.getProverPoint();
-		    		epoch = pr.getEpoch();
-		    	}
-		    	DB.addLocationToValidated(id, proverPos, epoch);
-		    	 response.setReplycode(replyCode.OK.ordinal());
-			     response.setReplymessage("Your report was submitted successfully");
-	    	}else {
-	    		throw new Exception("at least a user must be near you to validate you position");
-			}
-	       
-	
-	        
-    	}else {
-    		throw new Exception("Nonce must be different for each request");
-    	}
-    	return response;
-    }
+   
+    
 
-    private List<ProofReport> getProofReports(String[] reportList) {
-    	List<ProofReport> reports = new ArrayList<>();
-    	for(int i=0; i < reportList.length; i++) {
-    		ProofReport proof = new ProofReport(reportList[i]);
-    		reports.add(proof);
-    	}
-		return reports;
-	}
+   
 
 
 
-    /**************************************************************************************
-     * 											- reportHandler()
-     *  Handles submitLocationReportRequest received in submitLocationReport() method.
-     *  It should validate the request and define appropriate content of subLocRepReply
-     *  - input:
-     *      - request: The submit request received from a user
-     * @throws Exception 
-     *
-     * ************************************************************************************/
-    private obtLocRepReply.Builder obtainReportHandler(int userId, int epoch, int nonce) throws Exception {
-    	obtLocRepReply.Builder response = obtLocRepReply.newBuilder();
-    	List<Integer> userNonces = usersNonce.get(userId);
-    		if(userNonces == null)
-    			userNonces = new ArrayList<>();
-    	if(!userNonces.contains(nonce)) {
-    		userNonces.add(nonce);
-    		Point2D userPoint = DB.getLocationGivenEpoch(userId, epoch);
-    		Position.Builder position = Position.newBuilder().setX(userPoint.getX())
-    				.setY(userPoint.getY());
-    		response.setOnError(false);
-    		response.setPos(position).setUserID(userId);
-    		
-    	}else {
-			throw new Exception("Invalid nonce");
-		}
-    	return response;
-    }
+    
 
     /**************************************************************************************
      * 											- dHKeyExchange()
@@ -269,7 +176,7 @@ public class ServerImp extends serverServiceImplBase {
 			String userPbkDigSig = request.getDigSigPubKey();
 			String userPubKey = request.getMyDHPubKey();
 		 	Key secretKey = TrackerLocationSystem.createSecretKey(df, userPbkDigSig, userPubKey, key);
-		 	putOrUpdateSharedKeys(request.getUserID(), secretKey);
+		 	dealWithReq.putOrUpdateSharedKeys(request.getUserID(), secretKey);
 		 	PublicKey myPubkey = df.getPublicKey();
 		 	String pbkB64 = Base64.getEncoder().encodeToString(myPubkey.getEncoded());
 		 	String digSigMyDHpubkey = TrackerLocationSystem.getDHkeySigned(myPubkey, PRIVATE_KEY_PATH);
@@ -290,21 +197,6 @@ public class ServerImp extends serverServiceImplBase {
 		
     }
     
-    
-    /**************************************************************************************
-     * 											- putOrUpdateSharedKeys()
-     * -
-     *  - input:update the shared key between user id and server if both already
-     *  	 have a shared key otherwise it(server) adds them.
-     *      - id: 
-     *		
-     *		-key:
-     * ************************************************************************************/
-    public void putOrUpdateSharedKeys(int id , Key key) {
-    	if(sharedKeys.get(id) != null)
-    		sharedKeys.replace(id, key);
-    	else
-    		sharedKeys.put(id, key);
-    }
+    private enum replyCode {OK, WRONG_EPOCH, NOK}
     
 }
