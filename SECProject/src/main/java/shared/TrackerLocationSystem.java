@@ -32,12 +32,14 @@ public class TrackerLocationSystem {
 	private int G_width;
 	private int G_height;
 	private int serverPort;
+	public static int NUM_BIZANTINE_USERS;
 
-	public TrackerLocationSystem(int num_users, int G_width, int G_height) throws Exception {
+	public TrackerLocationSystem(int num_users, int G_width, int G_height, int f) throws Exception {
 		this.num_users = num_users;
 		this.G_width = G_width;
 		this.G_height = G_height;
 		this.serverPort = new Ini(new File("variables.ini")).get("Server","server_port", Integer.class);
+		NUM_BIZANTINE_USERS = f;
 	}
 	
 	public void start() throws Exception {
@@ -239,15 +241,15 @@ public class TrackerLocationSystem {
 	 *  
 	 * ************************************************************************************/
 	public static void main(String args[]) {
-		int num_users, G_width, G_height;
+		int num_users, G_width, G_height, f;
 		try {
 			num_users = Integer.parseInt(args[0]);
 			G_width = Integer.parseInt(args[1]);
 			G_height = Integer.parseInt(args[2]);
-
-			TrackerLocationSystem trl = new TrackerLocationSystem(num_users, G_width, G_height);
+			f = Integer.parseInt(args[3]);
+			TrackerLocationSystem trl = new TrackerLocationSystem(num_users, G_width, G_height, f);
 			trl.start();
-			while(true) {
+			/*while(true) {
 				Thread.sleep(10000);
 				int id = (int)(Math.random()*num_users);
 				int epoch = (int)(Math.random()*10);
@@ -255,7 +257,7 @@ public class TrackerLocationSystem {
 				User u = trl.getUsers().get(id);
 				subLocRepReply serverReply = u.proveLocation(epoch);
 				System.out.println("user ID = "+id+", server code: "+ serverReply.getReplycode() + ", server message:"+ serverReply.getReplymessage());
-			}
+			}*/
 			
 		} catch (Exception e) {
 			e.printStackTrace();

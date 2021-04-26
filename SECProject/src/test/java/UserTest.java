@@ -15,6 +15,7 @@ public class UserTest {
 	static int  num_users;
 	static int G_width;
 	static int G_height;
+	static int f;
 	static TrackerLocationSystem trl;
     
 	
@@ -23,8 +24,9 @@ public class UserTest {
 		  num_users = 10;
 	        G_width = 3;
 	        G_height = 3;
+	        f = 0;
 	        try {
-	        	trl = new TrackerLocationSystem(num_users, G_width, G_height);
+	        	trl = new TrackerLocationSystem(num_users, G_width, G_height,f);
 	        	trl.start();
 	        } catch (Exception e) {
 	            e.printStackTrace();
