@@ -1,6 +1,8 @@
 package server;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
@@ -22,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**WATCH NOTIFICATIONS BELLOW IN: 
 							- getLocationsGivenEpoch()							
@@ -76,8 +79,8 @@ public class InteractWithDB {
 		Document document = new Document();
 		document.append("user1", user1);
 		document.append("user2", user2);
-		document.append("pos1", pos1);
-		document.append("pos2", pos2);
+		document.append("pos1", pos1.toString());
+		document.append("pos2", pos2.toString());
 		document.append("epoch", epoch);
 		document.append("near", near);
 		document.append("Digi_sig_u1", proof1);
@@ -97,11 +100,6 @@ public class InteractWithDB {
 	
 		
 	//IF RETURN "NULL", PLACE EXCEPTION (PRINT TO SCREEN) IN CLASS SERVER THAT THE USER DOESNT HAVE A LOCATION PROOF FOR THAT EPOCH
-	/**
-	 * Get location document given a specific user and epoch (USER->SERVER) - obtainLocationReport()
-	 * @param location
-	 * @return
-	 */
 	public Point2D getLocationGivenEpoch(int user, int epoch) {
 		MongoCursor<Document> cursor = mongo_collection_validated.find().iterator();
 		Point2D location = null;
@@ -143,19 +141,52 @@ public class InteractWithDB {
 	}
 	
 
+	//PHASE 2 - Allows a user to obtain all the proofs that it provided to other users in a range of epochs
+	public ArrayList<String> getProofsinRange(int user, int epoch_start, int epoch_end) {
+		MongoCursor<Document> cursor = mongo_collection_all.find().iterator();
+		ArrayList <String> proofs = new ArrayList <String> ();
+		
+
+		while (cursor.hasNext()) {
+			Document current  = cursor.next();
+			
+			if(current.get("user1").equals(user) || current.get("user2").equals(user)  &&
+			(Integer.parseInt(current.get("epoch").toString()) >= epoch_start &&
+			Integer.parseInt(current.get("epoch").toString()) <= epoch_end)) {
+
+				BasicDBObject conveted_proof = new BasicDBObject(current);
+				@SuppressWarnings("unchecked")
+				Map <String,String> proof = conveted_proof.toMap();
+				proof.remove("_id");
+				
+				proofs.add(proof.toString());
+			}
+		}
+		return proofs;
+	}
+	
+
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		InteractWithDB it = new InteractWithDB("variables.ini");
 		it.cleanValidatedCollection();
 		it.cleanAllLocationsCollection();
-		//LOCATIONS
+		//LOCATIONS TO VALIDATED
 		it.addLocationToValidated(1, new Point2D(0,0), 1);
-		it.addLocationToValidated(4, new Point2D(0,0), 1);
-		it.addLocationToValidated(2, new Point2D(0,1), 1);
+		it.addLocationToValidated(1, new Point2D(2,0), 2);
+		it.addLocationToValidated(1, new Point2D(0,1), 3);
 		
+		
+		//LOCATIONS TO ALL
+		it.addReportToDatabase(1,2,new Point2D(1,0),new Point2D(0,0), 1, true, "XXX", "YYY");
+		it.addReportToDatabase(1,3,new Point2D(1,0),new Point2D(0,0), 3, true, "XXX", "YYY");
+		it.addReportToDatabase(4,1,new Point2D(1,0),new Point2D(0,0), 6, true, "XXX", "YYY");
+
 		//Point2D location = it.getLocationGivenEpoch(1, 2);
 		//System.out.println(location);
 		ArrayList <String> users = it.getUsersGivenPosAndEpoch(new Point2D(0,0), 1);
+		ArrayList <String> proofs = it.getProofsinRange(1, 0, 4);
+		System.out.println(proofs);
 	}
 
 }
