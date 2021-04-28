@@ -16,19 +16,15 @@ import shared.Point2D;
 
 import org.bson.Document;
 import org.ini4j.Ini;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import java.util.ArrayList;
-<<<<<<< HEAD
 import java.util.List;
 import java.util.Map;
-=======
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
->>>>>>> branch 'master' of https://github.com/dsfca/SEC.git
+
 
 /**WATCH NOTIFICATIONS BELLOW IN: 
 							- getLocationsGivenEpoch()							
@@ -181,9 +177,9 @@ public class InteractWithDB {
 		
 		
 		//LOCATIONS TO ALL
-		it.addReportToDatabase(1,2,new Point2D(1,0),new Point2D(0,0), 1, true, "XXX", "YYY");
-		it.addReportToDatabase(1,3,new Point2D(1,0),new Point2D(0,0), 3, true, "XXX", "YYY");
-		it.addReportToDatabase(4,1,new Point2D(1,0),new Point2D(0,0), 6, true, "XXX", "YYY");
+		it.addReportToDatabase(1,2,new Point2D(1,0),new Point2D(0,0), 1, true, "XXX");
+		it.addReportToDatabase(1,3,new Point2D(1,0),new Point2D(0,0), 3, true, "XXX");
+		it.addReportToDatabase(4,1,new Point2D(1,0),new Point2D(0,0), 6, true, "XXX");
 
 		//Point2D location = it.getLocationGivenEpoch(1, 2);
 		//System.out.println(location);
