@@ -8,11 +8,11 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.server.grpc.ServerService.Position;
 
-import io.grpc.ManagedChannel;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
+
 import shared.Point2D;
-import shared.TrackerLocationSystem;
 
 import org.bson.Document;
 import org.ini4j.Ini;
@@ -20,11 +20,15 @@ import org.ini4j.Ini;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.Key;
+
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.List;
 import java.util.Map;
+=======
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+>>>>>>> branch 'master' of https://github.com/dsfca/SEC.git
 
 /**WATCH NOTIFICATIONS BELLOW IN: 
 							- getLocationsGivenEpoch()							
@@ -75,7 +79,7 @@ public class InteractWithDB {
 	
 	
 	//ADDS PROOF TO DATABSE - COLLECTION "ALL_LOCATIONS"
-	public void addReportToDatabase(int user1, int user2, Point2D pos1, Point2D pos2, int epoch, boolean near, String proof1, String proof2) {
+	public void addReportToDatabase(int user1, int user2, Point2D pos1, Point2D pos2, int epoch, boolean near, String proof1) {
 		Document document = new Document();
 		document.append("user1", user1);
 		document.append("user2", user2);
@@ -84,7 +88,6 @@ public class InteractWithDB {
 		document.append("epoch", epoch);
 		document.append("near", near);
 		document.append("Digi_sig_u1", proof1);
-		document.append("Digi_sig_u2", proof2);
 		mongo_collection_all.insertOne(document);
 	}
 	
@@ -108,7 +111,7 @@ public class InteractWithDB {
 			Document current  = cursor.next();
 			if(current.get("epoch").equals(epoch) && current.get("user").equals(user)) {
 				String location_string = current.get("location").toString();
-				location = new Point2D(Integer.valueOf(location_string.substring(1, 2)), Integer.valueOf(location_string.substring(4, 5)));
+				location = new Point2D(Integer.valueOf(location_string.substring(1,2)), Integer.valueOf(location_string.substring(3, 4)));
 			}
 		}
 		return location;
