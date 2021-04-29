@@ -85,5 +85,3 @@ message DHKeyExcRep{
 message BInteger {
    bytes value = 1;
 }
-
-
