@@ -1,5 +1,6 @@
 package user;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.Key;
 import java.security.PrivateKey;
@@ -10,6 +11,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import org.ini4j.Ini;
+
 import com.user.grpc.UserService.LocProofRep;
 import com.user.grpc.UserService.LocProofReq;
 import com.user.grpc.UserService.Position;
@@ -22,9 +26,12 @@ import com.google.gson.JsonObject;
 import com.server.grpc.ServerService.BInteger;
 import com.server.grpc.ServerService.DHKeyExcRep;
 import com.server.grpc.ServerService.DHKeyExcReq;
+import com.server.grpc.ServerService.obtLocRepReply;
+import com.server.grpc.ServerService.obtLocRepReq;
 import com.server.grpc.ServerService.subLocRepReply;
 import io.grpc.*;
 import io.grpc.stub.StreamObserver;
+import crypto.AESProvider;
 import crypto.RSAProvider;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -43,8 +50,9 @@ public class User {
 
 	private int myID;
 	private int port;
-	private int myCurrentEpoch = 0;
-	private Point2D myCurrentPoosition; 
+	private Point2D myCurrentPoosition;
+	private Key sharedKey;
+	private int serverPort;
 	
 	/**************************************************************************************
 	* 											-User class constructor()
@@ -55,6 +63,7 @@ public class User {
 		this.myID = ID;
 		this.port = ID + Integer.parseInt("9090");
 		PRIVATE_KEY_PATH = "resources/private_keys/user" + myID + "_private.key";
+		serverPort = new Ini(new File("variables.ini")).get("Server","server_port", Integer.class);
 		init();
 		initThreadToSndReqProof();
 	}
@@ -89,7 +98,6 @@ public class User {
 			};
 			
 			new Thread(r).start();
-			System.out.println(" user thread for receive locationProof request running");
 			
 		}
 	
@@ -177,16 +185,16 @@ public class User {
 	 * @throws Exception 
 	 *
 	 * ************************************************************************************/
-	public void submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position, Key sharedKey) throws Exception {
+	public subLocRepReply submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position, Key sharedKey) throws Exception {
 		PrivateKey prvkey = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
-		Position.Builder pos = Position.newBuilder().setX(position.getX()).setY(position.getY());
 		String report = proofs.toString();
 		JsonObject secureReport = TrackerLocationSystem.getSecureText(sharedKey, prvkey, report);
 		String reportCipher = secureReport.get("ciphertext").getAsString();
 		String reportDigSig = secureReport.get("textDigitalSignature").getAsString();
 		int myNonce = new Random().nextInt();
 		
-		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", TrackerLocationSystem.getServerPort())
+	
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", serverPort)
 				.usePlaintext().build();
 		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel).withWaitForReady();
 
@@ -198,8 +206,7 @@ public class User {
 
 		channel.shutdown();
 
-		System.out.println("[" + ID + "] Got submit reply with code " + submitReply.getReplycode() +
-				           ": " + submitReply.getReplymessage());
+		return submitReply;
 
 	}
 	
@@ -238,7 +245,7 @@ public class User {
 		
 		DHKeyExcReq req = DHKeyExcReq.newBuilder().setP(p).setG(g).setMyDHPubKey(pbkB64)
 				.setDigSigPubKey(digSigMyDHpubkey).setUserID(myID).build();
-		ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", TrackerLocationSystem.getServerPort()).usePlaintext().build();
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", serverPort).usePlaintext().build();
 		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
 		
 		DHKeyExcRep rep = serverStub.dHKeyExchange(req);
@@ -281,6 +288,23 @@ public class User {
 		return closerChannel;	
 	}
 	
+	public subLocRepReply proveLocation(int epoch) throws Exception {
+		List<String> proofs;
+		myCurrentPoosition = TrackerLocationSystem.getPosInEpoc(myID, epoch).getPosition();
+		List<ManagedChannel> closerChannel = getCloserUsers(epoch);
+		proofs = sndProofRequest( closerChannel, myID, epoch, myCurrentPoosition);
+		if(epoch % 5 == 0 || sharedKey == null) {
+			sharedKey = DHkeyExchange();
+		}
+		
+		subLocRepReply serverReply = submitLocationReport(proofs, myID, epoch, myCurrentPoosition, sharedKey);
+		if(serverReply.getReplycode() == 0) {
+			return serverReply;
+		}else {
+			throw new Exception("userID = " +myID+ ": "+serverReply.getReplymessage() );
+		}
+	}
+	
 	/**************************************************************************************
 	 * 											-initThreadToUpdFilePos()
 	 * - this procedure start a thread that will run in a loop to update the
@@ -298,35 +322,47 @@ public class User {
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
+			int sleepTime, myCurrentEpoch = 0;
+			while(true) {
 				try {
-					List<String> proofs;
-					int sleepTime;
-					Key userNServerSharedKey = null;
-					while(true) {
 						sleepTime = (int)(Math.random()*15000 + 10000); //time to sleep between 10s-35s
-						System.out.println("**************************** waiting " + sleepTime + " to send proof my location**********************************");
 						Thread.sleep(sleepTime);
 						myCurrentEpoch = myCurrentEpoch%10 + 1;
-						myCurrentPoosition = TrackerLocationSystem.getPosInEpoc(myID, myCurrentEpoch).getPosition();
-						List<ManagedChannel> closerChannel = getCloserUsers(myCurrentEpoch);
-						proofs = sndProofRequest( closerChannel, myID, myCurrentEpoch, myCurrentPoosition);
-						System.out.println("ID = "+ myID +" users near me at epoch= " +myCurrentEpoch +"  are : "+proofs);
-						if(myCurrentEpoch % 5 == 0 || userNServerSharedKey == null) {
-							userNServerSharedKey = DHkeyExchange();
-							System.out.println("user agree key :" + new String(userNServerSharedKey.getEncoded()));
-						}
-						submitLocationReport(proofs, myID, myCurrentEpoch, myCurrentPoosition, userNServerSharedKey);
-					}
+						subLocRepReply serverReply = proveLocation(myCurrentEpoch);
+						System.out.println("user ID = "+myID+", server code: "+ serverReply.getReplycode() + ", server message:"+ serverReply.getReplymessage());
+						Thread.sleep(1000);
+						obtLocRepReply reply =  obtainLocationReport(myCurrentEpoch);
+						if(reply.getOnError())
+							System.out.println("user "+ myID + reply.getErrormessage());
+						else
+							System.out.println("user "+ myID +" position at epoch "+ myCurrentEpoch +": (" +reply.getPos().getX() + ", "+ reply.getPos().getY() +")");
 				} catch (Exception e) {
-					e.printStackTrace();
+					System.out.println(e.getMessage());
 				}
 				
 			}
-		};
+		}
+	};
 		
 	new Thread(r).start();
 	}
 	
+	public obtLocRepReply obtainLocationReport(int epoch) throws Exception {
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", serverPort)
+				.usePlaintext().build();
+		PrivateKey myprivkey = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
+		int myNonce = new Random().nextInt();
+		String reqPlainText = myID + " " + epoch +" "+myNonce;
+		JsonObject cipherReq  = TrackerLocationSystem.getSecureText(sharedKey, myprivkey, reqPlainText);
+		String cipherText = cipherReq.get("ciphertext").getAsString();
+		String digSig = cipherReq.get("textDigitalSignature").getAsString();
+		obtLocRepReq req = obtLocRepReq.newBuilder().setSecureRequest(cipherText).setUserID(myID).
+				setReqDigSig(digSig).build();
+		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
+		obtLocRepReply rep = serverStub.obtainLocationReport(req);
+		channel.shutdown();
+		return rep;
+	}
+	
 	
 }
-
