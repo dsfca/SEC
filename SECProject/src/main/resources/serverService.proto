@@ -23,6 +23,7 @@ message subLocRepReq{
 	
 }
 
+
 message subLocRepReply{
 	string replymessage = 1;
 	int32 replycode = 2; 
@@ -42,22 +43,28 @@ message obtLocRepReply{
 }
 
 message obtUseLocHAReq{
-	int32 userID = 1;
-	int32 epoch = 2;
+	string secureRequest = 1;
+	string digitalSignature = 2;
+	
 }
 
 message obtUseLocHARep{
-	int32 userID = 1;
-	Position position = 2;
-	
+	bool onError = 1;
+	int32 userID = 2;
+	Position position = 3;
+	string errormessage = 4;
 }
 
+
 message usersLocationReq{
-	
+	string secureRequest = 1;
+	string digitalSignature = 2;
 }
 
 message usersLocationRep{
-
+	bool onError = 1;
+	string usersList = 2;
+	string errorMessage = 3;
 }
 
 

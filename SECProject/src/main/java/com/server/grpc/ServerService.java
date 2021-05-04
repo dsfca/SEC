@@ -3266,14 +3266,24 @@ public final class ServerService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int32 userID = 1;</code>
+     * <code>string secureRequest = 1;</code>
      */
-    int getUserID();
+    java.lang.String getSecureRequest();
+    /**
+     * <code>string secureRequest = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getSecureRequestBytes();
 
     /**
-     * <code>int32 epoch = 2;</code>
+     * <code>string digitalSignature = 2;</code>
      */
-    int getEpoch();
+    java.lang.String getDigitalSignature();
+    /**
+     * <code>string digitalSignature = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getDigitalSignatureBytes();
   }
   /**
    * Protobuf type {@code obtUseLocHAReq}
@@ -3288,8 +3298,8 @@ public final class ServerService {
       super(builder);
     }
     private obtUseLocHAReq() {
-      userID_ = 0;
-      epoch_ = 0;
+      secureRequest_ = "";
+      digitalSignature_ = "";
     }
 
     @java.lang.Override
@@ -3316,14 +3326,16 @@ public final class ServerService {
             case 0:
               done = true;
               break;
-            case 8: {
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
 
-              userID_ = input.readInt32();
+              secureRequest_ = s;
               break;
             }
-            case 16: {
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
 
-              epoch_ = input.readInt32();
+              digitalSignature_ = s;
               break;
             }
             default: {
@@ -3358,22 +3370,72 @@ public final class ServerService {
               com.server.grpc.ServerService.obtUseLocHAReq.class, com.server.grpc.ServerService.obtUseLocHAReq.Builder.class);
     }
 
-    public static final int USERID_FIELD_NUMBER = 1;
-    private int userID_;
+    public static final int SECUREREQUEST_FIELD_NUMBER = 1;
+    private volatile java.lang.Object secureRequest_;
     /**
-     * <code>int32 userID = 1;</code>
+     * <code>string secureRequest = 1;</code>
      */
-    public int getUserID() {
-      return userID_;
+    public java.lang.String getSecureRequest() {
+      java.lang.Object ref = secureRequest_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        secureRequest_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string secureRequest = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSecureRequestBytes() {
+      java.lang.Object ref = secureRequest_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        secureRequest_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
-    public static final int EPOCH_FIELD_NUMBER = 2;
-    private int epoch_;
+    public static final int DIGITALSIGNATURE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object digitalSignature_;
     /**
-     * <code>int32 epoch = 2;</code>
+     * <code>string digitalSignature = 2;</code>
      */
-    public int getEpoch() {
-      return epoch_;
+    public java.lang.String getDigitalSignature() {
+      java.lang.Object ref = digitalSignature_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        digitalSignature_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string digitalSignature = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDigitalSignatureBytes() {
+      java.lang.Object ref = digitalSignature_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        digitalSignature_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3390,11 +3452,11 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (userID_ != 0) {
-        output.writeInt32(1, userID_);
+      if (!getSecureRequestBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, secureRequest_);
       }
-      if (epoch_ != 0) {
-        output.writeInt32(2, epoch_);
+      if (!getDigitalSignatureBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, digitalSignature_);
       }
       unknownFields.writeTo(output);
     }
@@ -3405,13 +3467,11 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
-      if (userID_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, userID_);
+      if (!getSecureRequestBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, secureRequest_);
       }
-      if (epoch_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, epoch_);
+      if (!getDigitalSignatureBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, digitalSignature_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3429,10 +3489,10 @@ public final class ServerService {
       com.server.grpc.ServerService.obtUseLocHAReq other = (com.server.grpc.ServerService.obtUseLocHAReq) obj;
 
       boolean result = true;
-      result = result && (getUserID()
-          == other.getUserID());
-      result = result && (getEpoch()
-          == other.getEpoch());
+      result = result && getSecureRequest()
+          .equals(other.getSecureRequest());
+      result = result && getDigitalSignature()
+          .equals(other.getDigitalSignature());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -3444,10 +3504,10 @@ public final class ServerService {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + USERID_FIELD_NUMBER;
-      hash = (53 * hash) + getUserID();
-      hash = (37 * hash) + EPOCH_FIELD_NUMBER;
-      hash = (53 * hash) + getEpoch();
+      hash = (37 * hash) + SECUREREQUEST_FIELD_NUMBER;
+      hash = (53 * hash) + getSecureRequest().hashCode();
+      hash = (37 * hash) + DIGITALSIGNATURE_FIELD_NUMBER;
+      hash = (53 * hash) + getDigitalSignature().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3581,9 +3641,9 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        userID_ = 0;
+        secureRequest_ = "";
 
-        epoch_ = 0;
+        digitalSignature_ = "";
 
         return this;
       }
@@ -3611,8 +3671,8 @@ public final class ServerService {
       @java.lang.Override
       public com.server.grpc.ServerService.obtUseLocHAReq buildPartial() {
         com.server.grpc.ServerService.obtUseLocHAReq result = new com.server.grpc.ServerService.obtUseLocHAReq(this);
-        result.userID_ = userID_;
-        result.epoch_ = epoch_;
+        result.secureRequest_ = secureRequest_;
+        result.digitalSignature_ = digitalSignature_;
         onBuilt();
         return result;
       }
@@ -3661,11 +3721,13 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.obtUseLocHAReq other) {
         if (other == com.server.grpc.ServerService.obtUseLocHAReq.getDefaultInstance()) return this;
-        if (other.getUserID() != 0) {
-          setUserID(other.getUserID());
+        if (!other.getSecureRequest().isEmpty()) {
+          secureRequest_ = other.secureRequest_;
+          onChanged();
         }
-        if (other.getEpoch() != 0) {
-          setEpoch(other.getEpoch());
+        if (!other.getDigitalSignature().isEmpty()) {
+          digitalSignature_ = other.digitalSignature_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3696,54 +3758,140 @@ public final class ServerService {
         return this;
       }
 
-      private int userID_ ;
+      private java.lang.Object secureRequest_ = "";
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>string secureRequest = 1;</code>
        */
-      public int getUserID() {
-        return userID_;
+      public java.lang.String getSecureRequest() {
+        java.lang.Object ref = secureRequest_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          secureRequest_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>string secureRequest = 1;</code>
        */
-      public Builder setUserID(int value) {
-        
-        userID_ = value;
+      public com.google.protobuf.ByteString
+          getSecureRequestBytes() {
+        java.lang.Object ref = secureRequest_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          secureRequest_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string secureRequest = 1;</code>
+       */
+      public Builder setSecureRequest(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        secureRequest_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>string secureRequest = 1;</code>
        */
-      public Builder clearUserID() {
+      public Builder clearSecureRequest() {
         
-        userID_ = 0;
+        secureRequest_ = getDefaultInstance().getSecureRequest();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string secureRequest = 1;</code>
+       */
+      public Builder setSecureRequestBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        secureRequest_ = value;
         onChanged();
         return this;
       }
 
-      private int epoch_ ;
+      private java.lang.Object digitalSignature_ = "";
       /**
-       * <code>int32 epoch = 2;</code>
+       * <code>string digitalSignature = 2;</code>
        */
-      public int getEpoch() {
-        return epoch_;
+      public java.lang.String getDigitalSignature() {
+        java.lang.Object ref = digitalSignature_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          digitalSignature_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>int32 epoch = 2;</code>
+       * <code>string digitalSignature = 2;</code>
        */
-      public Builder setEpoch(int value) {
-        
-        epoch_ = value;
+      public com.google.protobuf.ByteString
+          getDigitalSignatureBytes() {
+        java.lang.Object ref = digitalSignature_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          digitalSignature_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string digitalSignature = 2;</code>
+       */
+      public Builder setDigitalSignature(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        digitalSignature_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int32 epoch = 2;</code>
+       * <code>string digitalSignature = 2;</code>
        */
-      public Builder clearEpoch() {
+      public Builder clearDigitalSignature() {
         
-        epoch_ = 0;
+        digitalSignature_ = getDefaultInstance().getDigitalSignature();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string digitalSignature = 2;</code>
+       */
+      public Builder setDigitalSignatureBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        digitalSignature_ = value;
         onChanged();
         return this;
       }
@@ -3805,22 +3953,37 @@ public final class ServerService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int32 userID = 1;</code>
+     * <code>bool onError = 1;</code>
+     */
+    boolean getOnError();
+
+    /**
+     * <code>int32 userID = 2;</code>
      */
     int getUserID();
 
     /**
-     * <code>.Position position = 2;</code>
+     * <code>.Position position = 3;</code>
      */
     boolean hasPosition();
     /**
-     * <code>.Position position = 2;</code>
+     * <code>.Position position = 3;</code>
      */
     com.server.grpc.ServerService.Position getPosition();
     /**
-     * <code>.Position position = 2;</code>
+     * <code>.Position position = 3;</code>
      */
     com.server.grpc.ServerService.PositionOrBuilder getPositionOrBuilder();
+
+    /**
+     * <code>string errormessage = 4;</code>
+     */
+    java.lang.String getErrormessage();
+    /**
+     * <code>string errormessage = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getErrormessageBytes();
   }
   /**
    * Protobuf type {@code obtUseLocHARep}
@@ -3835,7 +3998,9 @@ public final class ServerService {
       super(builder);
     }
     private obtUseLocHARep() {
+      onError_ = false;
       userID_ = 0;
+      errormessage_ = "";
     }
 
     @java.lang.Override
@@ -3864,10 +4029,15 @@ public final class ServerService {
               break;
             case 8: {
 
+              onError_ = input.readBool();
+              break;
+            }
+            case 16: {
+
               userID_ = input.readInt32();
               break;
             }
-            case 18: {
+            case 26: {
               com.server.grpc.ServerService.Position.Builder subBuilder = null;
               if (position_ != null) {
                 subBuilder = position_.toBuilder();
@@ -3878,6 +4048,12 @@ public final class ServerService {
                 position_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              errormessage_ = s;
               break;
             }
             default: {
@@ -3912,34 +4088,77 @@ public final class ServerService {
               com.server.grpc.ServerService.obtUseLocHARep.class, com.server.grpc.ServerService.obtUseLocHARep.Builder.class);
     }
 
-    public static final int USERID_FIELD_NUMBER = 1;
+    public static final int ONERROR_FIELD_NUMBER = 1;
+    private boolean onError_;
+    /**
+     * <code>bool onError = 1;</code>
+     */
+    public boolean getOnError() {
+      return onError_;
+    }
+
+    public static final int USERID_FIELD_NUMBER = 2;
     private int userID_;
     /**
-     * <code>int32 userID = 1;</code>
+     * <code>int32 userID = 2;</code>
      */
     public int getUserID() {
       return userID_;
     }
 
-    public static final int POSITION_FIELD_NUMBER = 2;
+    public static final int POSITION_FIELD_NUMBER = 3;
     private com.server.grpc.ServerService.Position position_;
     /**
-     * <code>.Position position = 2;</code>
+     * <code>.Position position = 3;</code>
      */
     public boolean hasPosition() {
       return position_ != null;
     }
     /**
-     * <code>.Position position = 2;</code>
+     * <code>.Position position = 3;</code>
      */
     public com.server.grpc.ServerService.Position getPosition() {
       return position_ == null ? com.server.grpc.ServerService.Position.getDefaultInstance() : position_;
     }
     /**
-     * <code>.Position position = 2;</code>
+     * <code>.Position position = 3;</code>
      */
     public com.server.grpc.ServerService.PositionOrBuilder getPositionOrBuilder() {
       return getPosition();
+    }
+
+    public static final int ERRORMESSAGE_FIELD_NUMBER = 4;
+    private volatile java.lang.Object errormessage_;
+    /**
+     * <code>string errormessage = 4;</code>
+     */
+    public java.lang.String getErrormessage() {
+      java.lang.Object ref = errormessage_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        errormessage_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string errormessage = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getErrormessageBytes() {
+      java.lang.Object ref = errormessage_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        errormessage_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3956,11 +4175,17 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (onError_ != false) {
+        output.writeBool(1, onError_);
+      }
       if (userID_ != 0) {
-        output.writeInt32(1, userID_);
+        output.writeInt32(2, userID_);
       }
       if (position_ != null) {
-        output.writeMessage(2, getPosition());
+        output.writeMessage(3, getPosition());
+      }
+      if (!getErrormessageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, errormessage_);
       }
       unknownFields.writeTo(output);
     }
@@ -3971,13 +4196,20 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
+      if (onError_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, onError_);
+      }
       if (userID_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, userID_);
+          .computeInt32Size(2, userID_);
       }
       if (position_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getPosition());
+          .computeMessageSize(3, getPosition());
+      }
+      if (!getErrormessageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, errormessage_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3995,6 +4227,8 @@ public final class ServerService {
       com.server.grpc.ServerService.obtUseLocHARep other = (com.server.grpc.ServerService.obtUseLocHARep) obj;
 
       boolean result = true;
+      result = result && (getOnError()
+          == other.getOnError());
       result = result && (getUserID()
           == other.getUserID());
       result = result && (hasPosition() == other.hasPosition());
@@ -4002,6 +4236,8 @@ public final class ServerService {
         result = result && getPosition()
             .equals(other.getPosition());
       }
+      result = result && getErrormessage()
+          .equals(other.getErrormessage());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -4013,12 +4249,17 @@ public final class ServerService {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ONERROR_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getOnError());
       hash = (37 * hash) + USERID_FIELD_NUMBER;
       hash = (53 * hash) + getUserID();
       if (hasPosition()) {
         hash = (37 * hash) + POSITION_FIELD_NUMBER;
         hash = (53 * hash) + getPosition().hashCode();
       }
+      hash = (37 * hash) + ERRORMESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getErrormessage().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4152,6 +4393,8 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        onError_ = false;
+
         userID_ = 0;
 
         if (positionBuilder_ == null) {
@@ -4160,6 +4403,8 @@ public final class ServerService {
           position_ = null;
           positionBuilder_ = null;
         }
+        errormessage_ = "";
+
         return this;
       }
 
@@ -4186,12 +4431,14 @@ public final class ServerService {
       @java.lang.Override
       public com.server.grpc.ServerService.obtUseLocHARep buildPartial() {
         com.server.grpc.ServerService.obtUseLocHARep result = new com.server.grpc.ServerService.obtUseLocHARep(this);
+        result.onError_ = onError_;
         result.userID_ = userID_;
         if (positionBuilder_ == null) {
           result.position_ = position_;
         } else {
           result.position_ = positionBuilder_.build();
         }
+        result.errormessage_ = errormessage_;
         onBuilt();
         return result;
       }
@@ -4240,11 +4487,18 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.obtUseLocHARep other) {
         if (other == com.server.grpc.ServerService.obtUseLocHARep.getDefaultInstance()) return this;
+        if (other.getOnError() != false) {
+          setOnError(other.getOnError());
+        }
         if (other.getUserID() != 0) {
           setUserID(other.getUserID());
         }
         if (other.hasPosition()) {
           mergePosition(other.getPosition());
+        }
+        if (!other.getErrormessage().isEmpty()) {
+          errormessage_ = other.errormessage_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4275,15 +4529,41 @@ public final class ServerService {
         return this;
       }
 
+      private boolean onError_ ;
+      /**
+       * <code>bool onError = 1;</code>
+       */
+      public boolean getOnError() {
+        return onError_;
+      }
+      /**
+       * <code>bool onError = 1;</code>
+       */
+      public Builder setOnError(boolean value) {
+        
+        onError_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool onError = 1;</code>
+       */
+      public Builder clearOnError() {
+        
+        onError_ = false;
+        onChanged();
+        return this;
+      }
+
       private int userID_ ;
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>int32 userID = 2;</code>
        */
       public int getUserID() {
         return userID_;
       }
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>int32 userID = 2;</code>
        */
       public Builder setUserID(int value) {
         
@@ -4292,7 +4572,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>int32 userID = 2;</code>
        */
       public Builder clearUserID() {
         
@@ -4305,13 +4585,13 @@ public final class ServerService {
       private com.google.protobuf.SingleFieldBuilderV3<
           com.server.grpc.ServerService.Position, com.server.grpc.ServerService.Position.Builder, com.server.grpc.ServerService.PositionOrBuilder> positionBuilder_;
       /**
-       * <code>.Position position = 2;</code>
+       * <code>.Position position = 3;</code>
        */
       public boolean hasPosition() {
         return positionBuilder_ != null || position_ != null;
       }
       /**
-       * <code>.Position position = 2;</code>
+       * <code>.Position position = 3;</code>
        */
       public com.server.grpc.ServerService.Position getPosition() {
         if (positionBuilder_ == null) {
@@ -4321,7 +4601,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>.Position position = 2;</code>
+       * <code>.Position position = 3;</code>
        */
       public Builder setPosition(com.server.grpc.ServerService.Position value) {
         if (positionBuilder_ == null) {
@@ -4337,7 +4617,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.Position position = 2;</code>
+       * <code>.Position position = 3;</code>
        */
       public Builder setPosition(
           com.server.grpc.ServerService.Position.Builder builderForValue) {
@@ -4351,7 +4631,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.Position position = 2;</code>
+       * <code>.Position position = 3;</code>
        */
       public Builder mergePosition(com.server.grpc.ServerService.Position value) {
         if (positionBuilder_ == null) {
@@ -4369,7 +4649,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.Position position = 2;</code>
+       * <code>.Position position = 3;</code>
        */
       public Builder clearPosition() {
         if (positionBuilder_ == null) {
@@ -4383,7 +4663,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.Position position = 2;</code>
+       * <code>.Position position = 3;</code>
        */
       public com.server.grpc.ServerService.Position.Builder getPositionBuilder() {
         
@@ -4391,7 +4671,7 @@ public final class ServerService {
         return getPositionFieldBuilder().getBuilder();
       }
       /**
-       * <code>.Position position = 2;</code>
+       * <code>.Position position = 3;</code>
        */
       public com.server.grpc.ServerService.PositionOrBuilder getPositionOrBuilder() {
         if (positionBuilder_ != null) {
@@ -4402,7 +4682,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>.Position position = 2;</code>
+       * <code>.Position position = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           com.server.grpc.ServerService.Position, com.server.grpc.ServerService.Position.Builder, com.server.grpc.ServerService.PositionOrBuilder> 
@@ -4416,6 +4696,75 @@ public final class ServerService {
           position_ = null;
         }
         return positionBuilder_;
+      }
+
+      private java.lang.Object errormessage_ = "";
+      /**
+       * <code>string errormessage = 4;</code>
+       */
+      public java.lang.String getErrormessage() {
+        java.lang.Object ref = errormessage_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          errormessage_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string errormessage = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getErrormessageBytes() {
+        java.lang.Object ref = errormessage_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          errormessage_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string errormessage = 4;</code>
+       */
+      public Builder setErrormessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        errormessage_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string errormessage = 4;</code>
+       */
+      public Builder clearErrormessage() {
+        
+        errormessage_ = getDefaultInstance().getErrormessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string errormessage = 4;</code>
+       */
+      public Builder setErrormessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        errormessage_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -4473,6 +4822,26 @@ public final class ServerService {
   public interface usersLocationReqOrBuilder extends
       // @@protoc_insertion_point(interface_extends:usersLocationReq)
       com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string secureRequest = 1;</code>
+     */
+    java.lang.String getSecureRequest();
+    /**
+     * <code>string secureRequest = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getSecureRequestBytes();
+
+    /**
+     * <code>string digitalSignature = 2;</code>
+     */
+    java.lang.String getDigitalSignature();
+    /**
+     * <code>string digitalSignature = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getDigitalSignatureBytes();
   }
   /**
    * Protobuf type {@code usersLocationReq}
@@ -4487,6 +4856,8 @@ public final class ServerService {
       super(builder);
     }
     private usersLocationReq() {
+      secureRequest_ = "";
+      digitalSignature_ = "";
     }
 
     @java.lang.Override
@@ -4502,6 +4873,7 @@ public final class ServerService {
       if (extensionRegistry == null) {
         throw new java.lang.NullPointerException();
       }
+      int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -4512,6 +4884,18 @@ public final class ServerService {
             case 0:
               done = true;
               break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              secureRequest_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              digitalSignature_ = s;
+              break;
+            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -4544,6 +4928,74 @@ public final class ServerService {
               com.server.grpc.ServerService.usersLocationReq.class, com.server.grpc.ServerService.usersLocationReq.Builder.class);
     }
 
+    public static final int SECUREREQUEST_FIELD_NUMBER = 1;
+    private volatile java.lang.Object secureRequest_;
+    /**
+     * <code>string secureRequest = 1;</code>
+     */
+    public java.lang.String getSecureRequest() {
+      java.lang.Object ref = secureRequest_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        secureRequest_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string secureRequest = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSecureRequestBytes() {
+      java.lang.Object ref = secureRequest_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        secureRequest_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DIGITALSIGNATURE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object digitalSignature_;
+    /**
+     * <code>string digitalSignature = 2;</code>
+     */
+    public java.lang.String getDigitalSignature() {
+      java.lang.Object ref = digitalSignature_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        digitalSignature_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string digitalSignature = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDigitalSignatureBytes() {
+      java.lang.Object ref = digitalSignature_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        digitalSignature_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -4558,6 +5010,12 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (!getSecureRequestBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, secureRequest_);
+      }
+      if (!getDigitalSignatureBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, digitalSignature_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -4567,6 +5025,12 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
+      if (!getSecureRequestBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, secureRequest_);
+      }
+      if (!getDigitalSignatureBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, digitalSignature_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -4583,6 +5047,10 @@ public final class ServerService {
       com.server.grpc.ServerService.usersLocationReq other = (com.server.grpc.ServerService.usersLocationReq) obj;
 
       boolean result = true;
+      result = result && getSecureRequest()
+          .equals(other.getSecureRequest());
+      result = result && getDigitalSignature()
+          .equals(other.getDigitalSignature());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -4594,6 +5062,10 @@ public final class ServerService {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + SECUREREQUEST_FIELD_NUMBER;
+      hash = (53 * hash) + getSecureRequest().hashCode();
+      hash = (37 * hash) + DIGITALSIGNATURE_FIELD_NUMBER;
+      hash = (53 * hash) + getDigitalSignature().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4727,6 +5199,10 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        secureRequest_ = "";
+
+        digitalSignature_ = "";
+
         return this;
       }
 
@@ -4753,6 +5229,8 @@ public final class ServerService {
       @java.lang.Override
       public com.server.grpc.ServerService.usersLocationReq buildPartial() {
         com.server.grpc.ServerService.usersLocationReq result = new com.server.grpc.ServerService.usersLocationReq(this);
+        result.secureRequest_ = secureRequest_;
+        result.digitalSignature_ = digitalSignature_;
         onBuilt();
         return result;
       }
@@ -4801,6 +5279,14 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.usersLocationReq other) {
         if (other == com.server.grpc.ServerService.usersLocationReq.getDefaultInstance()) return this;
+        if (!other.getSecureRequest().isEmpty()) {
+          secureRequest_ = other.secureRequest_;
+          onChanged();
+        }
+        if (!other.getDigitalSignature().isEmpty()) {
+          digitalSignature_ = other.digitalSignature_;
+          onChanged();
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -4827,6 +5313,144 @@ public final class ServerService {
             mergeFrom(parsedMessage);
           }
         }
+        return this;
+      }
+
+      private java.lang.Object secureRequest_ = "";
+      /**
+       * <code>string secureRequest = 1;</code>
+       */
+      public java.lang.String getSecureRequest() {
+        java.lang.Object ref = secureRequest_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          secureRequest_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string secureRequest = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSecureRequestBytes() {
+        java.lang.Object ref = secureRequest_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          secureRequest_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string secureRequest = 1;</code>
+       */
+      public Builder setSecureRequest(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        secureRequest_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string secureRequest = 1;</code>
+       */
+      public Builder clearSecureRequest() {
+        
+        secureRequest_ = getDefaultInstance().getSecureRequest();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string secureRequest = 1;</code>
+       */
+      public Builder setSecureRequestBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        secureRequest_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object digitalSignature_ = "";
+      /**
+       * <code>string digitalSignature = 2;</code>
+       */
+      public java.lang.String getDigitalSignature() {
+        java.lang.Object ref = digitalSignature_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          digitalSignature_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string digitalSignature = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDigitalSignatureBytes() {
+        java.lang.Object ref = digitalSignature_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          digitalSignature_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string digitalSignature = 2;</code>
+       */
+      public Builder setDigitalSignature(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        digitalSignature_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string digitalSignature = 2;</code>
+       */
+      public Builder clearDigitalSignature() {
+        
+        digitalSignature_ = getDefaultInstance().getDigitalSignature();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string digitalSignature = 2;</code>
+       */
+      public Builder setDigitalSignatureBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        digitalSignature_ = value;
+        onChanged();
         return this;
       }
       @java.lang.Override
@@ -4885,6 +5509,31 @@ public final class ServerService {
   public interface usersLocationRepOrBuilder extends
       // @@protoc_insertion_point(interface_extends:usersLocationRep)
       com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>bool onError = 1;</code>
+     */
+    boolean getOnError();
+
+    /**
+     * <code>string usersList = 2;</code>
+     */
+    java.lang.String getUsersList();
+    /**
+     * <code>string usersList = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getUsersListBytes();
+
+    /**
+     * <code>string errorMessage = 3;</code>
+     */
+    java.lang.String getErrorMessage();
+    /**
+     * <code>string errorMessage = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getErrorMessageBytes();
   }
   /**
    * Protobuf type {@code usersLocationRep}
@@ -4899,6 +5548,9 @@ public final class ServerService {
       super(builder);
     }
     private usersLocationRep() {
+      onError_ = false;
+      usersList_ = "";
+      errorMessage_ = "";
     }
 
     @java.lang.Override
@@ -4914,6 +5566,7 @@ public final class ServerService {
       if (extensionRegistry == null) {
         throw new java.lang.NullPointerException();
       }
+      int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -4924,6 +5577,23 @@ public final class ServerService {
             case 0:
               done = true;
               break;
+            case 8: {
+
+              onError_ = input.readBool();
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              usersList_ = s;
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              errorMessage_ = s;
+              break;
+            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -4956,6 +5626,83 @@ public final class ServerService {
               com.server.grpc.ServerService.usersLocationRep.class, com.server.grpc.ServerService.usersLocationRep.Builder.class);
     }
 
+    public static final int ONERROR_FIELD_NUMBER = 1;
+    private boolean onError_;
+    /**
+     * <code>bool onError = 1;</code>
+     */
+    public boolean getOnError() {
+      return onError_;
+    }
+
+    public static final int USERSLIST_FIELD_NUMBER = 2;
+    private volatile java.lang.Object usersList_;
+    /**
+     * <code>string usersList = 2;</code>
+     */
+    public java.lang.String getUsersList() {
+      java.lang.Object ref = usersList_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        usersList_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string usersList = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUsersListBytes() {
+      java.lang.Object ref = usersList_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        usersList_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ERRORMESSAGE_FIELD_NUMBER = 3;
+    private volatile java.lang.Object errorMessage_;
+    /**
+     * <code>string errorMessage = 3;</code>
+     */
+    public java.lang.String getErrorMessage() {
+      java.lang.Object ref = errorMessage_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        errorMessage_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string errorMessage = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getErrorMessageBytes() {
+      java.lang.Object ref = errorMessage_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        errorMessage_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -4970,6 +5717,15 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (onError_ != false) {
+        output.writeBool(1, onError_);
+      }
+      if (!getUsersListBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, usersList_);
+      }
+      if (!getErrorMessageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, errorMessage_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -4979,6 +5735,16 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
+      if (onError_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, onError_);
+      }
+      if (!getUsersListBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, usersList_);
+      }
+      if (!getErrorMessageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, errorMessage_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -4995,6 +5761,12 @@ public final class ServerService {
       com.server.grpc.ServerService.usersLocationRep other = (com.server.grpc.ServerService.usersLocationRep) obj;
 
       boolean result = true;
+      result = result && (getOnError()
+          == other.getOnError());
+      result = result && getUsersList()
+          .equals(other.getUsersList());
+      result = result && getErrorMessage()
+          .equals(other.getErrorMessage());
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -5006,6 +5778,13 @@ public final class ServerService {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ONERROR_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getOnError());
+      hash = (37 * hash) + USERSLIST_FIELD_NUMBER;
+      hash = (53 * hash) + getUsersList().hashCode();
+      hash = (37 * hash) + ERRORMESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getErrorMessage().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5139,6 +5918,12 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        onError_ = false;
+
+        usersList_ = "";
+
+        errorMessage_ = "";
+
         return this;
       }
 
@@ -5165,6 +5950,9 @@ public final class ServerService {
       @java.lang.Override
       public com.server.grpc.ServerService.usersLocationRep buildPartial() {
         com.server.grpc.ServerService.usersLocationRep result = new com.server.grpc.ServerService.usersLocationRep(this);
+        result.onError_ = onError_;
+        result.usersList_ = usersList_;
+        result.errorMessage_ = errorMessage_;
         onBuilt();
         return result;
       }
@@ -5213,6 +6001,17 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.usersLocationRep other) {
         if (other == com.server.grpc.ServerService.usersLocationRep.getDefaultInstance()) return this;
+        if (other.getOnError() != false) {
+          setOnError(other.getOnError());
+        }
+        if (!other.getUsersList().isEmpty()) {
+          usersList_ = other.usersList_;
+          onChanged();
+        }
+        if (!other.getErrorMessage().isEmpty()) {
+          errorMessage_ = other.errorMessage_;
+          onChanged();
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -5239,6 +6038,170 @@ public final class ServerService {
             mergeFrom(parsedMessage);
           }
         }
+        return this;
+      }
+
+      private boolean onError_ ;
+      /**
+       * <code>bool onError = 1;</code>
+       */
+      public boolean getOnError() {
+        return onError_;
+      }
+      /**
+       * <code>bool onError = 1;</code>
+       */
+      public Builder setOnError(boolean value) {
+        
+        onError_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool onError = 1;</code>
+       */
+      public Builder clearOnError() {
+        
+        onError_ = false;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object usersList_ = "";
+      /**
+       * <code>string usersList = 2;</code>
+       */
+      public java.lang.String getUsersList() {
+        java.lang.Object ref = usersList_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          usersList_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string usersList = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getUsersListBytes() {
+        java.lang.Object ref = usersList_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          usersList_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string usersList = 2;</code>
+       */
+      public Builder setUsersList(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        usersList_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string usersList = 2;</code>
+       */
+      public Builder clearUsersList() {
+        
+        usersList_ = getDefaultInstance().getUsersList();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string usersList = 2;</code>
+       */
+      public Builder setUsersListBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        usersList_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object errorMessage_ = "";
+      /**
+       * <code>string errorMessage = 3;</code>
+       */
+      public java.lang.String getErrorMessage() {
+        java.lang.Object ref = errorMessage_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          errorMessage_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string errorMessage = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getErrorMessageBytes() {
+        java.lang.Object ref = errorMessage_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          errorMessage_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string errorMessage = 3;</code>
+       */
+      public Builder setErrorMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        errorMessage_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string errorMessage = 3;</code>
+       */
+      public Builder clearErrorMessage() {
+        
+        errorMessage_ = getDefaultInstance().getErrorMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string errorMessage = 3;</code>
+       */
+      public Builder setErrorMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        errorMessage_ = value;
+        onChanged();
         return this;
       }
       @java.lang.Override
@@ -8416,26 +9379,30 @@ public final class ServerService {
       "userID\030\001 \001(\005\022\025\n\rsecureRequest\030\002 \001(\t\022\021\n\tr" +
       "eqDigSig\030\003 \001(\t\"_\n\016obtLocRepReply\022\017\n\007onEr" +
       "ror\030\001 \001(\010\022\016\n\006userID\030\002 \001(\005\022\026\n\003pos\030\003 \001(\0132\t" +
-      ".Position\022\024\n\014errormessage\030\004 \001(\t\"/\n\016obtUs" +
-      "eLocHAReq\022\016\n\006userID\030\001 \001(\005\022\r\n\005epoch\030\002 \001(\005" +
-      "\"=\n\016obtUseLocHARep\022\016\n\006userID\030\001 \001(\005\022\033\n\010po" +
-      "sition\030\002 \001(\0132\t.Position\"\022\n\020usersLocation" +
-      "Req\"\022\n\020usersLocationRep\" \n\010Position\022\t\n\001X" +
-      "\030\001 \001(\005\022\t\n\001Y\030\002 \001(\005\"s\n\013DHKeyExcReq\022\016\n\006user" +
-      "ID\030\001 \001(\005\022\024\n\001p\030\002 \001(\0132\t.BInteger\022\024\n\001g\030\003 \001(" +
-      "\0132\t.BInteger\022\022\n\nMyDHPubKey\030\004 \001(\t\022\024\n\014digS" +
-      "igPubKey\030\005 \001(\t\"\\\n\013DHKeyExcRep\022\020\n\010myPubKe" +
-      "y\030\001 \001(\t\022\024\n\014digSigPubkey\030\002 \001(\t\022\017\n\007onError" +
-      "\030\003 \001(\010\022\024\n\014errorMessage\030\004 \001(\t\"\031\n\010BInteger" +
-      "\022\r\n\005value\030\001 \001(\0142\247\002\n\rserverService\0226\n\024sub" +
-      "mitLocationReport\022\r.subLocRepReq\032\017.subLo" +
-      "cRepReply\0226\n\024obtainLocationReport\022\r.obtL" +
-      "ocRepReq\032\017.obtLocRepReply\022:\n\026obtainLocat" +
-      "ionReportHA\022\017.obtUseLocHAReq\032\017.obtUseLoc" +
-      "HARep\022=\n\025obtainUsersAtLocation\022\021.usersLo" +
-      "cationReq\032\021.usersLocationRep\022+\n\rDHKeyExc" +
-      "hange\022\014.DHKeyExcReq\032\014.DHKeyExcRepB\021\n\017com" +
-      ".server.grpcb\006proto3"
+      ".Position\022\024\n\014errormessage\030\004 \001(\t\"A\n\016obtUs" +
+      "eLocHAReq\022\025\n\rsecureRequest\030\001 \001(\t\022\030\n\020digi" +
+      "talSignature\030\002 \001(\t\"d\n\016obtUseLocHARep\022\017\n\007" +
+      "onError\030\001 \001(\010\022\016\n\006userID\030\002 \001(\005\022\033\n\010positio" +
+      "n\030\003 \001(\0132\t.Position\022\024\n\014errormessage\030\004 \001(\t" +
+      "\"C\n\020usersLocationReq\022\025\n\rsecureRequest\030\001 " +
+      "\001(\t\022\030\n\020digitalSignature\030\002 \001(\t\"L\n\020usersLo" +
+      "cationRep\022\017\n\007onError\030\001 \001(\010\022\021\n\tusersList\030" +
+      "\002 \001(\t\022\024\n\014errorMessage\030\003 \001(\t\" \n\010Position\022" +
+      "\t\n\001X\030\001 \001(\005\022\t\n\001Y\030\002 \001(\005\"s\n\013DHKeyExcReq\022\016\n\006" +
+      "userID\030\001 \001(\005\022\024\n\001p\030\002 \001(\0132\t.BInteger\022\024\n\001g\030" +
+      "\003 \001(\0132\t.BInteger\022\022\n\nMyDHPubKey\030\004 \001(\t\022\024\n\014" +
+      "digSigPubKey\030\005 \001(\t\"\\\n\013DHKeyExcRep\022\020\n\010myP" +
+      "ubKey\030\001 \001(\t\022\024\n\014digSigPubkey\030\002 \001(\t\022\017\n\007onE" +
+      "rror\030\003 \001(\010\022\024\n\014errorMessage\030\004 \001(\t\"\031\n\010BInt" +
+      "eger\022\r\n\005value\030\001 \001(\0142\247\002\n\rserverService\0226\n" +
+      "\024submitLocationReport\022\r.subLocRepReq\032\017.s" +
+      "ubLocRepReply\0226\n\024obtainLocationReport\022\r." +
+      "obtLocRepReq\032\017.obtLocRepReply\022:\n\026obtainL" +
+      "ocationReportHA\022\017.obtUseLocHAReq\032\017.obtUs" +
+      "eLocHARep\022=\n\025obtainUsersAtLocation\022\021.use" +
+      "rsLocationReq\032\021.usersLocationRep\022+\n\rDHKe" +
+      "yExchange\022\014.DHKeyExcReq\032\014.DHKeyExcRepB\021\n" +
+      "\017com.server.grpcb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -8478,25 +9445,25 @@ public final class ServerService {
     internal_static_obtUseLocHAReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_obtUseLocHAReq_descriptor,
-        new java.lang.String[] { "UserID", "Epoch", });
+        new java.lang.String[] { "SecureRequest", "DigitalSignature", });
     internal_static_obtUseLocHARep_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_obtUseLocHARep_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_obtUseLocHARep_descriptor,
-        new java.lang.String[] { "UserID", "Position", });
+        new java.lang.String[] { "OnError", "UserID", "Position", "Errormessage", });
     internal_static_usersLocationReq_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_usersLocationReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_usersLocationReq_descriptor,
-        new java.lang.String[] { });
+        new java.lang.String[] { "SecureRequest", "DigitalSignature", });
     internal_static_usersLocationRep_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_usersLocationRep_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_usersLocationRep_descriptor,
-        new java.lang.String[] { });
+        new java.lang.String[] { "OnError", "UsersList", "ErrorMessage", });
     internal_static_Position_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_Position_fieldAccessorTable = new

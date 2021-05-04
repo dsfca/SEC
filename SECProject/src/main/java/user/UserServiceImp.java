@@ -85,7 +85,7 @@ public class UserServiceImp extends userServiceImplBase  {
 	 * ************************************************************************************/
 	private LocProofRep.Builder locationProofHandler(int proverID, int epoch, Point2D proverPos) throws Exception{
 		LocProofRep.Builder response = LocProofRep.newBuilder();
-		PrivateKey key = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
+		PrivateKey key = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
 		String proof = getProof(proverID, proverPos, epoch);
 		String proof_dig_sig = RSAProvider.getTexthashEnWithPriKey(proof, key);
 		proof = proof +" "+ proof_dig_sig;

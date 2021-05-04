@@ -5,12 +5,17 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.server.grpc.ServerService.Position;
 import com.server.grpc.ServerService.obtLocRepReply;
+import com.server.grpc.ServerService.obtUseLocHARep;
 import com.server.grpc.ServerService.subLocRepReply;
+import com.server.grpc.ServerService.usersLocationRep;
+import com.server.grpc.ServerService.usersLocationRep.Builder;
 
 import shared.Point2D;
 import shared.TrackerLocationSystem;
@@ -123,6 +128,50 @@ public class DealWithRequest {
 		return reports;
 	}
     
+    
+    public obtUseLocHARep.Builder obtainLocationReportHAHandler(int userID, int epoch, int nonce){
+    	obtUseLocHARep.Builder response = obtUseLocHARep.newBuilder();
+    	List<Integer> userNonces = usersNonce.get(0);
+		if(userNonces == null)
+			userNonces = new ArrayList<>();
+		if(!userNonces.contains(nonce)) {
+		    	Point2D userPoint = DB.getLocationGivenEpoch(userID, epoch);
+		    	if(userPoint != null) {
+			    	Position.Builder position = Position.newBuilder().setX(userPoint.getX())
+			    			.setY(userPoint.getY());
+			    	response.setOnError(false);
+			    	response.setPosition(position);
+					
+		    	}else {
+					response.setOnError(true);
+					response.setErrormessage("no user position submited at this epoch, try later");
+				}
+		}else {
+			response.setOnError(true);
+			response.setErrormessage("user nonce already exists");
+		}
+	    return response;
+	}
+    
+    public Builder obtainUsersAtLocationHandler(Point2D requestPoint, int requestEpoch, int nonce) {
+    	usersLocationRep.Builder response = usersLocationRep.newBuilder();
+    	List<Integer> userNonces = usersNonce.get(0);
+		if(userNonces == null)
+			userNonces = new ArrayList<>();
+		if(!userNonces.contains(nonce)) {
+    
+	    	ArrayList<String> usersAtPos = DB.getUsersGivenPosAndEpoch(requestPoint, requestEpoch);
+	    	ArrayList<String> uniqueUsers = (ArrayList<String>) usersAtPos.stream()
+	    													.distinct()
+	    													.collect(Collectors.toList());
+	    	response.setOnError(false);
+	    	response.setUsersList(uniqueUsers.toString());
+		}else {
+			response.setOnError(true).setErrorMessage("nonce must be different for each request");
+		}
+		return response;
+	}
+    
     /**************************************************************************************
      * 											- putOrUpdateSharedKeys()
      * -
@@ -142,5 +191,6 @@ public class DealWithRequest {
     public Key getSharedKey(int ID) {
     	return sharedKeys.get(ID);
     }
+
     
 }
