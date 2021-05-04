@@ -1,24 +1,34 @@
 package crypto;
 
 
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.security.InvalidKeyException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-import javax.crypto.BadPaddingException;
+
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+
 
 public class RSAProvider {
 
@@ -37,21 +47,60 @@ public class RSAProvider {
 	 * - return:
 	 * 
 	 * ************************************************************************************/
-	public static void RSAKeyGenerator(String privKeyPath, String pubKeyPath) throws Exception {
+public static void RSAKeyGenerator(String privKeyPath, String pubKeyPath) throws Exception {
 		
 		KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ASSYMMETRIC_CYPHER_ALGO);
         keyGen.initialize(1024);
         KeyPair keys = keyGen.generateKeyPair();
         
         PrivateKey privKey = keys.getPrivate();
-        byte[] privKeyEncoded = privKey.getEncoded();
+        //byte[] privKeyEncoded = privKey.getEncoded();
         
         PublicKey pubKey = keys.getPublic();
-        byte[] pubKeyEncoded = pubKey.getEncoded();
+        //byte[] pubKeyEncoded = pubKey.getEncoded();
         
-        write(privKeyEncoded, privKeyPath);
-        write(pubKeyEncoded, pubKeyPath);
+        KeyFactory keyfactory = KeyFactory.getInstance(ASSYMMETRIC_CYPHER_ALGO);
+        RSAPublicKeySpec rsaPubKeySpec = keyfactory.getKeySpec(pubKey, RSAPublicKeySpec.class);
+        RSAPrivateKeySpec rsaPriKeySpec = keyfactory.getKeySpec(privKey, RSAPrivateKeySpec.class);
         
+        saveKeys(pubKeyPath, rsaPubKeySpec.getModulus(), rsaPubKeySpec.getPublicExponent());
+        saveKeys(privKeyPath, rsaPriKeySpec.getModulus(), rsaPriKeySpec.getPrivateExponent());
+        /*    write(privKeyEncoded, privKeyPath);
+        write(pubKeyEncoded, pubKeyPath);*/
+        
+	}
+	
+	private static void saveKeys(String path, BigInteger modulus, BigInteger exp) throws Exception {
+		FileOutputStream fos  = new FileOutputStream(path);
+		ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos));
+		oos.writeObject(modulus);
+		oos.writeObject(exp);
+		oos.close();
+		fos.close();	
+	}
+	
+	public static PublicKey readpublicKeyFromFile(String pubKeyPath) throws Exception {
+		FileInputStream fis = new FileInputStream(new File(pubKeyPath));
+		ObjectInputStream ois = new ObjectInputStream(fis);
+		BigInteger mod = (BigInteger) ois.readObject();
+		BigInteger exp = (BigInteger) ois.readObject();
+		RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(mod, exp);
+		KeyFactory fact = KeyFactory.getInstance(ASSYMMETRIC_CYPHER_ALGO);
+		PublicKey publicKey = fact.generatePublic(rsaPublicKeySpec);
+		return publicKey;
+		
+	}
+	
+	public static PrivateKey readprivateKeyFromFile(String privKeyPath) throws Exception {
+		FileInputStream fis = new FileInputStream(new File(privKeyPath));
+		ObjectInputStream ois = new ObjectInputStream(fis);
+		BigInteger mod = (BigInteger) ois.readObject();
+		BigInteger exp = (BigInteger) ois.readObject();
+		RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(mod, exp);
+		KeyFactory fact = KeyFactory.getInstance(ASSYMMETRIC_CYPHER_ALGO);
+		PrivateKey privateKey = fact.generatePrivate(rsaPrivateKeySpec);
+		return privateKey;
+		
 	}
 	
 	/**write content of the array 
@@ -61,6 +110,28 @@ public class RSAProvider {
 		FileOutputStream file  = new FileOutputStream(path);
         file.write(content);
         file.close();
+	}
+	
+	public static void writeprivateKeyWithPassword(PrivateKey key, String privKeyPath, String password) throws Exception {
+		File file = new File(privKeyPath);
+		KeyStore javaKeyStore = KeyStore.getInstance("JCEKS");
+		if(!file.exists()) {
+			javaKeyStore.load(null, null);
+		}
+		//PrivateKeyEntry keyEntry = new PrivateKeyEntry(key, null);
+		javaKeyStore.setKeyEntry("keyAlias", key, /*new KeyStore.PasswordProtection(password.toCharArray())*/ password.toCharArray(),null);
+		OutputStream writeStream = new FileOutputStream(privKeyPath);
+		javaKeyStore.store(writeStream, password.toCharArray());
+		
+	}
+	
+	public static PrivateKey loadPrivKey(String privKeyPath, String password) throws Exception {
+		KeyStore keyStore = KeyStore.getInstance("JCEKS");
+		InputStream readStream = new FileInputStream(privKeyPath);
+		keyStore.load(readStream, password.toCharArray());
+		PrivateKey key = (PrivateKey) keyStore.getKey("keyAlias", password.toCharArray());
+		return key;
+		
 	}
 	
 
@@ -86,7 +157,7 @@ public class RSAProvider {
 	public static PublicKey readPubKey(String pubkeypath) throws Exception {
 		byte[] pubEncoded = readfile(pubkeypath);
 		X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(pubEncoded);
-	    KeyFactory keyFacPub = KeyFactory.getInstance("RSA");
+	    KeyFactory keyFacPub = KeyFactory.getInstance(ASSYMMETRIC_CYPHER_ALGO);
 	    PublicKey pub = keyFacPub.generatePublic(pubSpec);
 	    return pub;
 	}
@@ -94,7 +165,7 @@ public class RSAProvider {
 	public static PrivateKey readPrivKey(String privKeyPath) throws Exception {
 		byte[] privEncoded = readfile(privKeyPath);
 		PKCS8EncodedKeySpec privSpec = new PKCS8EncodedKeySpec(privEncoded);
-        KeyFactory keyFacPriv = KeyFactory.getInstance("RSA");
+        KeyFactory keyFacPriv = KeyFactory.getInstance(ASSYMMETRIC_CYPHER_ALGO);
         PrivateKey priv = keyFacPriv.generatePrivate(privSpec);
 	    return priv;
 	}
@@ -204,17 +275,18 @@ public class RSAProvider {
     	return cipherB64String;
 	}
 	
-/*	public static void main(String[] args) {
+	public static void main(String[] args) {
 		
 		try {
-			for(int i = 0; i < 7; i++) {
-				String privKeyPath = "resources/public_keys/user" + 1 +"_public.key";
-				String pubKeyPath = "resources/private_keys/user" + 1 + "_private.key";
+			String pass = "#######";
+			//for(int i = 0; i < 10; i++) {
+				String privKeyPath = "resources/private_keys/server_private.key";
+				String pubKeyPath = "resources/public_keys/server_public.key";
 				RSAKeyGenerator(privKeyPath, pubKeyPath);
-			}
+			//}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}*/
+	}
 	
 }

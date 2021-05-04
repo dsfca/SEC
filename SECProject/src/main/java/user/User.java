@@ -60,12 +60,17 @@ public class User {
 	* 
 	* ************************************************************************************/
 	public User(int ID) throws Exception {
-		this.myID = ID;
-		this.port = ID + Integer.parseInt("9090");
-		PRIVATE_KEY_PATH = "resources/private_keys/user" + myID + "_private.key";
-		serverPort = new Ini(new File("variables.ini")).get("Server","server_port", Integer.class);
-		init();
-		initThreadToSndReqProof();
+		if(ID > 0) {
+			this.myID = ID;
+			this.port = ID + Integer.parseInt("9090");
+			PRIVATE_KEY_PATH = "resources/private_keys/user" + myID + "_private.key";
+			serverPort = new Ini(new File("variables.ini")).get("Server","server_port", Integer.class);
+			init();
+			initThreadToSndReqProof();
+		}
+		else {
+			throw new IllegalArgumentException("the ID of the user must be bigger than 0");
+		}
 	}
 
 	public User(int ID, int port, String pkeyPath) {
@@ -186,7 +191,7 @@ public class User {
 	 *
 	 * ************************************************************************************/
 	public subLocRepReply submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position, Key sharedKey) throws Exception {
-		PrivateKey prvkey = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
+		PrivateKey prvkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
 		String report = proofs.toString();
 		JsonObject secureReport = TrackerLocationSystem.getSecureText(sharedKey, prvkey, report);
 		String reportCipher = secureReport.get("ciphertext").getAsString();
@@ -218,7 +223,7 @@ public class User {
 	* 
 	* ************************************************************************************/
 	public String get_sig_of(String s) throws Exception {
-		PrivateKey priv = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
+		PrivateKey priv = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
 		String sig = RSAProvider.getTexthashEnWithPriKey(s, priv);
 		return sig;
 	}
@@ -250,7 +255,7 @@ public class User {
 		
 		DHKeyExcRep rep = serverStub.dHKeyExchange(req);
 		String servPubKeyPath = "resources/public_keys/server_public.key";
-		PublicKey key = RSAProvider.readPubKey(servPubKeyPath);
+		PublicKey key = RSAProvider.readpublicKeyFromFile(servPubKeyPath);
 		String servPbkDigSig = rep.getDigSigPubkey();
 		String servPubKey = rep.getMyPubKey();
 		channel.shutdown();
@@ -350,7 +355,7 @@ public class User {
 	public obtLocRepReply obtainLocationReport(int epoch) throws Exception {
 		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", serverPort)
 				.usePlaintext().build();
-		PrivateKey myprivkey = RSAProvider.readPrivKey(PRIVATE_KEY_PATH);
+		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
 		int myNonce = new Random().nextInt();
 		String reqPlainText = myID + " " + epoch +" "+myNonce;
 		JsonObject cipherReq  = TrackerLocationSystem.getSecureText(sharedKey, myprivkey, reqPlainText);

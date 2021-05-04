@@ -50,7 +50,7 @@ public class TrackerLocationSystem {
 	}
 	
 	public void start_users(int num_users, int g_width, int g_height) throws Exception {
-		for(int i = 0; i < num_users; i++) {
+		for(int i = 1; i < num_users; i++) {
 			User user = new User(i);
 			users.add(user);
 		}
@@ -142,7 +142,8 @@ public class TrackerLocationSystem {
 	public static PublicKey getUserPublicKey(int id) throws Exception {
 		PublicKey key = null;
 		String path = "resources/public_keys/user" + id +"_public.key";
-		key = RSAProvider.readPubKey(path);
+		//key = RSAProvider.readPubKey(path);
+		key = RSAProvider.readpublicKeyFromFile(path);
 		return key;
 	}
 	
@@ -163,9 +164,9 @@ public class TrackerLocationSystem {
 	public static void ini_pos_file(int n_user, int n_epoch, int G_width, int G_height) {
 		boolean append = false;
 		for(int i = 1; i <= n_epoch; i++) {
-			for(int j = 0; j < n_user; j++) {
+			for(int j = 1; j < n_user; j++) {
 				Point2D userPos = new Point2D((int)(Math.random()*G_width), (int)(Math.random()*G_height));
-				if(i == 1 && j == 0) { append = false;}
+				if(i == 1 && j == 1) { append = false;}
 				else {	 append = true; }
 				update_user_pos(j, userPos, i, 9090 + j, append);
 			}
@@ -199,7 +200,7 @@ public class TrackerLocationSystem {
 	public static String getDHkeySigned(PublicKey dfPubKey, String privateKeyPath ) throws Exception {
 		byte[] myDHpbkbytes = dfPubKey.getEncoded();
 		String pbkB64 = Base64.getEncoder().encodeToString(myDHpbkbytes);
-		PrivateKey privkey = RSAProvider.readPrivKey(privateKeyPath);
+		PrivateKey privkey = RSAProvider.readprivateKeyFromFile(privateKeyPath);
 		String digSigMyDHpubkey = RSAProvider.getTexthashEnWithPriKey(pbkB64, privkey);
 		return digSigMyDHpubkey;
 	}

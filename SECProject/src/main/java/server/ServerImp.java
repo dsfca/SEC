@@ -5,7 +5,11 @@ import com.server.grpc.ServerService.DHKeyExcRep;
 import com.server.grpc.ServerService.DHKeyExcReq;
 import com.server.grpc.ServerService.subLocRepReply;
 import com.server.grpc.ServerService.subLocRepReq;
+import com.server.grpc.ServerService.usersLocationRep;
+import com.server.grpc.ServerService.usersLocationReq;
 import com.server.grpc.ServerService.obtLocRepReq;
+import com.server.grpc.ServerService.obtUseLocHARep;
+import com.server.grpc.ServerService.obtUseLocHAReq;
 import com.server.grpc.ServerService.obtLocRepReply;
 
 
@@ -15,12 +19,14 @@ import crypto.AESProvider;
 import crypto.RSAProvider;
 import io.grpc.stub.StreamObserver;
 import shared.DiffieHelman;
+import shared.Point2D;
 import shared.TrackerLocationSystem;
 
 import java.math.BigInteger;
 import java.security.Key;
 import java.security.PublicKey;
 import java.util.Base64;
+import java.util.regex.Pattern;
 
 
 
@@ -122,10 +128,33 @@ public class ServerImp extends serverServiceImplBase {
      *      - responseObserver: allows to respond to specific user
      *
      * ************************************************************************************/
- /*   @Override
-    public void obtainLocationReportHA(obtLocRepReq request, StreamObserver<obtLocRepReply> responseObserver) {
-    		
-    }*/
+   @Override
+   public void obtainLocationReportHA(obtUseLocHAReq request, StreamObserver<obtUseLocHARep> responseObserver) {
+	   try {
+		   Key sharedKey = dealWithReq.getSharedKey(0);
+		   PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(0);
+		   String secureMessage = request.getSecureRequest();
+		   String messDigSig = request.getDigitalSignature();
+		   String messPlainText = AESProvider.getPlainTextOfCipherText(secureMessage, sharedKey);
+		   boolean DigSigIsValid = RSAProvider.istextAuthentic(messPlainText, messDigSig, pubkey);
+		   if(DigSigIsValid) {
+			   String[] requestValues = messPlainText.split(Pattern.quote("||"));
+			   int nonce = Integer.parseInt(requestValues[2]);
+			   int userID = Integer.parseInt(requestValues[0]);
+			   int epoch = Integer.parseInt(requestValues[1]);
+			   obtUseLocHARep.Builder response = dealWithReq.obtainLocationReportHAHandler(userID, epoch, nonce);
+			   responseObserver.onNext(response.build());
+			   responseObserver.onCompleted();
+		   }else {
+			   throw new Exception("the message is not authentic, please use your keys to cipher the messages");
+		   }
+	   }catch (Exception e) {
+		   obtUseLocHARep.Builder response = obtUseLocHARep.newBuilder().setOnError(true).
+				   setErrormessage(e.toString()+""+e.getMessage());
+		   responseObserver.onNext(response.build());
+		   responseObserver.onCompleted();
+	   }
+   }
 
     /**************************************************************************************
      *                                  - obtainUsersAtLocation()
@@ -136,22 +165,38 @@ public class ServerImp extends serverServiceImplBase {
      *      - responseObserver: allows to respond to specific user
      *
      * ************************************************************************************/
-  /*  @Override
-    public void obtainUsersAtLocation(usersLocationReq request, StreamObserver<obtUseLocRep> responseObserver) {
-        
-//        ServerService.obtUseLocRep.Builder response = obtainReportsHandler(request);
-  //      responseObserver.onNext(response.build());
-    //    responseObserver.onCompleted();
-    }*/
+   @Override
+   public void obtainUsersAtLocation(usersLocationReq request, StreamObserver<usersLocationRep> responseObserver) {
+	   usersLocationRep.Builder response;
+	   try {
+		   Key sharedKey = dealWithReq.getSharedKey(0);
+		   PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(0);
+		   String secureMessage = request.getSecureRequest();
+		   String messDigSig = request.getDigitalSignature();
+		   String messPlainText = AESProvider.getPlainTextOfCipherText(secureMessage, sharedKey);
+		   boolean DigSigIsValid = RSAProvider.istextAuthentic(messPlainText, messDigSig, pubkey);
+		   if(DigSigIsValid) {
+			   String[] requestValues = messPlainText.split(Pattern.quote("||"));
+			   int requestEpoch = Integer.parseInt(requestValues[1]);
+			   String position = requestValues[0].substring(1, 4);
+			   int x = Integer.parseInt(position.substring(0,1));
+			   int y = Integer.parseInt(position.substring(2,3));
+			   Point2D requestPoint = new Point2D(x, y);
+			   int nonce =Integer.parseInt(requestValues[2]);
+			   response = dealWithReq.obtainUsersAtLocationHandler(requestPoint, requestEpoch, nonce);
+			   responseObserver.onNext(response.build());
+			   responseObserver.onCompleted();
+			   }
+	   }catch (Exception e) {
+		response = usersLocationRep.newBuilder().setOnError(true)
+												.setErrorMessage(e.getMessage());
+		responseObserver.onNext(response.build());
+		   responseObserver.onCompleted();
+	}
+   }
 
 
    
-    
-
-   
-
-
-
     
 
     /**************************************************************************************
