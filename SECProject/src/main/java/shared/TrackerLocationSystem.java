@@ -38,7 +38,7 @@ public class TrackerLocationSystem {
 		this.num_users = num_users;
 		this.G_width = G_width;
 		this.G_height = G_height;
-		this.serverPort = new Ini(new File("variables.ini")).get("Server","server_port", Integer.class);
+		this.serverPort = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
 		NUM_BIZANTINE_USERS = f;
 	}
 	

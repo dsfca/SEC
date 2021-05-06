@@ -47,7 +47,7 @@ public class Server {
     
   //SERVER ATTRIBUTES GET FROM INI FILE 
     public static void main(String [] args) throws InvalidFileFormatException, IOException {
-    	Server server = new Server(new Ini(new File("variables.ini")).get("Server","server_port", Integer.class));
+    	Server server = new Server(new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class));
     	server.init();
     	
     	System.out.println("sbtring".substring(2,3));

@@ -64,7 +64,7 @@ public class User {
 			this.myID = ID;
 			this.port = ID + Integer.parseInt("9090");
 			PRIVATE_KEY_PATH = "resources/private_keys/user" + myID + "_private.key";
-			serverPort = new Ini(new File("variables.ini")).get("Server","server_port", Integer.class);
+			serverPort = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
 			init();
 			initThreadToSndReqProof();
 		}
