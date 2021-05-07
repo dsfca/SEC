@@ -1,10 +1,8 @@
 import org.junit.jupiter.api.Test;
 
-import com.server.grpc.ServerService.obtLocRepReply;
-import com.server.grpc.ServerService.subLocRepReply;
 
 import shared.TrackerLocationSystem;
-import user.User;
+import user.NormalUser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -46,11 +44,10 @@ public class UserTest {
             
             int userID = 2;
             int epoch = 2;
-            User u = trl.getUsers().get(userID);
+            NormalUser u = trl.getUsers().get(userID);
             Thread.sleep(1000);
-            subLocRepReply serverReply = u.proveLocation(epoch); u.proveLocation(epoch);
-            assertEquals(serverReply.getReplycode(), 0);
-            assertEquals(serverReply.getReplymessage(), "Your report was submitted successfully");
+            String serverReply = u.proveLocation(epoch); u.proveLocation(epoch);
+            assertEquals(serverReply, "Your report was submitted successfully");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,13 +61,12 @@ public class UserTest {
     		
             int userID = 1;
             int epoch = 2;
-            User u = trl.getUsers().get(userID);
-            subLocRepReply serverReply = u.proveLocation(epoch); u.proveLocation(epoch);
-            assertEquals(serverReply.getReplycode(), 0);
-            assertEquals(serverReply.getReplymessage(), "Your report was submitted successfully");
+            NormalUser u = trl.getUsers().get(userID);
+            String serverReply = u.proveLocation(epoch); u.proveLocation(epoch);    
+            assertEquals(serverReply, "Your report was submitted successfully");
             Thread.sleep(2000);
-            obtLocRepReply reply =  u.obtainLocationReport(epoch);
-            System.out.println("user position: (" +reply.getPos().getX() + ", "+ reply.getPos().getY() +")");
+            String reply =  u.obtainLocationReport(epoch);
+            System.out.println("user position: " + reply);
             
 
         } catch (Exception e) {

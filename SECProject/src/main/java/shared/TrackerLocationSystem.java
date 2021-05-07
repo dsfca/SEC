@@ -6,27 +6,24 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.Key;
+import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-
 import org.ini4j.Ini;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.server.grpc.ServerService.subLocRepReply;
-
 import server.Server;
 import crypto.AESProvider;
 import crypto.RSAProvider;
-import user.User;
+import user.NormalUser;
 import user.UserLocation;
 
 public class TrackerLocationSystem {
 	
-	private  List<User> users = new ArrayList<User>();
+	private  List<NormalUser> users = new ArrayList<NormalUser>();
 	private static final String pos_file_path = "resources/Grid.txt";
 	private int num_users;
 	private int G_width;
@@ -43,7 +40,7 @@ public class TrackerLocationSystem {
 	}
 	
 	public void start() throws Exception {
-		Server server = new Server(serverPort);
+		Server server = new Server(0,serverPort);
 		server.init();
 		ini_pos_file(num_users, 10, G_width, G_height);
 		start_users(num_users, G_width, G_height);
@@ -51,12 +48,12 @@ public class TrackerLocationSystem {
 	
 	public void start_users(int num_users, int g_width, int g_height) throws Exception {
 		for(int i = 1; i < num_users; i++) {
-			User user = new User(i);
+			NormalUser user = new NormalUser(i);
 			users.add(user);
 		}
 	}
 	
-	public List<User> getUsers(){
+	public List<NormalUser> getUsers(){
 		return users;
 	}
 
@@ -142,6 +139,14 @@ public class TrackerLocationSystem {
 	public static PublicKey getUserPublicKey(int id) throws Exception {
 		PublicKey key = null;
 		String path = "resources/public_keys/user" + id +"_public.key";
+		//key = RSAProvider.readPubKey(path);
+		key = RSAProvider.readpublicKeyFromFile(path);
+		return key;
+	}
+	
+	public static PublicKey getServerPublicKey(int serverID) throws Exception {
+		PublicKey key = null;
+		String path = "resources/public_keys/server" + serverID +"_public.key";
 		//key = RSAProvider.readPubKey(path);
 		key = RSAProvider.readpublicKeyFromFile(path);
 		return key;
@@ -269,4 +274,5 @@ public class TrackerLocationSystem {
 		
 		
 	}
+
 }

@@ -5,7 +5,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -148,8 +147,8 @@ public static void RSAKeyGenerator(String privKeyPath, String pubKeyPath) throws
 	 * 
 	 * ************************************************************************************/
 	public static KeyPair readRSAKey(String pubkeypath, String privKeyPath) throws Exception {
-	    PublicKey pub = readPubKey(pubkeypath);	    
-        PrivateKey priv = readPrivKey(privKeyPath);
+	    PublicKey pub = readpublicKeyFromFile(pubkeypath);	    
+        PrivateKey priv = readprivateKeyFromFile(privKeyPath);
         KeyPair keys = new KeyPair(pub, priv);
         return keys;
 	}
