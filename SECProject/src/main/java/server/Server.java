@@ -15,12 +15,12 @@ public class Server {
 
     private int port;
     private DealWithRequest serverDealWithReq;
-    private int ID;
+    private int server_id;
 
-    public Server(int id,int port) {
+    public Server(int server_id, int port) {
         this.port = port;
-        serverDealWithReq = new DealWithRequest(id);
-        this.ID = id;
+        this.server_id = server_id;
+        serverDealWithReq = new DealWithRequest(this.server_id);
     }
 
     /**************************************************************************************
@@ -32,11 +32,11 @@ public class Server {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                io.grpc.Server server = ServerBuilder.forPort(port).addService(new ServerImp(ID,serverDealWithReq)).build();
+                io.grpc.Server server = ServerBuilder.forPort(port).addService(new ServerImp(server_id,serverDealWithReq)).build();
                 try {
-                	verifyKeys(ID, "server");
+                	verifyKeys(server_id, "server");
                     server.start();
-                    System.out.println("Server started at " + server.getPort());
+                    System.out.println("INIT: Server " + getID() + " started at " + server.getPort());
 
                     server.awaitTermination();
                 } catch (Exception e) {
@@ -47,8 +47,12 @@ public class Server {
         };
 
         new Thread(r).start();
-        System.out.println("Server thread running");
+        System.out.println("INIT: Server " + getID() + " thread running");
 
+    }
+    
+    public int getID() {
+    	return this.server_id;
     }
     
     public void verifyKeys(int id, String serverOrUser) throws Exception {

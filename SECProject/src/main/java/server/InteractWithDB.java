@@ -34,15 +34,17 @@ public class InteractWithDB {
 	
 	//Mongo
 	static Ini ini;
-	static MongoDatabase mongo_db;
-	static MongoClient mongo_client;
-	static MongoCollection<Document> mongo_collection_all;
-	static MongoCollection<Document> mongo_collection_validated;
+	private MongoDatabase mongo_db;
+	private MongoClient mongo_client;
+	private MongoCollection<Document> mongo_collection_all;
+	private MongoCollection<Document> mongo_collection_validated;
+	private int server_id;
 	
 
 	
-	public InteractWithDB(String mongo_ini) throws FileNotFoundException, IOException {
+	public InteractWithDB(String mongo_ini, int server_id) throws FileNotFoundException, IOException {
 		this.ini = new Ini(new File(mongo_ini));
+		this.server_id = server_id;
 		connectToMongo();
 	}
 	
@@ -66,9 +68,10 @@ public class InteractWithDB {
 	//ESTABLISH CONNECTION TO DATABASE
 	public void connectToMongo() {
 		mongo_client = new MongoClient(new MongoClientURI(getHost()));
-		mongo_db = mongo_client.getDatabase(getDatabase());
+		mongo_db = mongo_client.getDatabase(getDatabase()+ "_" + server_id) ;
 		mongo_collection_all = mongo_db.getCollection(getAllCollection());
 		mongo_collection_validated = mongo_db.getCollection(getValidatedCollection());
+		System.out.println("DATABASE: Server "+server_id+" successfully connected to database");
 		//System.out.println(mongo_db.getName());
 	}
 
@@ -85,6 +88,7 @@ public class InteractWithDB {
 		document.append("near", near);
 		document.append("Digi_sig_u1", proof1);
 		mongo_collection_all.insertOne(document);
+		System.out.println("ADDED TO DB   " + mongo_collection_all.getNamespace() + "   OF SERVER "+ server_id);
 	}
 	
 	
@@ -110,6 +114,7 @@ public class InteractWithDB {
 				location = new Point2D(Integer.valueOf(location_string.substring(1,2)), Integer.valueOf(location_string.substring(3, 4)));
 			}
 		}
+		System.out.println("Checking server " + this.server_id + " submitted locations");
 		return location;
 	}
 	
@@ -166,8 +171,8 @@ public class InteractWithDB {
 	
 
 	
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		InteractWithDB it = new InteractWithDB("variables.ini");
+	/*public static void main(String[] args) throws FileNotFoundException, IOException {
+		InteractWithDB it = new InteractWithDB("variables.ini", 1);
 		it.cleanValidatedCollection();
 		it.cleanAllLocationsCollection();
 		//LOCATIONS TO VALIDATED
@@ -186,6 +191,7 @@ public class InteractWithDB {
 		ArrayList <String> users = it.getUsersGivenPosAndEpoch(new Point2D(0,0), 1);
 		ArrayList <String> proofs = it.getProofsinRange(1, 0, 4);
 		System.out.println(proofs);
-	}
+	}*/
 
 }
+

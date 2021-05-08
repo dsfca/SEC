@@ -38,7 +38,8 @@ public class NormalUser extends User {
 	
 
 	private int port;
-	private int serverPort;
+	private int server_start_port;
+	private int num_servers;
 	
 	/**************************************************************************************
 	* 											-User class constructor()
@@ -50,7 +51,8 @@ public class NormalUser extends User {
 	public NormalUser(int ID) throws Exception {
 		super(ID);
 		this.port = ID + Integer.parseInt("9090");
-		serverPort = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
+		this.server_start_port = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
+		this.num_servers = new Ini(new File("variables.ini")).get("Server","number_of_servers", Integer.class);
 		init();
 		initThreadToSndReqProof();
 	}
@@ -68,7 +70,7 @@ public class NormalUser extends User {
 					Server userServer = ServerBuilder.forPort(port).addService(new UserServiceImp(getMyID(), getPRIVATE_KEY_PATH())).build();
 					try {
 						userServer.start();
-						System.out.println("user server start at " + userServer.getPort());
+						System.out.println("user " + myID + " server start at " + userServer.getPort());
 						
 						userServer.awaitTermination();
 					} catch (IOException | InterruptedException e) {
@@ -166,13 +168,14 @@ public class NormalUser extends User {
 	 * @throws Exception 
 	 *
 	 * ************************************************************************************/
-	public secureReplay submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position, Key sharedKey, int myNonce) throws Exception {
+	public secureReplay submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position, Key sharedKey, int myNonce, int server_id) throws Exception {
 		String message = proofs.toString() + "||" + epoch +"||" + myNonce; ;
-		JsonObject secureMessage = getsecureMessage(0,message);
+		JsonObject secureMessage = getsecureMessage(server_id, message);
 		String messagecipher = secureMessage.get("ciphertext").getAsString();
 		String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
 		
-		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", serverPort)
+		secureReplay submitReply = null;
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
 				.usePlaintext().build();
 		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel).withWaitForReady();
 
@@ -180,7 +183,7 @@ public class NormalUser extends User {
 				.setConfidentMessage(messagecipher).setMessageDigitalSignature(messageDigSig)
 				.build();
 
-		secureReplay submitReply = serverStub.submitLocationReport(submitRequest);
+		submitReply = serverStub.submitLocationReport(submitRequest);
 
 		channel.shutdown();
 
@@ -224,9 +227,15 @@ public class NormalUser extends User {
 		List<String> proofs;
 		Point2D myCurrentPoosition = TrackerLocationSystem.getPosInEpoc(getMyID(), epoch).getPosition();
 		List<ManagedChannel> closerChannel = getCloserUsers(epoch);
-		proofs = sndProofRequest( closerChannel, getMyID(), epoch, myCurrentPoosition);
-		int myNonce = new Random().nextInt();
-		secureReplay serverReply = submitLocationReport(proofs, getMyID(), epoch, myCurrentPoosition, getSharedKey(), myNonce);
+		proofs = sndProofRequest(closerChannel, getMyID(), epoch, myCurrentPoosition);
+		
+		//NICAS
+		secureReplay serverReply = null;
+		int myNonce = 0;
+		for(int i = 0; i < this.num_servers; i++) {
+			myNonce = new Random().nextInt();
+			serverReply = submitLocationReport(proofs, getMyID(), epoch, myCurrentPoosition, getSharedKey(i), myNonce, i);
+		}
 		if(!serverReply.getOnError()) {
 			int serverID = serverReply.getServerID();
 			String[] replyFields = getfieldsFromSecureMessage(serverID, serverReply.getConfidentMessage(), serverReply.getMessageDigitalSignature());
@@ -280,18 +289,24 @@ public class NormalUser extends User {
 	}
 	
 	public String obtainLocationReport(int epoch) throws Exception {
-		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", serverPort)
-				.usePlaintext().build();
-		int myNonce = new Random().nextInt();
-		String message = getMyID() + "||" + epoch +"||"+myNonce;
-		JsonObject cipherReq  = getsecureMessage(0,message);
-		String cipherText = cipherReq.get("ciphertext").getAsString();
-		String digSig = cipherReq.get("textDigitalSignature").getAsString();
-		secureRequest req = secureRequest.newBuilder().setConfidentMessage(cipherText).setUserID(getMyID()).
-				setMessageDigitalSignature(digSig).build();
-		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
-		secureReplay rep = serverStub.obtainLocationReport(req);
-		channel.shutdown();
+		secureReplay rep = null;
+		int myNonce = 0;
+
+		//NICAS
+		for (int i = 0; i < num_servers; i++) {
+			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port + i)
+					.usePlaintext().build();
+			myNonce = new Random().nextInt();
+			String message = getMyID() + "||" + epoch +"||"+myNonce;
+			JsonObject cipherReq  = getsecureMessage(i, message);
+			String cipherText = cipherReq.get("ciphertext").getAsString();
+			String digSig = cipherReq.get("textDigitalSignature").getAsString();
+			secureRequest req = secureRequest.newBuilder().setConfidentMessage(cipherText).setUserID(getMyID()).
+					setMessageDigitalSignature(digSig).build();
+			serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
+			rep = serverStub.obtainLocationReport(req);
+			channel.shutdown();
+		}
 		if(!rep.getOnError()) {
 			int serverID = rep.getServerID();
 			String[] replyFields = getfieldsFromSecureMessage(serverID, rep.getConfidentMessage(), rep.getMessageDigitalSignature());

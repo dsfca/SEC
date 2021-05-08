@@ -28,24 +28,31 @@ public class TrackerLocationSystem {
 	private int num_users;
 	private int G_width;
 	private int G_height;
-	private int serverPort;
+	private int server_start_port;
 	public static int NUM_BIZANTINE_USERS;
+	private int num_servers;
 
 	public TrackerLocationSystem(int num_users, int G_width, int G_height, int f) throws Exception {
 		this.num_users = num_users;
 		this.G_width = G_width;
 		this.G_height = G_height;
-		this.serverPort = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
+		this.server_start_port = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
 		NUM_BIZANTINE_USERS = f;
+		this.num_servers = new Ini(new File("variables.ini")).get("Server","number_of_servers", Integer.class);
 	}
 	
 	public void start() throws Exception {
-		Server server = new Server(0,serverPort);
-		server.init();
+		start_servers();
 		ini_pos_file(num_users, 10, G_width, G_height);
 		start_users(num_users, G_width, G_height);
 	}
 	
+	public void start_servers() throws Exception {
+		for(int i = 0; i < num_servers; i++) {
+			Server server = new Server(i, (server_start_port + i));
+			server.init();
+		}
+	}
 	public void start_users(int num_users, int g_width, int g_height) throws Exception {
 		for(int i = 1; i < num_users; i++) {
 			NormalUser user = new NormalUser(i);

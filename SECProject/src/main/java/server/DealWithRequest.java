@@ -26,11 +26,12 @@ public class DealWithRequest {
     private Map<Integer, List<Integer>> usersNonce = new HashMap<>();
     private InteractWithDB DB;
     private int ID;
+    
     public DealWithRequest(int id) {
     	try {
     		this.ID = id;
     		PRIVATE_KEY_PATH = "resources/private_keys/server" + id +"_private.key";
-			DB = new InteractWithDB("variables.ini");
+			DB = new InteractWithDB("variables.ini", id);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

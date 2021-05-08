@@ -45,7 +45,7 @@ public class ServerImp extends serverServiceImplBase {
     		String[] reqFields = getfieldsFromSecureMessage(request.getUserID(), request.getConfidentMessage(), request.getMessageDigitalSignature());	
 	       	int nonce =Integer.parseInt(reqFields[2]);
 	       	String report = reqFields[0];
-	       	ServerService.secureReplay.Builder response =dealWithReq.submitReportHandler(request.getUserID(), report, nonce);
+	       	ServerService.secureReplay.Builder response = dealWithReq.submitReportHandler(request.getUserID(), report, nonce);
 		    responseObserver.onNext(response.build());
 		    responseObserver.onCompleted();
 	        
@@ -76,7 +76,7 @@ public class ServerImp extends serverServiceImplBase {
 		    String[] reqSplit = getfieldsFromSecureMessage(request.getUserID(), request.getConfidentMessage(), request.getMessageDigitalSignature());
 		    int epoch = Integer.parseInt(reqSplit[1]);
 		    int nonce = Integer.parseInt(reqSplit[2]);
-		    ServerService.secureReplay.Builder response =dealWithReq.obtainReportHandler(request.getUserID(), epoch, nonce);
+		    ServerService.secureReplay.Builder response = dealWithReq.obtainReportHandler(request.getUserID(), epoch, nonce);
 		    responseObserver.onNext(response.build());
 		    responseObserver.onCompleted();
 			

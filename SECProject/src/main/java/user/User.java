@@ -6,6 +6,7 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.ini4j.Ini;
@@ -28,22 +29,25 @@ public class User {
 	
 	
 	private  String PRIVATE_KEY_PATH;
-	private Key sharedKey;
-	private int myID;
+	private Key [] sharedKey;
+	protected int myID;
 	private int N_timesSharedKeyUsed;
+	private int num_servers;
 	
 	public User(int ID) throws Exception {
 		this.myID = ID;
 		PRIVATE_KEY_PATH = "resources/private_keys/user" + myID + "_private.key";
 		verifyKeys(myID, "user");
+		this.num_servers = new Ini(new File("variables.ini")).get("Server","number_of_servers", Integer.class);
+		this.sharedKey = new Key [num_servers]; 
 	}
 	
-	public Key getSharedKey() {
-		return sharedKey;
+	public Key getSharedKey(int server_id) {
+		return sharedKey[server_id];
 	}
 
-	public void setSharedKey(Key sharedKey) {
-		this.sharedKey = sharedKey;
+	public void setSharedKey(Key sharedKey, int server_id) {
+		this.sharedKey[server_id] = sharedKey;
 	}
 
 	public int getMyID() {
@@ -61,29 +65,29 @@ public class User {
 		return N_timesSharedKeyUsed;
 	}
 	
-	public JsonObject getsecureMessage(int serverID,String message) throws Exception {
+	public JsonObject getsecureMessage(int serverID, String message) throws Exception {
 		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
-		if(sharedKey == null || N_timesSharedKeyUsed % 5 == 0 ) {
+		if(this.sharedKey[serverID] == null || N_timesSharedKeyUsed % 5 == 0 ) {
 			int serverPort = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
-			sharedKey = DHkeyExchange(serverID, serverPort);
+			this.sharedKey[serverID] = DHkeyExchange(serverID, serverPort + serverID);
 		}
-		JsonObject cipherReq  = TrackerLocationSystem.getSecureText(sharedKey, myprivkey, message);
+		JsonObject cipherReq  = TrackerLocationSystem.getSecureText(this.sharedKey[serverID], myprivkey, message);
 		N_timesSharedKeyUsed++;
 		return cipherReq;
 	}
 	
 	public String[] getfieldsFromSecureMessage(int serverID ,String secureMessage, String digsig ) throws Exception {
 		PublicKey pubkey = TrackerLocationSystem.getServerPublicKey(serverID);
-		 String messPlainText = AESProvider.getPlainTextOfCipherText(secureMessage, sharedKey);
-		 boolean DigSigIsValid = RSAProvider.istextAuthentic(messPlainText, digsig, pubkey);
-		 if(DigSigIsValid) {
-			 String[] requestValues = messPlainText.split(Pattern.quote("||"));
-			 return requestValues;
-		 }else {
-			 throw new Exception("the message is not authentic");
-		 }
+		String messPlainText = AESProvider.getPlainTextOfCipherText(secureMessage, sharedKey[serverID]);
+		boolean DigSigIsValid = RSAProvider.istextAuthentic(messPlainText, digsig, pubkey);
+		if(DigSigIsValid) {
+			String[] requestValues = messPlainText.split(Pattern.quote("||"));
+			return requestValues;
+		}else {
+			throw new Exception("the message is not authentic");
+		}
 	}
-	
+
 	/**************************************************************************************
 	* 											-get_sig_of()
 	* - return the hash of the string "s" ciphered with private key of
@@ -111,8 +115,8 @@ public class User {
 		PublicKey dfPubKey = df.getPublicKey();
 		String pbkB64 = Base64.getEncoder().encodeToString(dfPubKey.getEncoded());
 		String digSigMyDHpubkey = TrackerLocationSystem.getDHkeySigned(dfPubKey, PRIVATE_KEY_PATH);	
-		BInteger p =DiffieHelman.write(df.getP());
-		BInteger g =DiffieHelman.write(df.getG());
+		BInteger p = DiffieHelman.write(df.getP());
+		BInteger g = DiffieHelman.write(df.getG());
 		
 		DHKeyExcReq req = DHKeyExcReq.newBuilder().setP(p).setG(g).setMyDHPubKey(pbkB64)
 				.setDigSigPubKey(digSigMyDHpubkey).setUserID(myID).build();
