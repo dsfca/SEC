@@ -8,6 +8,7 @@ import com.server.grpc.ServerService.secureRequest;
 import com.server.grpc.serverServiceGrpc.serverServiceImplBase;
 import crypto.AESProvider;
 import crypto.RSAProvider;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import shared.DiffieHelman;
 import shared.Point2D;
@@ -50,11 +51,7 @@ public class ServerImp extends serverServiceImplBase {
 		    responseObserver.onCompleted();
 	        
     	}catch (Exception e) {
-    		secureReplay.Builder response = secureReplay.newBuilder();
-    		response.setOnError(true);
-    		response.setErrormessage(e.getMessage());
-    		responseObserver.onNext(response.build());
-		    responseObserver.onCompleted();
+			responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
 		}
 
     }

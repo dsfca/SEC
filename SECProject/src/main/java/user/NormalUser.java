@@ -4,9 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.security.Key;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.sql.Time;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.ini4j.Ini;
@@ -18,6 +17,7 @@ import com.user.grpc.userServiceGrpc;
 import com.user.grpc.userServiceGrpc.userServiceStub;
 import com.server.grpc.serverServiceGrpc;
 import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
+import com.server.grpc.serverServiceGrpc.serverServiceStub;
 import com.google.gson.JsonObject;
 import com.server.grpc.ServerService.secureReplay;
 import com.server.grpc.ServerService.secureRequest;
@@ -40,6 +40,8 @@ public class NormalUser extends User {
 	private int port;
 	private int server_start_port;
 	private int num_servers;
+	private int num_byzantines;
+	private int quorum;
 	
 	/**************************************************************************************
 	* 											-User class constructor()
@@ -53,6 +55,8 @@ public class NormalUser extends User {
 		this.port = ID + Integer.parseInt("9090");
 		this.server_start_port = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
 		this.num_servers = new Ini(new File("variables.ini")).get("Server","number_of_servers", Integer.class);
+		this.num_byzantines = new Ini(new File("variables.ini")).get("Server","number_of_byzantines", Integer.class);
+		this.quorum = (num_servers+num_byzantines)/2;
 		init();
 		initThreadToSndReqProof();
 	}
@@ -168,33 +172,86 @@ public class NormalUser extends User {
 	 * @throws Exception 
 	 *
 	 * ************************************************************************************/
-	public secureReplay submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position, Key sharedKey, int myNonce, int server_id) throws Exception {
-		String message = proofs.toString() + "||" + epoch +"||" + myNonce; ;
-		JsonObject secureMessage = getsecureMessage(server_id, message);
-		String messagecipher = secureMessage.get("ciphertext").getAsString();
-		String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
-		
-		secureReplay submitReply = null;
-		ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
-				.usePlaintext().build();
-		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel).withWaitForReady();
+	public boolean submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position) throws Exception {
+		List<Integer> nonces = new ArrayList<>();
 
-		secureRequest submitRequest = secureRequest.newBuilder().setUserID(ID)
-				.setConfidentMessage(messagecipher).setMessageDigitalSignature(messageDigSig)
-				.build();
+		// submitLocationReport callback
+		Set<Integer> acks = new HashSet<>();
+		final CountDownLatch finishLatch = new CountDownLatch(this.num_servers);
+		StreamObserver<secureReplay> acksObserver = new StreamObserver<secureReplay>() {
+			@Override
+			public void onNext(secureReplay reply) {
+				int serverID = reply.getServerID();
+				String[] replyFields = new String[0];
+				try {
+					replyFields = getfieldsFromSecureMessage(serverID, reply.getConfidentMessage(),
+																	  reply.getMessageDigitalSignature());
+				} catch (Exception e) { // Message is not authenticated
+					System.out.println(e.getMessage());
+					return;
+				}
 
-		submitReply = serverStub.submitLocationReport(submitRequest);
+				int serverNonce = Integer.parseInt(replyFields[1]);
+				if(serverNonce != nonces.get(serverID)-1) {
+					System.out.println("[user" + ID + "] Submit Report Error: Unexpected nonce");
+					return;
+				}
 
-		channel.shutdown();
+				// Everything OK, accept this ack
+				// Set is used to ignore more acks from single server
+				acks.add(serverID);
+			}
 
-		return submitReply;
+			@Override
+			public void onError(Throwable t) {
+				Status status = Status.fromThrowable(t);
+				System.out.println("[user" + ID + "] Submit Report Error: " + status);
+				finishLatch.countDown();
+			}
 
+			@Override
+			public void onCompleted() {
+				finishLatch.countDown();
+
+			}
+		};
+
+		// Send submit report request to each server
+		List<ManagedChannel> serverChannels = new ArrayList<>();
+		serverServiceStub serverAsyncStub;
+
+		for(int server_id = 0; server_id < this.num_servers; server_id++) {
+			int myNonce = new Random().nextInt();
+			nonces.add(myNonce); // Store to verify in a reply
+
+			String message = proofs.toString() + "||" + epoch +"||" + myNonce;
+			JsonObject secureMessage = getsecureMessage(server_id, message);
+			String messagecipher = secureMessage.get("ciphertext").getAsString();
+			String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
+
+			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
+					                       .usePlaintext().build();
+			serverChannels.add(channel); // Store it for a proper close later
+			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(8, TimeUnit.SECONDS)
+																.withWaitForReady();
+
+			secureRequest submitRequest = secureRequest.newBuilder().setUserID(ID)
+													  				.setConfidentMessage(messagecipher)
+													  				.setMessageDigitalSignature(messageDigSig).build();
+			serverAsyncStub.submitLocationReport(submitRequest, acksObserver);
+		}
+
+		// Wait for all replies (both errors and ok)
+		finishLatch.await();
+
+		// Close channels
+		for(ManagedChannel channel : serverChannels)
+			channel.shutdown();
+
+		// Set acks now contains ids of servers accepted the submit request
+		return acks.size() > this.quorum;
 	}
-	
-	
 
-
-	
 	/**************************************************************************************
 	 * 											-getCloserUsers()
 	 * - returns the channel of the user that are closer to him in a given epoch 
@@ -223,29 +280,14 @@ public class NormalUser extends User {
 		return closerChannel;	
 	}
 	
-	public String proveLocation(int epoch) throws Exception {
+	public boolean proveLocation(int epoch) throws Exception {
 		List<String> proofs;
 		Point2D myCurrentPoosition = TrackerLocationSystem.getPosInEpoc(getMyID(), epoch).getPosition();
 		List<ManagedChannel> closerChannel = getCloserUsers(epoch);
 		proofs = sndProofRequest(closerChannel, getMyID(), epoch, myCurrentPoosition);
-		
-		//NICAS
-		secureReplay serverReply = null;
-		int myNonce = 0;
-		for(int i = 0; i < this.num_servers; i++) {
-			myNonce = new Random().nextInt();
-			serverReply = submitLocationReport(proofs, getMyID(), epoch, myCurrentPoosition, getSharedKey(i), myNonce, i);
-		}
-		if(!serverReply.getOnError()) {
-			int serverID = serverReply.getServerID();
-			String[] replyFields = getfieldsFromSecureMessage(serverID, serverReply.getConfidentMessage(), serverReply.getMessageDigitalSignature());
-			int serverNonce = Integer.parseInt(replyFields[1]);
-			if(serverNonce != myNonce -1)
-				throw new Exception("Nonce error");
-			return replyFields[0];
-		}else {
-			throw new Exception("userID = " +getMyID()+ ": "+serverReply.getErrormessage());
-		}
+
+		// Send submitReport request to all servers asynchronously
+		return submitLocationReport(proofs, getMyID(), epoch, myCurrentPoosition);
 	}
 	
 	/**************************************************************************************
@@ -271,8 +313,11 @@ public class NormalUser extends User {
 						sleepTime = (int)(Math.random()*15000 + 10000); //time to sleep between 10s-35s
 						Thread.sleep(sleepTime);
 						myCurrentEpoch = myCurrentEpoch%10 + 1;
-						String serverReply = proveLocation(myCurrentEpoch);
-						System.out.println("user ID = "+getMyID()+", server message:"+ serverReply);
+
+						boolean submitStatus = proveLocation(myCurrentEpoch);
+						if (submitStatus) System.out.println("user ID = "+getMyID()+", report submitted");
+						else System.out.println("user ID = "+getMyID()+", report was NOT submitted");
+
 						Thread.sleep(1000);
 						String reply =  obtainLocationReport(myCurrentEpoch);
 						System.out.println("user "+ getMyID() +" position at epoch "+ myCurrentEpoch +": "+ reply);
