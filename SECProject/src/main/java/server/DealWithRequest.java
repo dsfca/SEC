@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -15,6 +16,7 @@ import com.google.gson.JsonObject;
 import com.server.grpc.ServerService.secureReplay;
 
 
+import crypto.AESProvider;
 import crypto.RSAProvider;
 import shared.Point2D;
 import shared.TrackerLocationSystem;
@@ -36,7 +38,43 @@ public class DealWithRequest {
 			e.printStackTrace();
 		}
     }
-    
+
+    public String[] validateSubmitRequest(int id, String ciphertext, String signature) throws Exception {
+		// Decrypt message
+    	String openText = getPlainText(id, ciphertext);
+		String[] reqFields = getfieldsFromMessage(openText);
+		String report = reqFields[0];
+
+		int nonce = Integer.parseInt(reqFields[1]);
+		if (!verifySignature(id, report, signature)) {
+			throw new Exception("Message was not authenticated");
+		}
+
+		// Check uniqueness of nonce
+		List<Integer> userNonces = usersNonce.get(id);
+		if(userNonces == null)
+    		userNonces = new ArrayList<>();
+
+		if(userNonces.contains(nonce)) {
+    		throw new Exception("Nonce must be unique for each request");
+		}
+
+		userNonces.add(nonce);
+		report = report.replace("[", "").replace("]", "");
+		if(report.length() <= 0) {
+    		throw new Exception("You cannot prove your location with 0 users near you!");
+		}
+
+		String[] reportList = report.split(",");
+    	List<ProofReport> proofReports = getProofReports(reportList);
+
+    	// Check expected number of proofs
+    	if( proofReports.size() <= TrackerLocationSystem.NUM_BIZANTINE_USERS) {
+			throw new Exception("Proof size must be larger than number of byzantine users");
+		}
+
+		return reqFields;
+	}
     
     /**************************************************************************************
      * 											- reportHandler()
@@ -48,46 +86,42 @@ public class DealWithRequest {
      *
      * ************************************************************************************/
     public secureReplay.Builder submitReportHandler(int id, String report, int nonce) throws Exception {
-    	List<Integer> userNonces = usersNonce.get(id);
     	secureReplay.Builder response = secureReplay.newBuilder();
-    	if(userNonces == null)
-    		userNonces = new ArrayList<>();
-    	if(!userNonces.contains(nonce)) {
-    		userNonces.add(nonce);
-	    	report = report.replace("[", "").replace("]", "");
-	    	if( report.length() > 0 ) {
-		    	String[] reportList = report.split(",");
-		    	List<ProofReport> proofReports = getProofReports(reportList); 
-		    	Point2D proverPos = null;
-		    	int epoch = 0;
-		        
-		    	if( proofReports.size() > TrackerLocationSystem.NUM_BIZANTINE_USERS) {
-			    	for(ProofReport pr : proofReports) {
-			    		PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(pr.getWitnessID());
-			    		if(pr.proofDigSigIsValid(witPubKey))
-			    			DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),
-			    				pr.getWitnessPoint(), pr.getEpoch(), pr.isWitnessIsNearProof(), pr.getWitnessDigSig());
-			    		
-			    		proverPos = pr.getProverPoint();
-			    		epoch = pr.getEpoch();
-			    	}
-			    	DB.addLocationToValidated(id, proverPos, epoch);
-			    	String message = "Your report was submitted successfully||" + (nonce - 1);
-			    	JsonObject secureMessage = getsecureMessage(message, id);
-			 		String confidentMessage = secureMessage.get("ciphertext").getAsString();
-			 		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
-			    	 response.setOnError(false);
-				     response.setServerID(ID).setConfidentMessage(confidentMessage).setMessageDigitalSignature(messDigSig);
-		    	}else {
-		    		throw new Exception("proof size must be bigger than num of byzantine users");
-				}
-	    	}else {
-	    		throw new Exception("You cannot proove your location with 0 users near you!");
+
+    	report = report.replace("[", "").replace("]", "");
+
+    	if(report.length() <= 0) {
+    		throw new Exception("You cannot prove your location with 0 users near you!");
+		}
+
+    	String[] reportList = report.split(",");
+    	List<ProofReport> proofReports = getProofReports(reportList);
+    	Point2D proverPos = null;
+    	int epoch = 0;
+
+    	if( proofReports.size() <= TrackerLocationSystem.NUM_BIZANTINE_USERS) {
+			throw new Exception("Proof size must be larger than number of byzantine users");
+		}
+
+    	for(ProofReport pr : proofReports) {
+   			PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(pr.getWitnessID());
+			if(pr.proofDigSigIsValid(witPubKey)) {
+				DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),
+						pr.getWitnessPoint(), pr.getEpoch(), pr.isWitnessIsNearProof(),
+						pr.getWitnessDigSig());
 			}
-	        
-    	}else {
-    		throw new Exception("Nonce must be different for each request");
-    	}
+			proverPos = pr.getProverPoint();
+			epoch = pr.getEpoch();
+		}
+
+    	DB.addLocationToValidated(id, proverPos, epoch);
+		String message = "Your report was submitted successfully||" + (nonce - 1);
+		JsonObject secureMessage = getsecureMessage(message, id);
+		String confidentMessage = secureMessage.get("ciphertext").getAsString();
+		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
+		response.setOnError(false);
+		response.setServerID(ID).setConfidentMessage(confidentMessage).setMessageDigitalSignature(messDigSig);
+
     	return response;
     }
     
@@ -209,6 +243,21 @@ public class DealWithRequest {
 		Key sharedKey = getSharedKey(userID);
 		JsonObject cipherReq  = TrackerLocationSystem.getSecureText(sharedKey, myprivkey, message);
 		return cipherReq;
+	}
+
+	public boolean verifySignature(int userID, String message, String signature) throws Exception {
+		PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID);
+		return RSAProvider.istextAuthentic(message, signature, pubkey);
+	}
+
+	public String getPlainText(int userID, String ct) throws Exception {
+		Key sharedKey = getSharedKey(userID);
+		PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID);
+		return AESProvider.getPlainTextOfCipherText(ct, sharedKey);
+	}
+
+	public String[] getfieldsFromMessage(String message) {
+    	return message.split(Pattern.quote("||"));
 	}
 
     

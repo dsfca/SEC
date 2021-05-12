@@ -64,6 +64,20 @@ public class User {
 	public int getN_timesSharedKeyUsed() {
 		return N_timesSharedKeyUsed;
 	}
+
+	public String signMessage(String message) throws Exception {
+		PrivateKey privkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
+		return RSAProvider.getTexthashEnWithPriKey(message, privkey);
+	}
+
+	public String encryptMessage(int serverID, String message) throws Exception {
+		if(this.sharedKey[serverID] == null || N_timesSharedKeyUsed % 5 == 0 ) {
+			int serverPort = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
+			this.sharedKey[serverID] = DHkeyExchange(serverID, serverPort + serverID);
+		}
+		N_timesSharedKeyUsed++;
+		return AESProvider.getCipherOfPlainText(message, sharedKey[serverID]);
+	}
 	
 	public JsonObject getsecureMessage(int serverID, String message) throws Exception {
 		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);

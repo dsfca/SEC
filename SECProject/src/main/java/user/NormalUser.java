@@ -167,8 +167,7 @@ public class NormalUser extends User {
 	 * 		- epoch: epoch which user want to report his location
 	 * 		- x,y: Location of user to report
 	 *
-	 * - return: List<string>( where each string is the proof of the witness
-	 * 	that the user is actually near him).
+	 * - return: True if quorum submitted a report
 	 * @throws Exception 
 	 *
 	 * ************************************************************************************/
@@ -182,6 +181,10 @@ public class NormalUser extends User {
 			@Override
 			public void onNext(secureReplay reply) {
 				int serverID = reply.getServerID();
+				if (acks.contains(serverID)) { // This server's already sent ack; ignore it
+					return;
+				}
+
 				String[] replyFields = new String[0];
 				try {
 					replyFields = getfieldsFromSecureMessage(serverID, reply.getConfidentMessage(),
@@ -197,9 +200,12 @@ public class NormalUser extends User {
 					return;
 				}
 
+				System.out.println("From server" + serverID + ": " + replyFields[0]);
+
 				// Everything OK, accept this ack
 				// Set is used to ignore more acks from single server
 				acks.add(serverID);
+				finishLatch.countDown();
 			}
 
 			@Override
@@ -210,34 +216,35 @@ public class NormalUser extends User {
 			}
 
 			@Override
-			public void onCompleted() {
-				finishLatch.countDown();
-
-			}
+			public void onCompleted() { }
 		};
 
 		// Send submit report request to each server
 		List<ManagedChannel> serverChannels = new ArrayList<>();
 		serverServiceStub serverAsyncStub;
 
+		String message = proofs.toString();// + "||" + epoch;
+		String signedMessage = signMessage(message);
+
 		for(int server_id = 0; server_id < this.num_servers; server_id++) {
 			int myNonce = new Random().nextInt();
 			nonces.add(myNonce); // Store to verify in a reply
 
-			String message = proofs.toString() + "||" + epoch +"||" + myNonce;
-			JsonObject secureMessage = getsecureMessage(server_id, message);
-			String messagecipher = secureMessage.get("ciphertext").getAsString();
-			String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
+//			String message = proofs.toString() + "||" + epoch +"||" + myNonce;
+//			JsonObject secureMessage = getsecureMessage(server_id, message);
+//			String messagecipher = secureMessage.get("ciphertext").getAsString();
+//			String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
+			String encryptedMessage = encryptMessage(server_id, message + "||" + myNonce);
 
 			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
 					                       .usePlaintext().build();
 			serverChannels.add(channel); // Store it for a proper close later
-			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(8, TimeUnit.SECONDS)
+			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(100, TimeUnit.SECONDS)
 																.withWaitForReady();
 
 			secureRequest submitRequest = secureRequest.newBuilder().setUserID(ID)
-													  				.setConfidentMessage(messagecipher)
-													  				.setMessageDigitalSignature(messageDigSig).build();
+													  				.setConfidentMessage(encryptedMessage)
+													  				.setMessageDigitalSignature(signedMessage).build();
 			serverAsyncStub.submitLocationReport(submitRequest, acksObserver);
 		}
 
@@ -310,7 +317,7 @@ public class NormalUser extends User {
 			int sleepTime, myCurrentEpoch = 0;
 			while(true) {
 				try {
-						sleepTime = (int)(Math.random()*15000 + 10000); //time to sleep between 10s-35s
+						sleepTime = (int)(Math.random()*15000 + 15000); //time to sleep between 15s-30s
 						Thread.sleep(sleepTime);
 						myCurrentEpoch = myCurrentEpoch%10 + 1;
 

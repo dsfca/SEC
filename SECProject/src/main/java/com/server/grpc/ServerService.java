@@ -4254,26 +4254,30 @@ public final class ServerService {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023serverService.proto\"Z\n\rsecureRequest\022\016" +
-      "\n\006userID\030\001 \001(\005\022\030\n\020confidentMessage\030\002 \001(\t" +
-      "\022\037\n\027MessageDigitalSignature\030\003 \001(\t\"\202\001\n\014se" +
-      "cureReplay\022\017\n\007onError\030\001 \001(\010\022\020\n\010serverID\030" +
-      "\002 \001(\005\022\030\n\020confidentMessage\030\003 \001(\t\022\037\n\027Messa" +
-      "geDigitalSignature\030\004 \001(\t\022\024\n\014errormessage" +
-      "\030\005 \001(\t\"s\n\013DHKeyExcReq\022\016\n\006userID\030\001 \001(\005\022\024\n" +
-      "\001p\030\002 \001(\0132\t.BInteger\022\024\n\001g\030\003 \001(\0132\t.BIntege" +
-      "r\022\022\n\nMyDHPubKey\030\004 \001(\t\022\024\n\014digSigPubKey\030\005 " +
-      "\001(\t\"\\\n\013DHKeyExcRep\022\020\n\010myPubKey\030\001 \001(\t\022\024\n\014" +
-      "digSigPubkey\030\002 \001(\t\022\017\n\007onError\030\003 \001(\010\022\024\n\014e" +
-      "rrorMessage\030\004 \001(\t\"\031\n\010BInteger\022\r\n\005value\030\001" +
-      " \001(\0142\233\002\n\rserverService\0225\n\024submitLocation" +
-      "Report\022\016.secureRequest\032\r.secureReplay\0225\n" +
-      "\024obtainLocationReport\022\016.secureRequest\032\r." +
-      "secureReplay\0227\n\026obtainLocationReportHA\022\016" +
-      ".secureRequest\032\r.secureReplay\0226\n\025obtainU" +
-      "sersAtLocation\022\016.secureRequest\032\r.secureR" +
-      "eplay\022+\n\rDHKeyExchange\022\014.DHKeyExcReq\032\014.D" +
-      "HKeyExcRepB\021\n\017com.server.grpcb\006proto3"
+      "\n\023serverService.proto\032\033google/protobuf/e" +
+      "mpty.proto\"Z\n\rsecureRequest\022\016\n\006userID\030\001 " +
+      "\001(\005\022\030\n\020confidentMessage\030\002 \001(\t\022\037\n\027Message" +
+      "DigitalSignature\030\003 \001(\t\"\202\001\n\014secureReplay\022" +
+      "\017\n\007onError\030\001 \001(\010\022\020\n\010serverID\030\002 \001(\005\022\030\n\020co" +
+      "nfidentMessage\030\003 \001(\t\022\037\n\027MessageDigitalSi" +
+      "gnature\030\004 \001(\t\022\024\n\014errormessage\030\005 \001(\t\"s\n\013D" +
+      "HKeyExcReq\022\016\n\006userID\030\001 \001(\005\022\024\n\001p\030\002 \001(\0132\t." +
+      "BInteger\022\024\n\001g\030\003 \001(\0132\t.BInteger\022\022\n\nMyDHPu" +
+      "bKey\030\004 \001(\t\022\024\n\014digSigPubKey\030\005 \001(\t\"\\\n\013DHKe" +
+      "yExcRep\022\020\n\010myPubKey\030\001 \001(\t\022\024\n\014digSigPubke" +
+      "y\030\002 \001(\t\022\017\n\007onError\030\003 \001(\010\022\024\n\014errorMessage" +
+      "\030\004 \001(\t\"\031\n\010BInteger\022\r\n\005value\030\001 \001(\0142\224\003\n\rse" +
+      "rverService\0225\n\024submitLocationReport\022\016.se" +
+      "cureRequest\032\r.secureReplay\022:\n\020submitRepo" +
+      "rtEcho\022\016.secureRequest\032\026.google.protobuf" +
+      ".Empty\022;\n\021submitReportReady\022\016.secureRequ" +
+      "est\032\026.google.protobuf.Empty\0225\n\024obtainLoc" +
+      "ationReport\022\016.secureRequest\032\r.secureRepl" +
+      "ay\0227\n\026obtainLocationReportHA\022\016.secureReq" +
+      "uest\032\r.secureReplay\0226\n\025obtainUsersAtLoca" +
+      "tion\022\016.secureRequest\032\r.secureReplay\022+\n\rD" +
+      "HKeyExchange\022\014.DHKeyExcReq\032\014.DHKeyExcRep" +
+      "B\021\n\017com.server.grpcb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4286,6 +4290,7 @@ public final class ServerService {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.google.protobuf.EmptyProto.getDescriptor(),
         }, assigner);
     internal_static_secureRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -4317,6 +4322,7 @@ public final class ServerService {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_BInteger_descriptor,
         new java.lang.String[] { "Value", });
+    com.google.protobuf.EmptyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -32,8 +32,8 @@ public class Server {
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                io.grpc.Server server = ServerBuilder.forPort(port).addService(new ServerImp(server_id,serverDealWithReq)).build();
                 try {
+                    io.grpc.Server server = ServerBuilder.forPort(port).addService(new ServerImp(server_id,serverDealWithReq)).build();
                 	verifyKeys(server_id, "server");
                     server.start();
                     System.out.println("INIT: Server " + getID() + " started at " + server.getPort());

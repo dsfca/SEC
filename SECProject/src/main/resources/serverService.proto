@@ -2,9 +2,14 @@ syntax = "proto3";
 
 option java_package = "com.server.grpc";
 
+import "google/protobuf/empty.proto";
+
 service serverService{
 	
 	rpc submitLocationReport(secureRequest) returns (secureReplay);
+	rpc submitReportEcho(secureRequest) returns (google.protobuf.Empty);
+	rpc submitReportReady(secureRequest) returns (google.protobuf.Empty);
+
 	rpc obtainLocationReport(secureRequest) returns (secureReplay);
 
 	rpc obtainLocationReportHA(secureRequest) returns (secureReplay);

@@ -60,6 +60,70 @@ public final class serverServiceGrpc {
   }
 
   private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
+      com.google.protobuf.Empty> getSubmitReportEchoMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "submitReportEcho",
+      requestType = com.server.grpc.ServerService.secureRequest.class,
+      responseType = com.google.protobuf.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
+      com.google.protobuf.Empty> getSubmitReportEchoMethod() {
+    io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest, com.google.protobuf.Empty> getSubmitReportEchoMethod;
+    if ((getSubmitReportEchoMethod = serverServiceGrpc.getSubmitReportEchoMethod) == null) {
+      synchronized (serverServiceGrpc.class) {
+        if ((getSubmitReportEchoMethod = serverServiceGrpc.getSubmitReportEchoMethod) == null) {
+          serverServiceGrpc.getSubmitReportEchoMethod = getSubmitReportEchoMethod = 
+              io.grpc.MethodDescriptor.<com.server.grpc.ServerService.secureRequest, com.google.protobuf.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "serverService", "submitReportEcho"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.secureRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.google.protobuf.Empty.getDefaultInstance()))
+                  .setSchemaDescriptor(new serverServiceMethodDescriptorSupplier("submitReportEcho"))
+                  .build();
+          }
+        }
+     }
+     return getSubmitReportEchoMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
+      com.google.protobuf.Empty> getSubmitReportReadyMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "submitReportReady",
+      requestType = com.server.grpc.ServerService.secureRequest.class,
+      responseType = com.google.protobuf.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
+      com.google.protobuf.Empty> getSubmitReportReadyMethod() {
+    io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest, com.google.protobuf.Empty> getSubmitReportReadyMethod;
+    if ((getSubmitReportReadyMethod = serverServiceGrpc.getSubmitReportReadyMethod) == null) {
+      synchronized (serverServiceGrpc.class) {
+        if ((getSubmitReportReadyMethod = serverServiceGrpc.getSubmitReportReadyMethod) == null) {
+          serverServiceGrpc.getSubmitReportReadyMethod = getSubmitReportReadyMethod = 
+              io.grpc.MethodDescriptor.<com.server.grpc.ServerService.secureRequest, com.google.protobuf.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "serverService", "submitReportReady"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.secureRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.google.protobuf.Empty.getDefaultInstance()))
+                  .setSchemaDescriptor(new serverServiceMethodDescriptorSupplier("submitReportReady"))
+                  .build();
+          }
+        }
+     }
+     return getSubmitReportReadyMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
       com.server.grpc.ServerService.secureReplay> getObtainLocationReportMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
@@ -223,6 +287,20 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public void submitReportEcho(com.server.grpc.ServerService.secureRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      asyncUnimplementedUnaryCall(getSubmitReportEchoMethod(), responseObserver);
+    }
+
+    /**
+     */
+    public void submitReportReady(com.server.grpc.ServerService.secureRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      asyncUnimplementedUnaryCall(getSubmitReportReadyMethod(), responseObserver);
+    }
+
+    /**
+     */
     public void obtainLocationReport(com.server.grpc.ServerService.secureRequest request,
         io.grpc.stub.StreamObserver<com.server.grpc.ServerService.secureReplay> responseObserver) {
       asyncUnimplementedUnaryCall(getObtainLocationReportMethod(), responseObserver);
@@ -258,6 +336,20 @@ public final class serverServiceGrpc {
                 com.server.grpc.ServerService.secureRequest,
                 com.server.grpc.ServerService.secureReplay>(
                   this, METHODID_SUBMIT_LOCATION_REPORT)))
+          .addMethod(
+            getSubmitReportEchoMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                com.server.grpc.ServerService.secureRequest,
+                com.google.protobuf.Empty>(
+                  this, METHODID_SUBMIT_REPORT_ECHO)))
+          .addMethod(
+            getSubmitReportReadyMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                com.server.grpc.ServerService.secureRequest,
+                com.google.protobuf.Empty>(
+                  this, METHODID_SUBMIT_REPORT_READY)))
           .addMethod(
             getObtainLocationReportMethod(),
             asyncUnaryCall(
@@ -314,6 +406,22 @@ public final class serverServiceGrpc {
         io.grpc.stub.StreamObserver<com.server.grpc.ServerService.secureReplay> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getSubmitLocationReportMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void submitReportEcho(com.server.grpc.ServerService.secureRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getSubmitReportEchoMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
+    public void submitReportReady(com.server.grpc.ServerService.secureRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getSubmitReportReadyMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
@@ -376,6 +484,20 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public com.google.protobuf.Empty submitReportEcho(com.server.grpc.ServerService.secureRequest request) {
+      return blockingUnaryCall(
+          getChannel(), getSubmitReportEchoMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.google.protobuf.Empty submitReportReady(com.server.grpc.ServerService.secureRequest request) {
+      return blockingUnaryCall(
+          getChannel(), getSubmitReportReadyMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
     public com.server.grpc.ServerService.secureReplay obtainLocationReport(com.server.grpc.ServerService.secureRequest request) {
       return blockingUnaryCall(
           getChannel(), getObtainLocationReportMethod(), getCallOptions(), request);
@@ -431,6 +553,22 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<com.google.protobuf.Empty> submitReportEcho(
+        com.server.grpc.ServerService.secureRequest request) {
+      return futureUnaryCall(
+          getChannel().newCall(getSubmitReportEchoMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.google.protobuf.Empty> submitReportReady(
+        com.server.grpc.ServerService.secureRequest request) {
+      return futureUnaryCall(
+          getChannel().newCall(getSubmitReportReadyMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<com.server.grpc.ServerService.secureReplay> obtainLocationReport(
         com.server.grpc.ServerService.secureRequest request) {
       return futureUnaryCall(
@@ -463,10 +601,12 @@ public final class serverServiceGrpc {
   }
 
   private static final int METHODID_SUBMIT_LOCATION_REPORT = 0;
-  private static final int METHODID_OBTAIN_LOCATION_REPORT = 1;
-  private static final int METHODID_OBTAIN_LOCATION_REPORT_HA = 2;
-  private static final int METHODID_OBTAIN_USERS_AT_LOCATION = 3;
-  private static final int METHODID_DHKEY_EXCHANGE = 4;
+  private static final int METHODID_SUBMIT_REPORT_ECHO = 1;
+  private static final int METHODID_SUBMIT_REPORT_READY = 2;
+  private static final int METHODID_OBTAIN_LOCATION_REPORT = 3;
+  private static final int METHODID_OBTAIN_LOCATION_REPORT_HA = 4;
+  private static final int METHODID_OBTAIN_USERS_AT_LOCATION = 5;
+  private static final int METHODID_DHKEY_EXCHANGE = 6;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -488,6 +628,14 @@ public final class serverServiceGrpc {
         case METHODID_SUBMIT_LOCATION_REPORT:
           serviceImpl.submitLocationReport((com.server.grpc.ServerService.secureRequest) request,
               (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.secureReplay>) responseObserver);
+          break;
+        case METHODID_SUBMIT_REPORT_ECHO:
+          serviceImpl.submitReportEcho((com.server.grpc.ServerService.secureRequest) request,
+              (io.grpc.stub.StreamObserver<com.google.protobuf.Empty>) responseObserver);
+          break;
+        case METHODID_SUBMIT_REPORT_READY:
+          serviceImpl.submitReportReady((com.server.grpc.ServerService.secureRequest) request,
+              (io.grpc.stub.StreamObserver<com.google.protobuf.Empty>) responseObserver);
           break;
         case METHODID_OBTAIN_LOCATION_REPORT:
           serviceImpl.obtainLocationReport((com.server.grpc.ServerService.secureRequest) request,
@@ -567,6 +715,8 @@ public final class serverServiceGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new serverServiceFileDescriptorSupplier())
               .addMethod(getSubmitLocationReportMethod())
+              .addMethod(getSubmitReportEchoMethod())
+              .addMethod(getSubmitReportReadyMethod())
               .addMethod(getObtainLocationReportMethod())
               .addMethod(getObtainLocationReportHAMethod())
               .addMethod(getObtainUsersAtLocationMethod())
