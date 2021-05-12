@@ -1,6 +1,5 @@
 ### Questions
-1. Two reports submit per epoch from same user?
-2. HA should not have fixed ID, if there are multiple HAs, then we can't distinguish them.
+1. Even the mongoDB does not run, server claims the report was submitted. Some check if it was really submitted?
 
 ## Assumption
 
@@ -26,12 +25,61 @@ rrrrr(null)  rrrrr(null)
 ```
 For that reason, Byzantine Atomic Register should be implemented.
 
+## Submit Report
+1. Client sends submit report request (correct client to every server)
+   - This is done using asynchronous and secure way.
+   - The client now awaits acks from more than (N+f)/2 of servers
+2. Server receives submitLocationReport() from a client
+   - Incoming message have to be deciphered and validated
+     (check if the report does not exist in DB)
+3. Server broadcast Echo{report + original signature} to
+   all other servers asynchronously and securely, if it
+   hasn't sent yet.
+4. Once a server receives more than (N+f)/2 of the same message
+   and hasn't sent Ready message yet, it broadcasts
+   the majority message in Ready{report + original signature}.
+   - That means we should temporary store a Map with Echo as
+   a key and information about if server already sent an Echo
+   and if the incoming message increments the amount of same 
+   messages.
+5. Once a server receives more than f of the same message and
+   hasn't sent Ready message yet, it broadcast the majority
+   message in Ready{report + original signature}
+   - It works in the same way as with the Echos, we have
+   to somehow store the incoming messages.
+6. Once a server receives more than 2f of the same message
+   it can deliver that majority message.
+
+For that purpose I created two collections:
+```
+Pair<report, signature> rs;
+Pair<sentAck, Set<serverIds>> ss;
+
+Hashtable<rs, ss> echos;
+Hashtable<rs, ss> readys;
+
+```
+Every time Echo is sent or received, it is added to
+echos table. Corresponding sentAck informs, if echo
+has been sent. The Set of IDs informs, from which
+server the Echo was received. Every time new
+echo came, it is also checked if there is more
+then quorum of that message. If there is, Ready
+message is broadcasted and the system above works
+in similar way. 
+The problem is - the code is extremely messy,
+don't you have any idea?
+
+
+
 ## Normal user
 
 ### SubmitLocationReport(list of proofs, id, epoch, position): out
 Create a report from input values.
 Send the report securely to all servers asynchronously.
-Wait for more than (N+f)/2 acks.
+Wait for all replies (or errors/timeouts). Every expected ack
+add to Set.
+Check if Set contains (N+f)/2 acks.
 Done.
 
 ### ObtainLocationReport(): out
