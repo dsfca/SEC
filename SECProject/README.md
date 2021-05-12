@@ -1,5 +1,13 @@
-### Questions
+## TODO
 1. Even the mongoDB does not run, server claims the report was submitted. Some check if it was really submitted?
+2. Check if report is already in DB, when receiving new submit request.
+3. The Reliable broadcast does not enc/dec/sign. Now they are communicating in plaintext.
+4. There are 2 HA function that should run on a regular register. That means to wait for a quorum
+   (see current obtainLocation of NormalUser)
+5. Submit and Obtain should be atomic, now are regular.
+6. HA user is only one
+7. Spam combat mechanism
+8. Tests
 
 ## Assumption
 
@@ -32,19 +40,19 @@ For that reason, Byzantine Atomic Register should be implemented.
 2. Server receives submitLocationReport() from a client
    - Incoming message have to be deciphered and validated
      (check if the report does not exist in DB)
-3. Server broadcast Echo{report + original signature} to
+3. Server broadcast Echo{report|>>>|original signature} to
    all other servers asynchronously and securely, if it
    hasn't sent yet.
-4. Once a server receives more than (N+f)/2 of the same message
+4. Once a server receives more than (N+f)/2 of the same echo messages
    and hasn't sent Ready message yet, it broadcasts
-   the majority message in Ready{report + original signature}.
+   the majority message in Ready{report|>>>|original signature}.
    - That means we should temporary store a Map with Echo as
-   a key and information about if server already sent an Echo
+   a key and information if server already sent an Echo
    and if the incoming message increments the amount of same 
    messages.
 5. Once a server receives more than f of the same message and
    hasn't sent Ready message yet, it broadcast the majority
-   message in Ready{report + original signature}
+   message in Ready{report|>>>|original signature}.
    - It works in the same way as with the Echos, we have
    to somehow store the incoming messages.
 6. Once a server receives more than 2f of the same message
@@ -52,29 +60,30 @@ For that reason, Byzantine Atomic Register should be implemented.
 
 For that purpose I created two collections:
 ```
-Pair<report, signature> rs;
-Pair<sentAck, Set<serverIds>> ss;
+ackDetail is class containing bool flag representing
+if current server already sent echo/ready and set of
+serverIids that sent echo/ready to current server.
 
-Hashtable<rs, ss> echos;
-Hashtable<rs, ss> readys;
+Hashtable<message, ackDetail> echos;
+Hashtable<message, ackDetail> readys;
 
 ```
 Every time Echo is sent or received, it is added to
-echos table. Corresponding sentAck informs, if echo
+echos table. Corresponding ackDetail informs, if echo
 has been sent. The Set of IDs informs, from which
 server the Echo was received. Every time new
 echo came, it is also checked if there is more
-then quorum of that message. If there is, Ready
-message is broadcasted and the system above works
+than quorum of that message. If there is, Ready
+message is broadcast and the system above works
 in similar way. 
-The problem is - the code is extremely messy,
-don't you have any idea?
 
 
 
 ## Normal user
 
 ### SubmitLocationReport(list of proofs, id, epoch, position): out
+TODO: Security between servers, atomicity
+
 Create a report from input values.
 Send the report securely to all servers asynchronously.
 Wait for all replies (or errors/timeouts). Every expected ack
@@ -83,20 +92,24 @@ Check if Set contains (N+f)/2 acks.
 Done.
 
 ### ObtainLocationReport(): out
+TODO: Atomicity
 
-Send securely and asynchronously read request to all servers,
-including nonce to prevent reply attack.
+Send securely and asynchronously read request to all servers.
 
-Verify incoming report and save it into array per a server.
+Verify incoming report, save it into Map{report, cnt} and also
+store server that responded into Set{serverIds}.
+
+Wait until server replies or timeout. Check if quorum acked
+correctly.
+
 As only one report per epoch is allowed, we don't have to
 deal with finding the most recent (timestamp, value) pair.
-Just accept the report, that is in the array more than (N+f)/2 times.
-Send to all ReadingComplete(rid), so they clean the array.
+Just accept the report, that has majority.
 
-Broadcasting gathered report is not necessary as we are
-assured, each server received same information during write.
-
-
+If using listening system for atomicity,
+send to all ReadingComplete(rid), so they clean the array.
+Or writeback gathered report, but thats weird as we are 
+submitting using reliable broadcast.
  
 
 
@@ -109,8 +122,8 @@ If it is a report to store, send securely and asynchronously SubmitEcho(MyId, re
 Save an information, that echo was sent SentEcho = True.
 Save an information, that ready was not sent SentReady = False.
 
-Notify all listening clients (HA or the prover himself), that a write operation
-is in a process. Send(report) to the waiting client (how??).
+If using listening system - Notify all listening clients (HA or the prover himself), that a write operation
+is in a process. Send(report) to the waiting client.
 
 Return ACK to client.
 
@@ -134,5 +147,5 @@ then submit the report.
 ### ObtainLocationReport(): in
 Validate user.
 
-Create a Listening array and store nonce for the Read request.
+If using listening system - Create a Listening array and store nonce for the Read request.
 return Report from DB.
