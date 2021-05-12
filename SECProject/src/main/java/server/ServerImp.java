@@ -315,10 +315,7 @@ public class ServerImp extends serverServiceImplBase {
 		    responseObserver.onCompleted();
 			
 		} catch (Exception e) {
-			secureReplay.Builder response = secureReplay.newBuilder().setOnError(true)
-					 .setErrormessage(e.getMessage());
-			 responseObserver.onNext(response.build());
-		     responseObserver.onCompleted();
+    		responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
 		}
     }
 

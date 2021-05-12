@@ -239,7 +239,7 @@ public class NormalUser extends User {
 			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
 					                       .usePlaintext().build();
 			serverChannels.add(channel); // Store it for a proper close later
-			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(100, TimeUnit.SECONDS)
+			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(10, TimeUnit.SECONDS)
 																.withWaitForReady();
 
 			secureRequest submitRequest = secureRequest.newBuilder().setUserID(ID)
@@ -341,35 +341,98 @@ public class NormalUser extends User {
 	}
 	
 	public String obtainLocationReport(int epoch) throws Exception {
-		secureReplay rep = null;
-		int myNonce = 0;
+		List<Integer> nonces = new ArrayList<>();
+		List<ManagedChannel> serverChannels = new ArrayList<>();
+		Map<String, Integer> readvals = new HashMap<>();
+		Set<Integer> acks = new HashSet<>();
 
-		//NICAS
-		for (int i = 0; i < num_servers; i++) {
-			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port + i)
+		serverServiceStub serverAsyncStub;
+		final CountDownLatch finishLatch = new CountDownLatch(this.num_servers);
+		StreamObserver<secureReplay> responseObserver = new StreamObserver<secureReplay>() {
+			@Override
+			public void onNext(secureReplay secureReplay) {
+				int serverID = secureReplay.getServerID();
+				if (acks.contains(serverID))
+					return;
+
+				String[] replyFields = new String[0];
+				try {
+					// {userid, point, nonce}
+					replyFields = getfieldsFromSecureMessage(serverID,
+							secureReplay.getConfidentMessage(), secureReplay.getMessageDigitalSignature());
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+					return;
+				}
+
+				int serverNonce = Integer.parseInt(replyFields[replyFields.length-1]);
+				if(serverNonce != nonces.get(serverID)-1) {
+					System.out.println("[user" + myID + "] Submit Report Error: Unexpected nonce");
+					return;
+				}
+
+				String location = replyFields[1];
+
+				acks.add(serverID);
+				if (!readvals.containsKey(location)) {
+					readvals.put(location, 1);
+				}
+
+				readvals.put(location, readvals.get(location) + 1);
+				finishLatch.countDown();
+			}
+
+			@Override
+			public void onError(Throwable t) {
+				Status status = Status.fromThrowable(t);
+				System.out.println("[user" + myID + "] Submit Report Error: " + status);
+				finishLatch.countDown();
+			}
+
+			@Override
+			public void onCompleted() { }
+		};
+
+
+		for (int server_id = 0; server_id < num_servers; ++server_id) {
+			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port + server_id)
 					.usePlaintext().build();
-			myNonce = new Random().nextInt();
+			int myNonce = new Random().nextInt();
+			nonces.add(myNonce);
+			serverChannels.add(channel);
+
 			String message = getMyID() + "||" + epoch +"||"+myNonce;
-			JsonObject cipherReq  = getsecureMessage(i, message);
+			JsonObject cipherReq  = getsecureMessage(server_id, message);
 			String cipherText = cipherReq.get("ciphertext").getAsString();
 			String digSig = cipherReq.get("textDigitalSignature").getAsString();
 			secureRequest req = secureRequest.newBuilder().setConfidentMessage(cipherText).setUserID(getMyID()).
 					setMessageDigitalSignature(digSig).build();
-			serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
-			rep = serverStub.obtainLocationReport(req);
+
+			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(10, TimeUnit.SECONDS)
+					.withWaitForReady();
+
+			serverAsyncStub.obtainLocationReport(req, responseObserver);
+		}
+
+		finishLatch.await();
+
+		for(ManagedChannel channel : serverChannels)
 			channel.shutdown();
+
+		if (readvals.size() <= quorum) {
+			throw new Exception("Not enough answers");
 		}
-		if(!rep.getOnError()) {
-			int serverID = rep.getServerID();
-			String[] replyFields = getfieldsFromSecureMessage(serverID, rep.getConfidentMessage(), rep.getMessageDigitalSignature());
-			int serverNonce = Integer.parseInt(replyFields[replyFields.length-1]);
-			if(serverNonce != myNonce -1)
-				throw new Exception("Nonce error");
-			return replyFields[1];
+
+		Integer max = 0;
+		String consensus = "";
+		for (Map.Entry<String, Integer> entry : readvals.entrySet()) {
+			if (entry.getValue() > max) {
+				max = entry.getValue();
+				consensus = entry.getKey();
+			}
 		}
-		else {
-			throw new Exception("user "+ getMyID() + rep.getErrormessage());
-		}
+
+		return consensus;
 	}
 	
 	
