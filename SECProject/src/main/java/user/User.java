@@ -1,12 +1,10 @@
 package user;
 
 import java.io.File;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.util.Base64;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 import org.ini4j.Ini;
@@ -153,9 +151,23 @@ public class User {
 		} catch (Exception e) {
 			RSAProvider.RSAKeyGenerator(privKeyPath, pubkeypath);
 		}
-	} 
-	
-	
-	
-	
+	}
+
+	public int hashCash(String message) throws NoSuchAlgorithmException {
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+		String cash;
+		byte[] hash;
+		int counter = new Random().nextInt();
+
+		cash = message + counter;
+		while(true) {
+			messageDigest.update(cash.getBytes());
+			hash = messageDigest.digest();
+			if ( hash[0] == 0 && hash[1] == 0 && hash[2] >>> 4 == 0 )
+				return counter;
+			cash = message + (++counter);
+		}
+	}
+
+
 }

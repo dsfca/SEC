@@ -226,8 +226,11 @@ public class NormalUser extends User {
 		String message = proofs.toString();// + "||" + epoch;
 		String signedMessage = signMessage(message);
 
+		// Find number that sha-1(proofs+numer) starts with 20 zeros
+		int myNonce = hashCash(message);
+
 		for(int server_id = 0; server_id < this.num_servers; server_id++) {
-			int myNonce = new Random().nextInt();
+//			int myNonce = new Random().nextInt();
 			nonces.add(myNonce); // Store to verify in a reply
 
 //			String message = proofs.toString() + "||" + epoch +"||" + myNonce;

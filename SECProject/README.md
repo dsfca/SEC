@@ -6,7 +6,6 @@
    (see current obtainLocation of NormalUser)
 5. Submit and Obtain should be atomic, now are regular.
 6. HA user is only one
-7. Spam combat mechanism
 8. Tests
 
 ## Assumption
@@ -14,6 +13,13 @@
 - N > 3f
 - (UserId, Epoch, Report) is unique and can't be modified. 
   Once report is submitted, it can't be updated nor removed.
+
+## Spam combat mechanism
+It is not used random nonce, but nonce meeting
+sha-1(report+nonce) startwith 20 zero bits.
+Same nonce is used for all servers.
+Applied only in normalUser.submit for now.
+
 
 ## Note
 

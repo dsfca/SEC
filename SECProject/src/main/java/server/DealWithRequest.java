@@ -1,9 +1,7 @@
 package server;
 
 import java.io.IOException;
-import java.security.Key;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +46,10 @@ public class DealWithRequest {
 		int nonce = Integer.parseInt(reqFields[1]);
 		if (!verifySignature(id, report, signature)) {
 			throw new Exception("Message was not authenticated");
+		}
+
+		if (!verifyHashCash(report, nonce)) {
+			throw new Exception("Invalid HashCash");
 		}
 
 		// Check uniqueness of nonce
@@ -260,5 +262,11 @@ public class DealWithRequest {
     	return message.split(Pattern.quote("||"));
 	}
 
+	public boolean verifyHashCash(String message, int nonce) throws NoSuchAlgorithmException {
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+		messageDigest.update((message + nonce).getBytes());
+		byte[] hash = messageDigest.digest();
+		return (hash[0] == 0 && hash[1] == 0 && hash[2] >>> 4 == 0);
+	}
     
 }
