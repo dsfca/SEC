@@ -228,6 +228,7 @@ public class NormalUser extends User {
 
 		// Find number that sha-1(proofs+numer) starts with 20 zeros
 		int myNonce = hashCash(message);
+		ManagedChannel channel;
 
 		for(int server_id = 0; server_id < this.num_servers; server_id++) {
 //			int myNonce = new Random().nextInt();
@@ -239,7 +240,7 @@ public class NormalUser extends User {
 //			String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
 			String encryptedMessage = encryptMessage(server_id, message + "||" + myNonce);
 
-			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
+			channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
 					                       .usePlaintext().build();
 			serverChannels.add(channel); // Store it for a proper close later
 			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(10, TimeUnit.SECONDS)
@@ -255,8 +256,8 @@ public class NormalUser extends User {
 		finishLatch.await();
 
 		// Close channels
-		for(ManagedChannel channel : serverChannels)
-			channel.shutdown();
+//		for(ManagedChannel channel : serverChannels)
+//			channel.shutdown();
 
 		// Set acks now contains ids of servers accepted the submit request
 		return acks.size() > this.quorum;

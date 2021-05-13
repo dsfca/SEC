@@ -80,9 +80,6 @@ public class ServerImp extends serverServiceImplBase {
 		public CountDownLatch getLatch() {
     		return countDownLatch;
 		}
-		public void delivered() {
-    		countDownLatch.countDown();
-		}
 	}
 
     public ServerImp(int id, DealWithRequest dwr) throws IOException {
@@ -144,7 +141,8 @@ public class ServerImp extends serverServiceImplBase {
 		    responseObserver.onCompleted();
 	        
     	}catch (Exception e) {
-			responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+    		System.out.println(e.getMessage());
+//			responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
 		}
 
     }
@@ -169,6 +167,14 @@ public class ServerImp extends serverServiceImplBase {
 		if (echoAck.isAckSent()) // Echo for this message has been already sent
 			return;
 
+		if (this.serverChannels.isEmpty()) {
+			for(int server_id = 0; server_id < this.num_servers; server_id++) {
+				ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
+					.usePlaintext().build();
+				serverChannels.add(channel); // Store it for reuse
+			}
+		}
+
     	// Broadcast echo message
 		serverServiceStub serverAsyncStub;
 		secureRequest echo;
@@ -179,7 +185,7 @@ public class ServerImp extends serverServiceImplBase {
 			echo = secureRequest.newBuilder().setUserID(this.myId)
 					 						 .setConfidentMessage(echoMsg)
 											 .setMessageDigitalSignature("").build();
-			serverAsyncStub.submitReportEcho(echo, null);
+			serverAsyncStub.submitReportEcho(echo, ignore);
 		}
 
 		// Echo for the message has been sent.
@@ -244,6 +250,14 @@ public class ServerImp extends serverServiceImplBase {
 		if (readyAck.isAckSent())
 			return;
 
+		if (this.serverChannels.isEmpty()) {
+			for(int server_id = 0; server_id < this.num_servers; server_id++) {
+				ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
+					.usePlaintext().build();
+				serverChannels.add(channel); // Store it for reuse
+			}
+		}
+
 		serverServiceStub serverAsyncStub;
 		secureRequest ready;
 		for(int server_id = 0; server_id < this.num_servers; server_id++) {
@@ -253,7 +267,7 @@ public class ServerImp extends serverServiceImplBase {
 			ready = secureRequest.newBuilder().setUserID(this.myId)
 					.setConfidentMessage(readyMsg)
 					.setMessageDigitalSignature("").build();
-			serverAsyncStub.submitReportReady(ready, null);
+			serverAsyncStub.submitReportReady(ready, ignore);
 		}
 
 		readyAck.setAckSent();
@@ -457,5 +471,11 @@ public class ServerImp extends serverServiceImplBase {
 
     	return messPlainText;
 	}
+
+	private StreamObserver<Empty> ignore = new StreamObserver<Empty>() {
+		@Override public void onNext(Empty empty) {}
+		@Override public void onError(Throwable throwable) { }
+		@Override public void onCompleted() { }
+	};
 
 }
