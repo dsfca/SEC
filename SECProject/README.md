@@ -1,5 +1,5 @@
 ## TODO
-1. Even the mongoDB does not run, server claims the report was submitted. Some check if it was really submitted?
+1. Even the mongoDB does not run, server claims the report was submitted. Some check if it was really submitted? (If Mongo is not running, it will be send an error since the beginning of the run)
 2. Check if report is already in DB, when receiving new submit request.
 3. The Reliable broadcast does not enc/dec/sign. Now they are communicating in plaintext.
 4. There are 2 HA function that should run on a regular register. That means to wait for a quorum
@@ -7,6 +7,7 @@
 5. Submit and Obtain should be atomic, now are regular.
 6. HA user is only one
 8. Tests
+9. Exchange SHA-1 (deprecated because of collision attack) in Spam Combat for SHA-256
 
 ## Assumption
 
@@ -16,7 +17,7 @@
 
 ## Spam combat mechanism
 It is not used random nonce, but nonce meeting
-sha-1(report+nonce) startwith 20 zero bits.
+sha-1(report+nonce) start with 20 zero bits.
 Same nonce is used for all servers.
 Applied only in normalUser.submit for now.
 
@@ -82,7 +83,6 @@ echo came, it is also checked if there is more
 than quorum of that message. If there is, Ready
 message is broadcast and the system above works
 in similar way. 
-
 
 
 ## Normal user
