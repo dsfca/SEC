@@ -38,11 +38,7 @@ public class NormalUser extends User {
 	
 
 	private int port;
-	private int server_start_port;
-	private int num_servers;
-	private int num_byzantines;
-	private int quorum;
-	
+
 	/**************************************************************************************
 	* 											-User class constructor()
 	* - 
@@ -53,10 +49,6 @@ public class NormalUser extends User {
 	public NormalUser(int ID) throws Exception {
 		super(ID, "user");
 		this.port = ID + Integer.parseInt("9090");
-		this.server_start_port = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
-		this.num_servers = new Ini(new File("variables.ini")).get("Server","number_of_servers", Integer.class);
-		this.num_byzantines = new Ini(new File("variables.ini")).get("Server","number_of_byzantines", Integer.class);
-		this.quorum = (num_servers+num_byzantines)/2;
 		init();
 		initThreadToSndReqProof();
 	}
@@ -185,6 +177,8 @@ public class NormalUser extends User {
 					return;
 				}
 
+				finishLatch.countDown();
+
 				String[] replyFields = new String[0];
 				try {
 					replyFields = getfieldsFromSecureMessage(serverID, reply.getConfidentMessage(),
@@ -205,7 +199,6 @@ public class NormalUser extends User {
 				// Everything OK, accept this ack
 				// Set is used to ignore more acks from single server
 				acks.add(serverID);
-				finishLatch.countDown();
 			}
 
 			@Override
@@ -359,6 +352,9 @@ public class NormalUser extends User {
 				if (acks.contains(serverID))
 					return;
 
+				acks.add(serverID);
+				finishLatch.countDown();
+
 				String[] replyFields = new String[0];
 				try {
 					// {userid, point, nonce}
@@ -377,13 +373,12 @@ public class NormalUser extends User {
 
 				String location = replyFields[1];
 
-				acks.add(serverID);
 				if (!readvals.containsKey(location)) {
 					readvals.put(location, 1);
+					return;
 				}
 
 				readvals.put(location, readvals.get(location) + 1);
-				finishLatch.countDown();
 			}
 
 			@Override
