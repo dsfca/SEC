@@ -227,15 +227,10 @@ public class DealWithRequest {
 
     	userNonces.add(nonce);
 
-    	String ret = "";
 		String[] epochList = epochs.split(";");
-		for (String ep : epochList) {
-			int epoch = Integer.parseInt(ep);
-			String proofs = DB.getProofsInEpoch(userID, epoch);
-			ret += ep + "=" + proofs + "||";
-		}
+		ArrayList <String> proofs = DB.getProofsinEpochs(userID, epochList);
 
-		String message = ret + (nonce - 1);
+		String message = proofs.toString() + (nonce - 1);
 		JsonObject secureMessage = getsecureMessage("user",message, userID);
 		String confidentMessage = secureMessage.get("ciphertext").getAsString();
 		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();

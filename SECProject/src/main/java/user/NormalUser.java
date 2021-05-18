@@ -259,7 +259,7 @@ public class NormalUser extends User {
 	
 	public String obtainLocationReport(int epoch) throws Exception {
 
-		String message =  getMyID() + "||" + epoch;
+		String message = String.valueOf(epoch);
 		return asyncServerRequest(message, MessageType.ObtainLocationReport);
 
 	}

@@ -146,38 +146,36 @@ public class InteractWithDB {
 	
 
 	//PHASE 2 - Allows a user to obtain all the proofs that it provided to other users in a range of epochs
-	public ArrayList<String> getProofsinRange(int user, int epoch_start, int epoch_end) {
+	public ArrayList<String> getProofsinEpochs(int user, String [] epochs) {
 		MongoCursor<Document> cursor = mongo_collection_all.find().iterator();
 		ArrayList <String> proofs = new ArrayList <String> ();
-		
-
+		boolean unique = true;
+ 
 		while (cursor.hasNext()) {
 			Document current  = cursor.next();
-			
-			if(current.get("user1").equals(user) || current.get("user2").equals(user)  &&
-			(Integer.parseInt(current.get("epoch").toString()) >= epoch_start &&
-			Integer.parseInt(current.get("epoch").toString()) <= epoch_end)) {
+			for (int i=0; i<epochs.length; i++) {
 
-				BasicDBObject conveted_proof = new BasicDBObject(current);
-				@SuppressWarnings("unchecked")
-				Map <String,String> proof = conveted_proof.toMap();
-				proof.remove("_id");
-				
-				proofs.add(proof.toString());
+				if(current.get("user2").equals(user)  && (Integer.parseInt(current.get("epoch").toString()) == Integer.parseInt(epochs[i]))) {
+
+					BasicDBObject conveted_proof = new BasicDBObject(current);
+					@SuppressWarnings("unchecked")
+					Map <String,String> proof = conveted_proof.toMap();
+					proof.remove("_id");
+					for (String p: proofs) {
+						if(p.equals(proof.toString()))
+							unique = false;
+					}
+					if (unique == true) {
+						proofs.add(proof.toString());
+					}
+				}
 			}
 		}
 		return proofs;
-	}
-
-	public String getProofsInEpoch(int user, int epoch) {
-
-		return "Not Implemented yet; returns set of proofs that @user provided in @epoch";
-
-	}
-	
+	}	
 
 	
-	/*public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args) throws FileNotFoundException, IOException {
 		InteractWithDB it = new InteractWithDB("variables.ini", 1);
 		it.cleanValidatedCollection();
 		it.cleanAllLocationsCollection();
@@ -188,16 +186,16 @@ public class InteractWithDB {
 		
 		
 		//LOCATIONS TO ALL
-		it.addReportToDatabase(1,2,new Point2D(1,0),new Point2D(0,0), 1, true, "XXX");
+		it.addReportToDatabase(1,1,new Point2D(1,0),new Point2D(0,0), 1, true, "XXX");
 		it.addReportToDatabase(1,3,new Point2D(1,0),new Point2D(0,0), 3, true, "XXX");
 		it.addReportToDatabase(4,1,new Point2D(1,0),new Point2D(0,0), 6, true, "XXX");
 
 		//Point2D location = it.getLocationGivenEpoch(1, 2);
-		//System.out.println(location);
+		String [] epochs = {"1","3","6"};
 		ArrayList <String> users = it.getUsersGivenPosAndEpoch(new Point2D(0,0), 1);
-		ArrayList <String> proofs = it.getProofsinRange(1, 0, 4);
-		System.out.println(proofs);
-	}*/
+		ArrayList <String> proofs = it.getProofsinEpochs(1, epochs);
+		System.out.println(proofs.toString());
+	}
 
 }
 
