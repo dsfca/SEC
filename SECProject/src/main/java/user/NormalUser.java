@@ -226,7 +226,7 @@ public class NormalUser extends User {
 		String message = proofs.toString();// + "||" + epoch;
 		String signedMessage = signMessage(message);
 
-		// Find number that sha-1(proofs+numer) starts with 20 zeros
+		// Find number that sha-256(proofs+numer) starts with 20 zeros
 		int myNonce = hashCash(message);
 		ManagedChannel channel;
 
@@ -256,8 +256,8 @@ public class NormalUser extends User {
 		finishLatch.await();
 
 		// Close channels
-//		for(ManagedChannel channel : serverChannels)
-//			channel.shutdown();
+		for(ManagedChannel ch : serverChannels)
+			ch.shutdown();
 
 		// Set acks now contains ids of servers accepted the submit request
 		return acks.size() > this.quorum;

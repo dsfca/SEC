@@ -5,7 +5,6 @@
 4. There are 2 HA function that should run on a regular register. That means to wait for a quorum
    (see current obtainLocation of NormalUser)
 5. Submit and Obtain should be atomic, now are regular.
-6. HA user is only one
 8. Tests
 
 ## Assumption

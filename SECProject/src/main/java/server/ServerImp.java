@@ -142,7 +142,7 @@ public class ServerImp extends serverServiceImplBase {
 	        
     	}catch (Exception e) {
     		System.out.println(e.getMessage());
-//			responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+			responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
 		}
 
     }

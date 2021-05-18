@@ -280,7 +280,7 @@ public class DealWithRequest {
 	}
 
 	public boolean verifyHashCash(String message, int nonce) throws NoSuchAlgorithmException {
-		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 		messageDigest.update((message + nonce).getBytes());
 		byte[] hash = messageDigest.digest();
 		return (hash[0] == 0 && hash[1] == 0 && hash[2] >>> 4 == 0);

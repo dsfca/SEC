@@ -156,7 +156,7 @@ public class User {
 	}
 
 	public int hashCash(String message) throws NoSuchAlgorithmException {
-		MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+		MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 		String cash;
 		byte[] hash;
 		int counter = new Random().nextInt();
