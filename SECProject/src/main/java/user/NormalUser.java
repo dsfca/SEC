@@ -35,7 +35,12 @@ public class NormalUser extends User {
 	
 	//distance that user consider to see if a user is near him
 	private final double closer_range_dist = 2;
-	
+
+	private enum MessageType {
+		ObtainLocationReport,
+		SubmitLocationReport,
+		RequestMyProofs
+	}
 
 	private int port;
 
@@ -164,96 +169,11 @@ public class NormalUser extends User {
 	 *
 	 * ************************************************************************************/
 	public boolean submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position) throws Exception {
-		List<Integer> nonces = new ArrayList<>();
 
-		// submitLocationReport callback
-		Set<Integer> acks = new HashSet<>();
-		final CountDownLatch finishLatch = new CountDownLatch(this.num_servers);
-		StreamObserver<secureReplay> acksObserver = new StreamObserver<secureReplay>() {
-			@Override
-			public void onNext(secureReplay reply) {
-				int serverID = reply.getServerID();
-				if (acks.contains(serverID)) { // This server's already sent ack; ignore it
-					return;
-				}
+		String message = proofs.toString();
+		String quorumReply = asyncServerRequest(message, MessageType.SubmitLocationReport);
+		return quorumReply.equals("||Your report was submitted successfully");
 
-				finishLatch.countDown();
-
-				String[] replyFields = new String[0];
-				try {
-					replyFields = getfieldsFromSecureMessage(serverID, reply.getConfidentMessage(),
-																	  reply.getMessageDigitalSignature());
-				} catch (Exception e) { // Message is not authenticated
-					System.out.println(e.getMessage());
-					return;
-				}
-
-				int serverNonce = Integer.parseInt(replyFields[1]);
-				if(serverNonce != nonces.get(serverID)-1) {
-					System.out.println("[user" + ID + "] Submit Report Error: Unexpected nonce");
-					return;
-				}
-
-				System.out.println("From server" + serverID + ": " + replyFields[0]);
-
-				// Everything OK, accept this ack
-				// Set is used to ignore more acks from single server
-				acks.add(serverID);
-			}
-
-			@Override
-			public void onError(Throwable t) {
-				Status status = Status.fromThrowable(t);
-				System.out.println("[user" + ID + "] Submit Report Error: " + status);
-				finishLatch.countDown();
-			}
-
-			@Override
-			public void onCompleted() { }
-		};
-
-		// Send submit report request to each server
-		List<ManagedChannel> serverChannels = new ArrayList<>();
-		serverServiceStub serverAsyncStub;
-
-		String message = proofs.toString();// + "||" + epoch;
-		String signedMessage = signMessage(message);
-
-		// Find number that sha-256(proofs+numer) starts with 20 zeros
-		int myNonce = hashCash(message);
-		ManagedChannel channel;
-
-		for(int server_id = 0; server_id < this.num_servers; server_id++) {
-//			int myNonce = new Random().nextInt();
-			nonces.add(myNonce); // Store to verify in a reply
-
-//			String message = proofs.toString() + "||" + epoch +"||" + myNonce;
-//			JsonObject secureMessage = getsecureMessage(server_id, message);
-//			String messagecipher = secureMessage.get("ciphertext").getAsString();
-//			String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
-			String encryptedMessage = encryptMessage(server_id, message + "||" + myNonce);
-
-			channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
-					                       .usePlaintext().build();
-			serverChannels.add(channel); // Store it for a proper close later
-			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(10, TimeUnit.SECONDS)
-																.withWaitForReady();
-
-			secureRequest submitRequest = secureRequest.newBuilder().setUserID(ID)
-													  				.setConfidentMessage(encryptedMessage)
-													  				.setMessageDigitalSignature(signedMessage).build();
-			serverAsyncStub.submitLocationReport(submitRequest, acksObserver);
-		}
-
-		// Wait for all replies (both errors and ok)
-		finishLatch.await();
-
-		// Close channels
-		for(ManagedChannel ch : serverChannels)
-			ch.shutdown();
-
-		// Set acks now contains ids of servers accepted the submit request
-		return acks.size() > this.quorum;
 	}
 
 	/**************************************************************************************
@@ -338,101 +258,140 @@ public class NormalUser extends User {
 	}
 	
 	public String obtainLocationReport(int epoch) throws Exception {
-		List<Integer> nonces = new ArrayList<>();
-		List<ManagedChannel> serverChannels = new ArrayList<>();
-		Map<String, Integer> readvals = new HashMap<>();
-		Set<Integer> acks = new HashSet<>();
 
-		serverServiceStub serverAsyncStub;
-		final CountDownLatch finishLatch = new CountDownLatch(this.num_servers);
-		StreamObserver<secureReplay> responseObserver = new StreamObserver<secureReplay>() {
-			@Override
-			public void onNext(secureReplay secureReplay) {
-				int serverID = secureReplay.getServerID();
-				if (acks.contains(serverID))
+		String message =  getMyID() + "||" + epoch;
+		return asyncServerRequest(message, MessageType.ObtainLocationReport);
+
+	}
+
+	public String requestMyProofs(Set<Integer> epochSet) throws Exception {
+
+		String epochs = epochSet.toString().replaceAll("\\[|\\]","")
+										   .replaceAll(", ",";");
+
+		String message = getMyID() + "||" + epochs;
+		return asyncServerRequest(message, MessageType.RequestMyProofs);
+
+	}
+
+	private String asyncServerRequest(String message, MessageType type) throws Exception {
+        List<Integer> nonces = new ArrayList<>();
+        Map<String, Integer> readvals = new HashMap<>();
+        Set<Integer> replied = new HashSet<>();
+
+        final CountDownLatch finishLatch = new CountDownLatch(this.num_servers);
+        StreamObserver<secureReplay> acksObserver = new StreamObserver<secureReplay>() {
+            @Override
+            public void onNext(secureReplay secureReplay) {
+                int serverId = secureReplay.getServerID();
+                if (replied.contains(serverId))
 					return;
 
-				acks.add(serverID);
-				finishLatch.countDown();
-
-				String[] replyFields = new String[0];
-				try {
-					// {userid, point, nonce}
-					replyFields = getfieldsFromSecureMessage(serverID,
+                // Get Nonce from the message
+                String[] replyFields = new String[0];
+                try {
+					replyFields = getfieldsFromSecureMessage(serverId,
 							secureReplay.getConfidentMessage(), secureReplay.getMessageDigitalSignature());
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
 					return;
 				}
 
-				int serverNonce = Integer.parseInt(replyFields[replyFields.length-1]);
-				if(serverNonce != nonces.get(serverID)-1) {
+                replied.add(serverId);
+                finishLatch.countDown();
+
+                // Validate nonce
+                int serverNonce = Integer.parseInt(replyFields[replyFields.length-1]);
+				if(serverNonce != nonces.get(serverId)-1) {
 					System.out.println("[user" + myID + "] Submit Report Error: Unexpected nonce");
 					return;
 				}
 
-				String location = replyFields[1];
+				// Compose plaintext message
+                String response = "";
+				for (int i = 0; i < replyFields.length-1; ++i)
+				    response += "||" + replyFields[i];
 
-				if (!readvals.containsKey(location)) {
-					readvals.put(location, 1);
-					return;
-				}
+                if (!readvals.containsKey(response)) {
+                    readvals.put(response, 1);
+                    return;
+                }
 
-				readvals.put(location, readvals.get(location) + 1);
-			}
+                readvals.put(response, readvals.get(response) + 1);
+            }
 
-			@Override
-			public void onError(Throwable t) {
-				Status status = Status.fromThrowable(t);
-				System.out.println("[user" + myID + "] Submit Report Error: " + status);
+            @Override
+            public void onError(Throwable t) {
+                Status status = Status.fromThrowable(t);
+				System.out.println("[User" + myID + "] Error: " + status);
 				finishLatch.countDown();
-			}
+            }
 
-			@Override
-			public void onCompleted() { }
-		};
+            @Override
+            public void onCompleted() { }
+        };
 
+        List<ManagedChannel> serverChannels = new ArrayList<>();
+		serverServiceGrpc.serverServiceStub serverAsyncStub;
 
-		for (int server_id = 0; server_id < num_servers; ++server_id) {
-			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port + server_id)
-					.usePlaintext().build();
-			int myNonce = new Random().nextInt();
-			nonces.add(myNonce);
-			serverChannels.add(channel);
+		String signedMessage = signMessage(message);
+		int myNonce = hashCash(message);
 
-			String message = getMyID() + "||" + epoch +"||"+myNonce;
-			JsonObject cipherReq  = getsecureMessage(server_id, message);
-			String cipherText = cipherReq.get("ciphertext").getAsString();
-			String digSig = cipherReq.get("textDigitalSignature").getAsString();
-			secureRequest req = secureRequest.newBuilder().setConfidentMessage(cipherText).setUserID(getMyID()).
-					setMessageDigitalSignature(digSig).build();
+        for(int server_id = 0; server_id < this.num_servers; server_id++) {
+//            int myNonce = new Random().nextInt();
+            nonces.add(myNonce);
 
+//            JsonObject secureMessage = getsecureMessage(server_id, message + "||" + myNonce);
+//            String messagecipher = secureMessage.get("ciphertext").getAsString();
+//			String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
+
+			String encryptedMessage = encryptMessage(server_id, message + "||" + myNonce);
+
+			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
+					                       .usePlaintext().build();
+			serverChannels.add(channel); // Store it for a proper close later
 			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(10, TimeUnit.SECONDS)
-					.withWaitForReady();
+																.withWaitForReady();
 
-			serverAsyncStub.obtainLocationReport(req, responseObserver);
-		}
+			secureRequest request = secureRequest.newBuilder().setUserID(myID)
+													  				.setConfidentMessage(encryptedMessage)
+													  				.setMessageDigitalSignature(signedMessage).build();
+			if (type == MessageType.ObtainLocationReport) {
+			    serverAsyncStub.obtainLocationReport(request, acksObserver);
+            } else if (type == MessageType.SubmitLocationReport) {
+			    serverAsyncStub.submitLocationReport(request, acksObserver);
+            } else if (type == MessageType.RequestMyProofs) {
+				serverAsyncStub.requestMyProofs(request, acksObserver);
+			}
+			else {
+			    throw new Exception("Unknown message type.");
+            }
+        }
 
+        // Wait for all replies (both errors and ok)
 		finishLatch.await();
 
-		for(ManagedChannel channel : serverChannels)
-			channel.shutdown();
+        // Close channels
+		for(ManagedChannel ch : serverChannels)
+			ch.shutdown();
 
-		if (readvals.size() <= quorum) {
-			throw new Exception("Not enough answers");
-		}
-
-		Integer max = 0;
+        // There is more than quorum of returned messages, find the most common
+        Integer max = 0;
 		String consensus = "";
+		int cnt = 0;
 		for (Map.Entry<String, Integer> entry : readvals.entrySet()) {
+			cnt += entry.getValue();
 			if (entry.getValue() > max) {
 				max = entry.getValue();
 				consensus = entry.getKey();
 			}
 		}
 
-		return consensus;
-	}
+		if (cnt <= quorum)
+			throw new Exception("Not enough answers.");
+
+        return consensus;
+    }
 	
 	
 }

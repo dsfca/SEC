@@ -168,6 +168,12 @@ public class InteractWithDB {
 		}
 		return proofs;
 	}
+
+	public String getProofsInEpoch(int user, int epoch) {
+
+		return "Not Implemented yet; returns set of proofs that @user provided in @epoch";
+
+	}
 	
 
 	

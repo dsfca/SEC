@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeAll;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class UserTest {
 	static int  num_users;
@@ -55,23 +58,24 @@ public class UserTest {
 
     }
     
-//    @Test
-//    void obtainLocationReportTest() {
-//    	try {
-//
-//            int userID = 1;
-//            int epoch = 2;
-//            NormalUser u = trl.getUsers().get(userID);
-//            String serverReply = u.proveLocation(epoch); u.proveLocation(epoch);
-//            assertEquals(serverReply, "Your report was submitted successfully");
-//            Thread.sleep(2000);
-//            String reply =  u.obtainLocationReport(epoch);
-//            System.out.println("user position: " + reply);
-//
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    @Test
+    void obtainLocationReportTest() {
+    	try {
+
+            int userID = 1;
+            int epoch = 2;
+            NormalUser u = trl.getUsers().get(userID);
+
+            boolean serverReply = u.proveLocation(epoch);
+            assertEquals(serverReply, true);
+            Thread.sleep(2000);
+            String reply =  u.obtainLocationReport(epoch);
+            System.out.println("user position: " + reply);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

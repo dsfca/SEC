@@ -137,7 +137,14 @@ public class DealWithRequest {
      * @throws Exception 
      *
      * ************************************************************************************/
-    public secureReplay.Builder obtainReportHandler(int userId, int epoch, int nonce) throws Exception {
+    public secureReplay.Builder obtainReportHandler(int userId, int epoch, int nonce, String sig) throws Exception {
+
+    	if (!verifyHashCash(userId + "||" + epoch, nonce))
+    		throw new Exception("Invalid HashCash");
+
+    	if (!verifySignature(userId, userId + "||" + epoch, sig))
+    		throw new Exception("Message not authentic");
+
     	secureReplay.Builder response = secureReplay.newBuilder();
     	List<Integer> userNonces = usersNonce.get(userId);
     		if(userNonces == null)
@@ -196,6 +203,46 @@ public class DealWithRequest {
 			response.setErrormessage("user nonce already exists");
 		}
 	    return response;
+	}
+
+	public secureReplay.Builder myProofs(int userID, String epochs, int nonce, String sig) throws Exception {
+
+		if (!verifySignature(userID, userID + "||" + epochs, sig))
+			throw new Exception("Messige was not authenticated");
+
+		if (!verifyHashCash(userID + "||" + epochs, nonce))
+    		throw new Exception("Invalid HashCash");
+
+		System.out.println("####" + userID + " " + epochs);
+
+    	secureReplay.Builder response = secureReplay.newBuilder();
+
+    	List<Integer> userNonces = usersNonce.get(userID);
+    	if(userNonces == null)
+			userNonces = new ArrayList<>();
+
+    	if(userNonces.contains(nonce)) {
+    		throw new Exception("user nonce already exists");
+		}
+
+    	userNonces.add(nonce);
+
+    	String ret = "";
+		String[] epochList = epochs.split(";");
+		for (String ep : epochList) {
+			int epoch = Integer.parseInt(ep);
+			String proofs = DB.getProofsInEpoch(userID, epoch);
+			ret += ep + "=" + proofs + "||";
+		}
+
+		String message = ret + (nonce - 1);
+		JsonObject secureMessage = getsecureMessage("user",message, userID);
+		String confidentMessage = secureMessage.get("ciphertext").getAsString();
+		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
+		response.setOnError(false);
+		response.setServerID(ID).setConfidentMessage(confidentMessage).setMessageDigitalSignature(messDigSig);
+
+		return response;
 	}
     
     public secureReplay.Builder obtainUsersAtLocationHandler(int userID, Point2D requestPoint, int requestEpoch, int nonce) throws Exception {
