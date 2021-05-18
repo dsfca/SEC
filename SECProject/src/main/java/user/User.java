@@ -30,8 +30,14 @@ public class User {
 	private Key [] sharedKey;
 	protected int myID;
 	private int N_timesSharedKeyUsed;
-	private int num_servers;
+	protected int num_servers;
 	private String type;
+
+	protected int server_start_port;
+	protected int num_byzantines;
+	protected int quorum;
+
+
 	
 	public User(int ID, String type) throws Exception {
 		this.type = type;
@@ -39,7 +45,11 @@ public class User {
 		PRIVATE_KEY_PATH = "resources/private_keys/"+ type +""+ myID + "_private.key";
 		verifyKeys(myID, type);
 		this.num_servers = new Ini(new File("variables.ini")).get("Server","number_of_servers", Integer.class);
-		this.sharedKey = new Key [num_servers]; 
+		this.sharedKey = new Key [num_servers];
+
+		this.server_start_port = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
+		this.num_byzantines = new Ini(new File("variables.ini")).get("Server","number_of_byzantines", Integer.class);
+		this.quorum = (num_servers+num_byzantines)/2;
 	}
 	
 	public Key getSharedKey(int server_id) {
@@ -151,6 +161,7 @@ public class User {
 		try {
 			KeyPair mykeypair = RSAProvider.readRSAKey(pubkeypath, privKeyPath);
 		} catch (Exception e) {
+			System.out.println(e);
 			RSAProvider.RSAKeyGenerator(privKeyPath, pubkeypath);
 		}
 	}
