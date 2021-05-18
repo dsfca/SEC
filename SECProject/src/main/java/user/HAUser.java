@@ -77,9 +77,6 @@ public class HAUser extends User {
                 if (acks.contains(serverId))
 					return;
 
-                acks.add(serverId);
-                finishLatch.countDown();
-
                 // Get Nonce from the message
                 String[] replyFields = new String[0];
                 try {
@@ -89,6 +86,9 @@ public class HAUser extends User {
 					System.out.println(e.getMessage());
 					return;
 				}
+
+                acks.add(serverId);
+                finishLatch.countDown();
 
                 // Validate nonce
                 int serverNonce = Integer.parseInt(replyFields[replyFields.length-1]);
@@ -142,7 +142,7 @@ public class HAUser extends User {
 													  				.setConfidentMessage(messagecipher)
 													  				.setMessageDigitalSignature(messageDigSig).build();
 			if (type == MessageType.ObtainLocationReport) {
-			    serverAsyncStub.obtainLocationReport(request, acksObserver);
+			    serverAsyncStub.obtainLocationReportHA(request, acksObserver);
             } else if (type == MessageType.ObtainUsersAtLocation) {
 			    serverAsyncStub.obtainUsersAtLocation(request, acksObserver);
             } else {
@@ -157,19 +157,19 @@ public class HAUser extends User {
 		for(ManagedChannel ch : serverChannels)
 			ch.shutdown();
 
-        if (readvals.size() <= quorum) {
-			throw new Exception("Not enough answers");
-		}
-
         // There is more than quorum of returned messages, find the most common
         Integer max = 0;
 		String consensus = "";
+		int cnt = 0;
 		for (Map.Entry<String, Integer> entry : readvals.entrySet()) {
+		    cnt += entry.getValue();
 			if (entry.getValue() > max) {
 				max = entry.getValue();
 				consensus = entry.getKey();
 			}
 		}
+
+		if (cnt <= quorum) throw new Exception("Not enough answers");
 
         return consensus;
     }

@@ -320,11 +320,13 @@ public class ServerImp extends serverServiceImplBase {
     @Override
     public void obtainLocationReport(secureRequest request, StreamObserver<secureReplay> responseObserver) {
     	try {
-    		
-		    String[] reqSplit = getfieldsFromSecureMessage(request.getUserID(), request.getConfidentMessage(), request.getMessageDigitalSignature(), "user");
-		    int epoch = Integer.parseInt(reqSplit[1]);
-		    int nonce = Integer.parseInt(reqSplit[2]);
-		    ServerService.secureReplay.Builder response = dealWithReq.obtainReportHandler(request.getUserID(), epoch, nonce);
+    		String openText = getPlainText("user", request.getUserID(), request.getConfidentMessage());
+			String[] messageFields = getfieldsFromMessage(openText);
+
+			int epoch = Integer.parseInt(messageFields[1]);
+			int nonce = Integer.parseInt(messageFields[2]);
+
+		    ServerService.secureReplay.Builder response = dealWithReq.obtainReportHandler(request.getUserID(), epoch, nonce, request.getMessageDigitalSignature());
 		    responseObserver.onNext(response.build());
 		    responseObserver.onCompleted();
 			
@@ -438,8 +440,29 @@ public class ServerImp extends serverServiceImplBase {
 		}
 	
     }
-    
-    public String[] getfieldsFromSecureMessage(int userID, String secureMessage, String digsig, String usertype) throws Exception {
+
+	@Override
+	public void requestMyProofs(secureRequest request, StreamObserver<secureReplay> responseObserver) {
+		try {
+
+			String openText = getPlainText("user", request.getUserID(), request.getConfidentMessage());
+			String[] messageFields = getfieldsFromMessage(openText);
+
+			String epochs = messageFields[1];
+			int nonce = Integer.parseInt(messageFields[2]);
+
+		    ServerService.secureReplay.Builder response = dealWithReq.myProofs(request.getUserID(), epochs, nonce, request.getMessageDigitalSignature());
+		    responseObserver.onNext(response.build());
+		    responseObserver.onCompleted();
+
+		} catch (Exception e) {
+    		responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+		}
+	}
+
+
+
+	public String[] getfieldsFromSecureMessage(int userID, String secureMessage, String digsig, String usertype) throws Exception {
 		return getPlainText(userID, secureMessage, digsig, usertype).split(Pattern.quote("||"));
 	}
 

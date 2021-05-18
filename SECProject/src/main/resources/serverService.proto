@@ -13,7 +13,9 @@ service serverService{
 	rpc obtainLocationReport(secureRequest) returns (secureReplay);
 
 	rpc obtainLocationReportHA(secureRequest) returns (secureReplay);
-	rpc obtainUsersAtLocation(secureRequest) returns (secureReplay); 
+	rpc obtainUsersAtLocation(secureRequest) returns (secureReplay);
+
+	rpc requestMyProofs(secureRequest) returns (secureReplay);
 	
 	rpc DHKeyExchange(DHKeyExcReq) returns (DHKeyExcRep);
 }
