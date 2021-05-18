@@ -219,6 +219,38 @@ public final class serverServiceGrpc {
      return getObtainUsersAtLocationMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
+      com.server.grpc.ServerService.secureReplay> getRequestMyProofsMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "requestMyProofs",
+      requestType = com.server.grpc.ServerService.secureRequest.class,
+      responseType = com.server.grpc.ServerService.secureReplay.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
+      com.server.grpc.ServerService.secureReplay> getRequestMyProofsMethod() {
+    io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest, com.server.grpc.ServerService.secureReplay> getRequestMyProofsMethod;
+    if ((getRequestMyProofsMethod = serverServiceGrpc.getRequestMyProofsMethod) == null) {
+      synchronized (serverServiceGrpc.class) {
+        if ((getRequestMyProofsMethod = serverServiceGrpc.getRequestMyProofsMethod) == null) {
+          serverServiceGrpc.getRequestMyProofsMethod = getRequestMyProofsMethod = 
+              io.grpc.MethodDescriptor.<com.server.grpc.ServerService.secureRequest, com.server.grpc.ServerService.secureReplay>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "serverService", "requestMyProofs"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.secureRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.secureReplay.getDefaultInstance()))
+                  .setSchemaDescriptor(new serverServiceMethodDescriptorSupplier("requestMyProofs"))
+                  .build();
+          }
+        }
+     }
+     return getRequestMyProofsMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.DHKeyExcReq,
       com.server.grpc.ServerService.DHKeyExcRep> getDHKeyExchangeMethod;
 
@@ -322,6 +354,13 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public void requestMyProofs(com.server.grpc.ServerService.secureRequest request,
+        io.grpc.stub.StreamObserver<com.server.grpc.ServerService.secureReplay> responseObserver) {
+      asyncUnimplementedUnaryCall(getRequestMyProofsMethod(), responseObserver);
+    }
+
+    /**
+     */
     public void dHKeyExchange(com.server.grpc.ServerService.DHKeyExcReq request,
         io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep> responseObserver) {
       asyncUnimplementedUnaryCall(getDHKeyExchangeMethod(), responseObserver);
@@ -371,6 +410,13 @@ public final class serverServiceGrpc {
                 com.server.grpc.ServerService.secureRequest,
                 com.server.grpc.ServerService.secureReplay>(
                   this, METHODID_OBTAIN_USERS_AT_LOCATION)))
+          .addMethod(
+            getRequestMyProofsMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                com.server.grpc.ServerService.secureRequest,
+                com.server.grpc.ServerService.secureReplay>(
+                  this, METHODID_REQUEST_MY_PROOFS)))
           .addMethod(
             getDHKeyExchangeMethod(),
             asyncUnaryCall(
@@ -450,6 +496,14 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public void requestMyProofs(com.server.grpc.ServerService.secureRequest request,
+        io.grpc.stub.StreamObserver<com.server.grpc.ServerService.secureReplay> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getRequestMyProofsMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
     public void dHKeyExchange(com.server.grpc.ServerService.DHKeyExcReq request,
         io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep> responseObserver) {
       asyncUnaryCall(
@@ -515,6 +569,13 @@ public final class serverServiceGrpc {
     public com.server.grpc.ServerService.secureReplay obtainUsersAtLocation(com.server.grpc.ServerService.secureRequest request) {
       return blockingUnaryCall(
           getChannel(), getObtainUsersAtLocationMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.server.grpc.ServerService.secureReplay requestMyProofs(com.server.grpc.ServerService.secureRequest request) {
+      return blockingUnaryCall(
+          getChannel(), getRequestMyProofsMethod(), getCallOptions(), request);
     }
 
     /**
@@ -593,6 +654,14 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<com.server.grpc.ServerService.secureReplay> requestMyProofs(
+        com.server.grpc.ServerService.secureRequest request) {
+      return futureUnaryCall(
+          getChannel().newCall(getRequestMyProofsMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<com.server.grpc.ServerService.DHKeyExcRep> dHKeyExchange(
         com.server.grpc.ServerService.DHKeyExcReq request) {
       return futureUnaryCall(
@@ -606,7 +675,8 @@ public final class serverServiceGrpc {
   private static final int METHODID_OBTAIN_LOCATION_REPORT = 3;
   private static final int METHODID_OBTAIN_LOCATION_REPORT_HA = 4;
   private static final int METHODID_OBTAIN_USERS_AT_LOCATION = 5;
-  private static final int METHODID_DHKEY_EXCHANGE = 6;
+  private static final int METHODID_REQUEST_MY_PROOFS = 6;
+  private static final int METHODID_DHKEY_EXCHANGE = 7;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -647,6 +717,10 @@ public final class serverServiceGrpc {
           break;
         case METHODID_OBTAIN_USERS_AT_LOCATION:
           serviceImpl.obtainUsersAtLocation((com.server.grpc.ServerService.secureRequest) request,
+              (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.secureReplay>) responseObserver);
+          break;
+        case METHODID_REQUEST_MY_PROOFS:
+          serviceImpl.requestMyProofs((com.server.grpc.ServerService.secureRequest) request,
               (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.secureReplay>) responseObserver);
           break;
         case METHODID_DHKEY_EXCHANGE:
@@ -720,6 +794,7 @@ public final class serverServiceGrpc {
               .addMethod(getObtainLocationReportMethod())
               .addMethod(getObtainLocationReportHAMethod())
               .addMethod(getObtainUsersAtLocationMethod())
+              .addMethod(getRequestMyProofsMethod())
               .addMethod(getDHKeyExchangeMethod())
               .build();
         }

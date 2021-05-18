@@ -4404,7 +4404,7 @@ public final class ServerService {
       "PubKey\030\006 \001(\t\"\\\n\013DHKeyExcRep\022\020\n\010myPubKey\030" +
       "\001 \001(\t\022\024\n\014digSigPubkey\030\002 \001(\t\022\017\n\007onError\030\003" +
       " \001(\010\022\024\n\014errorMessage\030\004 \001(\t\"\031\n\010BInteger\022\r" +
-      "\n\005value\030\001 \001(\0142\224\003\n\rserverService\0225\n\024submi" +
+      "\n\005value\030\001 \001(\0142\306\003\n\rserverService\0225\n\024submi" +
       "tLocationReport\022\016.secureRequest\032\r.secure" +
       "Replay\022:\n\020submitReportEcho\022\016.secureReque" +
       "st\032\026.google.protobuf.Empty\022;\n\021submitRepo" +
@@ -4413,9 +4413,10 @@ public final class ServerService {
       "Request\032\r.secureReplay\0227\n\026obtainLocation" +
       "ReportHA\022\016.secureRequest\032\r.secureReplay\022" +
       "6\n\025obtainUsersAtLocation\022\016.secureRequest" +
-      "\032\r.secureReplay\022+\n\rDHKeyExchange\022\014.DHKey" +
-      "ExcReq\032\014.DHKeyExcRepB\021\n\017com.server.grpcb" +
-      "\006proto3"
+      "\032\r.secureReplay\0220\n\017requestMyProofs\022\016.sec" +
+      "ureRequest\032\r.secureReplay\022+\n\rDHKeyExchan" +
+      "ge\022\014.DHKeyExcReq\032\014.DHKeyExcRepB\021\n\017com.se" +
+      "rver.grpcb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
