@@ -2,10 +2,11 @@
 1. Even the mongoDB does not run, server claims the report was submitted. Some check if it was really submitted?
 2. Check if report is already in DB, when receiving new submit request.
 3. The Reliable broadcast does not enc/dec/sign. Now they are communicating in plaintext.
-4. There are 2 HA function that should run on a regular register. That means to wait for a quorum
-   (see current obtainLocation of NormalUser)
-5. Submit and Obtain should be atomic, now are regular.
-8. Tests
+4. For same reason HA does not start because of missing key, although there is a key.
+5. Submit and Obtain should be atomic, now are regular. (also regarding HA.obtain)
+6. Tests
+7. Save delivered report into DB
+8. Implement getProofsInEpoch. We need specific epoch, not a range
 
 ## Assumption
 
