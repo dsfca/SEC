@@ -23,8 +23,8 @@ public class HAUser extends User {
      * -
      *
      * ************************************************************************************/
-    public HAUser(int serverPort) throws Exception {
-    	super(0);
+    public HAUser(int id, int serverPort) throws Exception {
+    	super(id, "HA");
     	channel =  ManagedChannelBuilder.forAddress("127.0.0.1", serverPort).usePlaintext().build();
         serverStub = serverServiceGrpc.newBlockingStub(channel).withWaitForReady();
     }
@@ -40,15 +40,16 @@ public class HAUser extends User {
      * ************************************************************************************/
     public String obtainLocationReport(int userId, int epoch) throws Exception {
     	int myNonce = new Random().nextInt();
+    	int serverID = 0;
 		String message = userId + "||" + epoch +"||" + myNonce; 
-		JsonObject secureReport = getsecureMessage(0, message);
+		JsonObject secureReport = getsecureMessage(serverID, message);
 		String secureMessage = secureReport.get("ciphertext").getAsString();
 		String messDigSig = secureReport.get("textDigitalSignature").getAsString();
 		secureRequest.Builder reportRequest = secureRequest.newBuilder().setConfidentMessage(secureMessage)
-    			.setMessageDigitalSignature(messDigSig);
+    			.setMessageDigitalSignature(messDigSig).setUserID(getMyID());
 		secureReplay reply = serverStub.obtainLocationReportHA(reportRequest.build());
     	if(!reply.getOnError()) {
-    		 int serverID = reply.getServerID();
+    		 serverID = reply.getServerID();
     		 String[] replyFields = getfieldsFromSecureMessage(serverID, reply.getConfidentMessage(), reply.getMessageDigitalSignature());
     		 int serverNonce = Integer.parseInt(replyFields[replyFields.length-1]);
     		 if(serverNonce != myNonce - 1)
@@ -74,7 +75,7 @@ public class HAUser extends User {
 		JsonObject secureReport = getsecureMessage(0, message);
 		String secureMessage = secureReport.get("ciphertext").getAsString();
 		String messDigSig = secureReport.get("textDigitalSignature").getAsString();
-		secureRequest locationRequest = secureRequest.newBuilder().setConfidentMessage(secureMessage).setMessageDigitalSignature(messDigSig).build();
+		secureRequest locationRequest = secureRequest.newBuilder().setUserID(this.myID).setConfidentMessage(secureMessage).setMessageDigitalSignature(messDigSig).build();
 		secureReplay reply = serverStub.obtainUsersAtLocation(locationRequest);
         if(reply.getOnError()) {
         	throw new Exception(reply.getErrormessage());
@@ -94,7 +95,7 @@ public class HAUser extends User {
 
     public static void main(String[] args) throws Exception {
         String help = "Accept only following formats:\n\tgetReport <ID> <epoch>\n\tgetUsers <X> <Y> <epoch>";
-        HAUser userHa = new HAUser(Integer.parseInt(args[0]));
+        HAUser userHa = new HAUser(Integer.parseInt(args[0]),Integer.parseInt(args[1]));
         String cmd, arg1, arg2, arg3;
         Scanner sn = new Scanner(System.in);
         System.out.println(help);

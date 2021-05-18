@@ -51,7 +51,7 @@ public class NormalUser extends User {
 	* 
 	* ************************************************************************************/
 	public NormalUser(int ID) throws Exception {
-		super(ID);
+		super(ID, "user");
 		this.port = ID + Integer.parseInt("9090");
 		this.server_start_port = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
 		this.num_servers = new Ini(new File("variables.ini")).get("Server","number_of_servers", Integer.class);
@@ -119,7 +119,7 @@ public class NormalUser extends User {
 				try {
 					String witnessProof = reply.getProof();
 					String witnessProofDigSig = reply.getProofDigSig();
-					PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(reply.getWitnessID());
+					PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(reply.getWitnessID(), "user");
 					boolean proofIsAuth = RSAProvider.istextAuthentic(witnessProof, witnessProofDigSig, witPubKey);
 					if(proofIsAuth)
 						proofs.add(reply.getProof());
@@ -145,7 +145,7 @@ public class NormalUser extends User {
 		userServiceStub userAsyncStub;
 		Position.Builder pos = Position.newBuilder().setX(proverPos.getX()).setY(proverPos.getY());
 		for(ManagedChannel channel : channels) {
-			String sig = get_sig_of(ID +" "+ epoch +" "+ proverPos.toString());
+			String sig = signMessage(ID +" "+ epoch +" "+ proverPos.toString());
 			userAsyncStub = userServiceGrpc.newStub(channel).withDeadlineAfter(5, TimeUnit.SECONDS);
 					LocProofReq req = LocProofReq.newBuilder().setProverID(ID)
 									 		.setEpoch(epoch).setLoc(pos).setDigSign(sig).build();

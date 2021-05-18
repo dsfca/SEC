@@ -31,11 +31,13 @@ public class User {
 	protected int myID;
 	private int N_timesSharedKeyUsed;
 	private int num_servers;
+	private String type;
 	
-	public User(int ID) throws Exception {
+	public User(int ID, String type) throws Exception {
+		this.type = type;
 		this.myID = ID;
-		PRIVATE_KEY_PATH = "resources/private_keys/user" + myID + "_private.key";
-		verifyKeys(myID, "user");
+		PRIVATE_KEY_PATH = "resources/private_keys/"+ type +""+ myID + "_private.key";
+		verifyKeys(myID, type);
 		this.num_servers = new Ini(new File("variables.ini")).get("Server","number_of_servers", Integer.class);
 		this.sharedKey = new Key [num_servers]; 
 	}
@@ -106,11 +108,11 @@ public class User {
 	*   the user(digital signature of string s) 
 	* 
 	* ************************************************************************************/
-	public String get_sig_of(String s) throws Exception {
+	/*public String get_sig_of(String s) throws Exception {
 		PrivateKey priv = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
 		String sig = RSAProvider.getTexthashEnWithPriKey(s, priv);
 		return sig;
-	}
+	}*/
 	
 	/**************************************************************************************
 	* 											-DHkeyExchange()
@@ -131,7 +133,7 @@ public class User {
 		BInteger g = DiffieHelman.write(df.getG());
 		
 		DHKeyExcReq req = DHKeyExcReq.newBuilder().setP(p).setG(g).setMyDHPubKey(pbkB64)
-				.setDigSigPubKey(digSigMyDHpubkey).setUserID(myID).build();
+				.setUserType(this.type).setDigSigPubKey(digSigMyDHpubkey).setUserID(myID).build();
 		ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", serverPort).usePlaintext().build();
 		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
 		

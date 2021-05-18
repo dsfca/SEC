@@ -1720,52 +1720,62 @@ public final class ServerService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int32 userID = 1;</code>
+     * <code>string user_type = 1;</code>
+     */
+    java.lang.String getUserType();
+    /**
+     * <code>string user_type = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getUserTypeBytes();
+
+    /**
+     * <code>int32 userID = 2;</code>
      */
     int getUserID();
 
     /**
-     * <code>.BInteger p = 2;</code>
+     * <code>.BInteger p = 3;</code>
      */
     boolean hasP();
     /**
-     * <code>.BInteger p = 2;</code>
+     * <code>.BInteger p = 3;</code>
      */
     com.server.grpc.ServerService.BInteger getP();
     /**
-     * <code>.BInteger p = 2;</code>
+     * <code>.BInteger p = 3;</code>
      */
     com.server.grpc.ServerService.BIntegerOrBuilder getPOrBuilder();
 
     /**
-     * <code>.BInteger g = 3;</code>
+     * <code>.BInteger g = 4;</code>
      */
     boolean hasG();
     /**
-     * <code>.BInteger g = 3;</code>
+     * <code>.BInteger g = 4;</code>
      */
     com.server.grpc.ServerService.BInteger getG();
     /**
-     * <code>.BInteger g = 3;</code>
+     * <code>.BInteger g = 4;</code>
      */
     com.server.grpc.ServerService.BIntegerOrBuilder getGOrBuilder();
 
     /**
-     * <code>string MyDHPubKey = 4;</code>
+     * <code>string MyDHPubKey = 5;</code>
      */
     java.lang.String getMyDHPubKey();
     /**
-     * <code>string MyDHPubKey = 4;</code>
+     * <code>string MyDHPubKey = 5;</code>
      */
     com.google.protobuf.ByteString
         getMyDHPubKeyBytes();
 
     /**
-     * <code>string digSigPubKey = 5;</code>
+     * <code>string digSigPubKey = 6;</code>
      */
     java.lang.String getDigSigPubKey();
     /**
-     * <code>string digSigPubKey = 5;</code>
+     * <code>string digSigPubKey = 6;</code>
      */
     com.google.protobuf.ByteString
         getDigSigPubKeyBytes();
@@ -1783,6 +1793,7 @@ public final class ServerService {
       super(builder);
     }
     private DHKeyExcReq() {
+      userType_ = "";
       userID_ = 0;
       myDHPubKey_ = "";
       digSigPubKey_ = "";
@@ -1812,12 +1823,18 @@ public final class ServerService {
             case 0:
               done = true;
               break;
-            case 8: {
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              userType_ = s;
+              break;
+            }
+            case 16: {
 
               userID_ = input.readInt32();
               break;
             }
-            case 18: {
+            case 26: {
               com.server.grpc.ServerService.BInteger.Builder subBuilder = null;
               if (p_ != null) {
                 subBuilder = p_.toBuilder();
@@ -1830,7 +1847,7 @@ public final class ServerService {
 
               break;
             }
-            case 26: {
+            case 34: {
               com.server.grpc.ServerService.BInteger.Builder subBuilder = null;
               if (g_ != null) {
                 subBuilder = g_.toBuilder();
@@ -1843,13 +1860,13 @@ public final class ServerService {
 
               break;
             }
-            case 34: {
+            case 42: {
               java.lang.String s = input.readStringRequireUtf8();
 
               myDHPubKey_ = s;
               break;
             }
-            case 42: {
+            case 50: {
               java.lang.String s = input.readStringRequireUtf8();
 
               digSigPubKey_ = s;
@@ -1887,61 +1904,95 @@ public final class ServerService {
               com.server.grpc.ServerService.DHKeyExcReq.class, com.server.grpc.ServerService.DHKeyExcReq.Builder.class);
     }
 
-    public static final int USERID_FIELD_NUMBER = 1;
+    public static final int USER_TYPE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object userType_;
+    /**
+     * <code>string user_type = 1;</code>
+     */
+    public java.lang.String getUserType() {
+      java.lang.Object ref = userType_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        userType_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string user_type = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUserTypeBytes() {
+      java.lang.Object ref = userType_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        userType_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int USERID_FIELD_NUMBER = 2;
     private int userID_;
     /**
-     * <code>int32 userID = 1;</code>
+     * <code>int32 userID = 2;</code>
      */
     public int getUserID() {
       return userID_;
     }
 
-    public static final int P_FIELD_NUMBER = 2;
+    public static final int P_FIELD_NUMBER = 3;
     private com.server.grpc.ServerService.BInteger p_;
     /**
-     * <code>.BInteger p = 2;</code>
+     * <code>.BInteger p = 3;</code>
      */
     public boolean hasP() {
       return p_ != null;
     }
     /**
-     * <code>.BInteger p = 2;</code>
+     * <code>.BInteger p = 3;</code>
      */
     public com.server.grpc.ServerService.BInteger getP() {
       return p_ == null ? com.server.grpc.ServerService.BInteger.getDefaultInstance() : p_;
     }
     /**
-     * <code>.BInteger p = 2;</code>
+     * <code>.BInteger p = 3;</code>
      */
     public com.server.grpc.ServerService.BIntegerOrBuilder getPOrBuilder() {
       return getP();
     }
 
-    public static final int G_FIELD_NUMBER = 3;
+    public static final int G_FIELD_NUMBER = 4;
     private com.server.grpc.ServerService.BInteger g_;
     /**
-     * <code>.BInteger g = 3;</code>
+     * <code>.BInteger g = 4;</code>
      */
     public boolean hasG() {
       return g_ != null;
     }
     /**
-     * <code>.BInteger g = 3;</code>
+     * <code>.BInteger g = 4;</code>
      */
     public com.server.grpc.ServerService.BInteger getG() {
       return g_ == null ? com.server.grpc.ServerService.BInteger.getDefaultInstance() : g_;
     }
     /**
-     * <code>.BInteger g = 3;</code>
+     * <code>.BInteger g = 4;</code>
      */
     public com.server.grpc.ServerService.BIntegerOrBuilder getGOrBuilder() {
       return getG();
     }
 
-    public static final int MYDHPUBKEY_FIELD_NUMBER = 4;
+    public static final int MYDHPUBKEY_FIELD_NUMBER = 5;
     private volatile java.lang.Object myDHPubKey_;
     /**
-     * <code>string MyDHPubKey = 4;</code>
+     * <code>string MyDHPubKey = 5;</code>
      */
     public java.lang.String getMyDHPubKey() {
       java.lang.Object ref = myDHPubKey_;
@@ -1956,7 +2007,7 @@ public final class ServerService {
       }
     }
     /**
-     * <code>string MyDHPubKey = 4;</code>
+     * <code>string MyDHPubKey = 5;</code>
      */
     public com.google.protobuf.ByteString
         getMyDHPubKeyBytes() {
@@ -1972,10 +2023,10 @@ public final class ServerService {
       }
     }
 
-    public static final int DIGSIGPUBKEY_FIELD_NUMBER = 5;
+    public static final int DIGSIGPUBKEY_FIELD_NUMBER = 6;
     private volatile java.lang.Object digSigPubKey_;
     /**
-     * <code>string digSigPubKey = 5;</code>
+     * <code>string digSigPubKey = 6;</code>
      */
     public java.lang.String getDigSigPubKey() {
       java.lang.Object ref = digSigPubKey_;
@@ -1990,7 +2041,7 @@ public final class ServerService {
       }
     }
     /**
-     * <code>string digSigPubKey = 5;</code>
+     * <code>string digSigPubKey = 6;</code>
      */
     public com.google.protobuf.ByteString
         getDigSigPubKeyBytes() {
@@ -2020,20 +2071,23 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (!getUserTypeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, userType_);
+      }
       if (userID_ != 0) {
-        output.writeInt32(1, userID_);
+        output.writeInt32(2, userID_);
       }
       if (p_ != null) {
-        output.writeMessage(2, getP());
+        output.writeMessage(3, getP());
       }
       if (g_ != null) {
-        output.writeMessage(3, getG());
+        output.writeMessage(4, getG());
       }
       if (!getMyDHPubKeyBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, myDHPubKey_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, myDHPubKey_);
       }
       if (!getDigSigPubKeyBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, digSigPubKey_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, digSigPubKey_);
       }
       unknownFields.writeTo(output);
     }
@@ -2044,23 +2098,26 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
+      if (!getUserTypeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, userType_);
+      }
       if (userID_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, userID_);
+          .computeInt32Size(2, userID_);
       }
       if (p_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getP());
+          .computeMessageSize(3, getP());
       }
       if (g_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getG());
+          .computeMessageSize(4, getG());
       }
       if (!getMyDHPubKeyBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, myDHPubKey_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, myDHPubKey_);
       }
       if (!getDigSigPubKeyBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, digSigPubKey_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, digSigPubKey_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2078,6 +2135,8 @@ public final class ServerService {
       com.server.grpc.ServerService.DHKeyExcReq other = (com.server.grpc.ServerService.DHKeyExcReq) obj;
 
       boolean result = true;
+      result = result && getUserType()
+          .equals(other.getUserType());
       result = result && (getUserID()
           == other.getUserID());
       result = result && (hasP() == other.hasP());
@@ -2105,6 +2164,8 @@ public final class ServerService {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + USER_TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getUserType().hashCode();
       hash = (37 * hash) + USERID_FIELD_NUMBER;
       hash = (53 * hash) + getUserID();
       if (hasP()) {
@@ -2252,6 +2313,8 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        userType_ = "";
+
         userID_ = 0;
 
         if (pBuilder_ == null) {
@@ -2296,6 +2359,7 @@ public final class ServerService {
       @java.lang.Override
       public com.server.grpc.ServerService.DHKeyExcReq buildPartial() {
         com.server.grpc.ServerService.DHKeyExcReq result = new com.server.grpc.ServerService.DHKeyExcReq(this);
+        result.userType_ = userType_;
         result.userID_ = userID_;
         if (pBuilder_ == null) {
           result.p_ = p_;
@@ -2357,6 +2421,10 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.DHKeyExcReq other) {
         if (other == com.server.grpc.ServerService.DHKeyExcReq.getDefaultInstance()) return this;
+        if (!other.getUserType().isEmpty()) {
+          userType_ = other.userType_;
+          onChanged();
+        }
         if (other.getUserID() != 0) {
           setUserID(other.getUserID());
         }
@@ -2403,15 +2471,84 @@ public final class ServerService {
         return this;
       }
 
+      private java.lang.Object userType_ = "";
+      /**
+       * <code>string user_type = 1;</code>
+       */
+      public java.lang.String getUserType() {
+        java.lang.Object ref = userType_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          userType_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string user_type = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getUserTypeBytes() {
+        java.lang.Object ref = userType_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          userType_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string user_type = 1;</code>
+       */
+      public Builder setUserType(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        userType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string user_type = 1;</code>
+       */
+      public Builder clearUserType() {
+        
+        userType_ = getDefaultInstance().getUserType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string user_type = 1;</code>
+       */
+      public Builder setUserTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        userType_ = value;
+        onChanged();
+        return this;
+      }
+
       private int userID_ ;
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>int32 userID = 2;</code>
        */
       public int getUserID() {
         return userID_;
       }
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>int32 userID = 2;</code>
        */
       public Builder setUserID(int value) {
         
@@ -2420,7 +2557,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>int32 userID = 2;</code>
        */
       public Builder clearUserID() {
         
@@ -2433,13 +2570,13 @@ public final class ServerService {
       private com.google.protobuf.SingleFieldBuilderV3<
           com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder> pBuilder_;
       /**
-       * <code>.BInteger p = 2;</code>
+       * <code>.BInteger p = 3;</code>
        */
       public boolean hasP() {
         return pBuilder_ != null || p_ != null;
       }
       /**
-       * <code>.BInteger p = 2;</code>
+       * <code>.BInteger p = 3;</code>
        */
       public com.server.grpc.ServerService.BInteger getP() {
         if (pBuilder_ == null) {
@@ -2449,7 +2586,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>.BInteger p = 2;</code>
+       * <code>.BInteger p = 3;</code>
        */
       public Builder setP(com.server.grpc.ServerService.BInteger value) {
         if (pBuilder_ == null) {
@@ -2465,7 +2602,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.BInteger p = 2;</code>
+       * <code>.BInteger p = 3;</code>
        */
       public Builder setP(
           com.server.grpc.ServerService.BInteger.Builder builderForValue) {
@@ -2479,7 +2616,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.BInteger p = 2;</code>
+       * <code>.BInteger p = 3;</code>
        */
       public Builder mergeP(com.server.grpc.ServerService.BInteger value) {
         if (pBuilder_ == null) {
@@ -2497,7 +2634,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.BInteger p = 2;</code>
+       * <code>.BInteger p = 3;</code>
        */
       public Builder clearP() {
         if (pBuilder_ == null) {
@@ -2511,7 +2648,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.BInteger p = 2;</code>
+       * <code>.BInteger p = 3;</code>
        */
       public com.server.grpc.ServerService.BInteger.Builder getPBuilder() {
         
@@ -2519,7 +2656,7 @@ public final class ServerService {
         return getPFieldBuilder().getBuilder();
       }
       /**
-       * <code>.BInteger p = 2;</code>
+       * <code>.BInteger p = 3;</code>
        */
       public com.server.grpc.ServerService.BIntegerOrBuilder getPOrBuilder() {
         if (pBuilder_ != null) {
@@ -2530,7 +2667,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>.BInteger p = 2;</code>
+       * <code>.BInteger p = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder> 
@@ -2550,13 +2687,13 @@ public final class ServerService {
       private com.google.protobuf.SingleFieldBuilderV3<
           com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder> gBuilder_;
       /**
-       * <code>.BInteger g = 3;</code>
+       * <code>.BInteger g = 4;</code>
        */
       public boolean hasG() {
         return gBuilder_ != null || g_ != null;
       }
       /**
-       * <code>.BInteger g = 3;</code>
+       * <code>.BInteger g = 4;</code>
        */
       public com.server.grpc.ServerService.BInteger getG() {
         if (gBuilder_ == null) {
@@ -2566,7 +2703,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>.BInteger g = 3;</code>
+       * <code>.BInteger g = 4;</code>
        */
       public Builder setG(com.server.grpc.ServerService.BInteger value) {
         if (gBuilder_ == null) {
@@ -2582,7 +2719,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.BInteger g = 3;</code>
+       * <code>.BInteger g = 4;</code>
        */
       public Builder setG(
           com.server.grpc.ServerService.BInteger.Builder builderForValue) {
@@ -2596,7 +2733,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.BInteger g = 3;</code>
+       * <code>.BInteger g = 4;</code>
        */
       public Builder mergeG(com.server.grpc.ServerService.BInteger value) {
         if (gBuilder_ == null) {
@@ -2614,7 +2751,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.BInteger g = 3;</code>
+       * <code>.BInteger g = 4;</code>
        */
       public Builder clearG() {
         if (gBuilder_ == null) {
@@ -2628,7 +2765,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>.BInteger g = 3;</code>
+       * <code>.BInteger g = 4;</code>
        */
       public com.server.grpc.ServerService.BInteger.Builder getGBuilder() {
         
@@ -2636,7 +2773,7 @@ public final class ServerService {
         return getGFieldBuilder().getBuilder();
       }
       /**
-       * <code>.BInteger g = 3;</code>
+       * <code>.BInteger g = 4;</code>
        */
       public com.server.grpc.ServerService.BIntegerOrBuilder getGOrBuilder() {
         if (gBuilder_ != null) {
@@ -2647,7 +2784,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>.BInteger g = 3;</code>
+       * <code>.BInteger g = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder> 
@@ -2665,7 +2802,7 @@ public final class ServerService {
 
       private java.lang.Object myDHPubKey_ = "";
       /**
-       * <code>string MyDHPubKey = 4;</code>
+       * <code>string MyDHPubKey = 5;</code>
        */
       public java.lang.String getMyDHPubKey() {
         java.lang.Object ref = myDHPubKey_;
@@ -2680,7 +2817,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>string MyDHPubKey = 4;</code>
+       * <code>string MyDHPubKey = 5;</code>
        */
       public com.google.protobuf.ByteString
           getMyDHPubKeyBytes() {
@@ -2696,7 +2833,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>string MyDHPubKey = 4;</code>
+       * <code>string MyDHPubKey = 5;</code>
        */
       public Builder setMyDHPubKey(
           java.lang.String value) {
@@ -2709,7 +2846,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>string MyDHPubKey = 4;</code>
+       * <code>string MyDHPubKey = 5;</code>
        */
       public Builder clearMyDHPubKey() {
         
@@ -2718,7 +2855,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>string MyDHPubKey = 4;</code>
+       * <code>string MyDHPubKey = 5;</code>
        */
       public Builder setMyDHPubKeyBytes(
           com.google.protobuf.ByteString value) {
@@ -2734,7 +2871,7 @@ public final class ServerService {
 
       private java.lang.Object digSigPubKey_ = "";
       /**
-       * <code>string digSigPubKey = 5;</code>
+       * <code>string digSigPubKey = 6;</code>
        */
       public java.lang.String getDigSigPubKey() {
         java.lang.Object ref = digSigPubKey_;
@@ -2749,7 +2886,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>string digSigPubKey = 5;</code>
+       * <code>string digSigPubKey = 6;</code>
        */
       public com.google.protobuf.ByteString
           getDigSigPubKeyBytes() {
@@ -2765,7 +2902,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>string digSigPubKey = 5;</code>
+       * <code>string digSigPubKey = 6;</code>
        */
       public Builder setDigSigPubKey(
           java.lang.String value) {
@@ -2778,7 +2915,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>string digSigPubKey = 5;</code>
+       * <code>string digSigPubKey = 6;</code>
        */
       public Builder clearDigSigPubKey() {
         
@@ -2787,7 +2924,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>string digSigPubKey = 5;</code>
+       * <code>string digSigPubKey = 6;</code>
        */
       public Builder setDigSigPubKeyBytes(
           com.google.protobuf.ByteString value) {
@@ -4260,24 +4397,25 @@ public final class ServerService {
       "DigitalSignature\030\003 \001(\t\"\202\001\n\014secureReplay\022" +
       "\017\n\007onError\030\001 \001(\010\022\020\n\010serverID\030\002 \001(\005\022\030\n\020co" +
       "nfidentMessage\030\003 \001(\t\022\037\n\027MessageDigitalSi" +
-      "gnature\030\004 \001(\t\022\024\n\014errormessage\030\005 \001(\t\"s\n\013D" +
-      "HKeyExcReq\022\016\n\006userID\030\001 \001(\005\022\024\n\001p\030\002 \001(\0132\t." +
-      "BInteger\022\024\n\001g\030\003 \001(\0132\t.BInteger\022\022\n\nMyDHPu" +
-      "bKey\030\004 \001(\t\022\024\n\014digSigPubKey\030\005 \001(\t\"\\\n\013DHKe" +
-      "yExcRep\022\020\n\010myPubKey\030\001 \001(\t\022\024\n\014digSigPubke" +
-      "y\030\002 \001(\t\022\017\n\007onError\030\003 \001(\010\022\024\n\014errorMessage" +
-      "\030\004 \001(\t\"\031\n\010BInteger\022\r\n\005value\030\001 \001(\0142\224\003\n\rse" +
-      "rverService\0225\n\024submitLocationReport\022\016.se" +
-      "cureRequest\032\r.secureReplay\022:\n\020submitRepo" +
-      "rtEcho\022\016.secureRequest\032\026.google.protobuf" +
-      ".Empty\022;\n\021submitReportReady\022\016.secureRequ" +
-      "est\032\026.google.protobuf.Empty\0225\n\024obtainLoc" +
-      "ationReport\022\016.secureRequest\032\r.secureRepl" +
-      "ay\0227\n\026obtainLocationReportHA\022\016.secureReq" +
-      "uest\032\r.secureReplay\0226\n\025obtainUsersAtLoca" +
-      "tion\022\016.secureRequest\032\r.secureReplay\022+\n\rD" +
-      "HKeyExchange\022\014.DHKeyExcReq\032\014.DHKeyExcRep" +
-      "B\021\n\017com.server.grpcb\006proto3"
+      "gnature\030\004 \001(\t\022\024\n\014errormessage\030\005 \001(\t\"\206\001\n\013" +
+      "DHKeyExcReq\022\021\n\tuser_type\030\001 \001(\t\022\016\n\006userID" +
+      "\030\002 \001(\005\022\024\n\001p\030\003 \001(\0132\t.BInteger\022\024\n\001g\030\004 \001(\0132" +
+      "\t.BInteger\022\022\n\nMyDHPubKey\030\005 \001(\t\022\024\n\014digSig" +
+      "PubKey\030\006 \001(\t\"\\\n\013DHKeyExcRep\022\020\n\010myPubKey\030" +
+      "\001 \001(\t\022\024\n\014digSigPubkey\030\002 \001(\t\022\017\n\007onError\030\003" +
+      " \001(\010\022\024\n\014errorMessage\030\004 \001(\t\"\031\n\010BInteger\022\r" +
+      "\n\005value\030\001 \001(\0142\224\003\n\rserverService\0225\n\024submi" +
+      "tLocationReport\022\016.secureRequest\032\r.secure" +
+      "Replay\022:\n\020submitReportEcho\022\016.secureReque" +
+      "st\032\026.google.protobuf.Empty\022;\n\021submitRepo" +
+      "rtReady\022\016.secureRequest\032\026.google.protobu" +
+      "f.Empty\0225\n\024obtainLocationReport\022\016.secure" +
+      "Request\032\r.secureReplay\0227\n\026obtainLocation" +
+      "ReportHA\022\016.secureRequest\032\r.secureReplay\022" +
+      "6\n\025obtainUsersAtLocation\022\016.secureRequest" +
+      "\032\r.secureReplay\022+\n\rDHKeyExchange\022\014.DHKey" +
+      "ExcReq\032\014.DHKeyExcRepB\021\n\017com.server.grpcb" +
+      "\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4309,7 +4447,7 @@ public final class ServerService {
     internal_static_DHKeyExcReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_DHKeyExcReq_descriptor,
-        new java.lang.String[] { "UserID", "P", "G", "MyDHPubKey", "DigSigPubKey", });
+        new java.lang.String[] { "UserType", "UserID", "P", "G", "MyDHPubKey", "DigSigPubKey", });
     internal_static_DHKeyExcRep_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_DHKeyExcRep_fieldAccessorTable = new

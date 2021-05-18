@@ -143,9 +143,9 @@ public class TrackerLocationSystem {
 	 * -returns: void
 	 *  
 	 * ************************************************************************************/
-	public static PublicKey getUserPublicKey(int id) throws Exception {
+	public static PublicKey getUserPublicKey(int id, String type) throws Exception {
 		PublicKey key = null;
-		String path = "resources/public_keys/user" + id +"_public.key";
+		String path = "resources/public_keys/"+type+"" + id +"_public.key";
 		//key = RSAProvider.readPubKey(path);
 		key = RSAProvider.readpublicKeyFromFile(path);
 		return key;
@@ -176,7 +176,7 @@ public class TrackerLocationSystem {
 	public static void ini_pos_file(int n_user, int n_epoch, int G_width, int G_height) {
 		boolean append = false;
 		for(int i = 1; i <= n_epoch; i++) {
-			for(int j = 1; j < n_user; j++) {
+			for(int j = 0; j < n_user; j++) {
 				Point2D userPos = new Point2D((int)(Math.random()*G_width), (int)(Math.random()*G_height));
 				if(i == 1 && j == 1) { append = false;}
 				else {	 append = true; }

@@ -321,7 +321,7 @@ public class ServerImp extends serverServiceImplBase {
     public void obtainLocationReport(secureRequest request, StreamObserver<secureReplay> responseObserver) {
     	try {
     		
-		    String[] reqSplit = getfieldsFromSecureMessage(request.getUserID(), request.getConfidentMessage(), request.getMessageDigitalSignature());
+		    String[] reqSplit = getfieldsFromSecureMessage(request.getUserID(), request.getConfidentMessage(), request.getMessageDigitalSignature(), "user");
 		    int epoch = Integer.parseInt(reqSplit[1]);
 		    int nonce = Integer.parseInt(reqSplit[2]);
 		    ServerService.secureReplay.Builder response = dealWithReq.obtainReportHandler(request.getUserID(), epoch, nonce);
@@ -346,16 +346,16 @@ public class ServerImp extends serverServiceImplBase {
    @Override
    public void obtainLocationReportHA(secureRequest request, StreamObserver<secureReplay> responseObserver) {
 	   try {
-		   if(request.getUserID() != 0)
-			   throw new Exception("only HA user can execute this functionality");
-		   String[] requestValues = getfieldsFromSecureMessage(0, request.getConfidentMessage(), request.getMessageDigitalSignature());
+		   String[] requestValues = getfieldsFromSecureMessage(request.getUserID(), request.getConfidentMessage(), request.getMessageDigitalSignature(), "HA");
 		   int nonce = Integer.parseInt(requestValues[2]);
 		   int userID = Integer.parseInt(requestValues[0]);
 		   int epoch = Integer.parseInt(requestValues[1]);
-		   secureReplay.Builder response = dealWithReq.obtainLocationReportHAHandler(0,userID, epoch, nonce);
+		  
+		   secureReplay.Builder response = dealWithReq.obtainLocationReportHAHandler(request.getUserID(),userID, epoch, nonce);
 		   responseObserver.onNext(response.build());
 		   responseObserver.onCompleted();
 	   }catch (Exception e) {
+		   e.printStackTrace();
 		   secureReplay.Builder response = secureReplay.newBuilder().setOnError(true).
 				   setErrormessage(e.toString()+""+e.getMessage());
 		   responseObserver.onNext(response.build());
@@ -376,16 +376,14 @@ public class ServerImp extends serverServiceImplBase {
    public void obtainUsersAtLocation(secureRequest request, StreamObserver<secureReplay> responseObserver) {
 	   secureReplay.Builder response;
 	   try {
-		   if(request.getUserID() != 0)
-			   throw new Exception("only HA user can execute this functionality");
-		   String[] requestValues = getfieldsFromSecureMessage(0, request.getConfidentMessage(), request.getMessageDigitalSignature());
+		   String[] requestValues = getfieldsFromSecureMessage(request.getUserID(), request.getConfidentMessage(), request.getMessageDigitalSignature(), "HA");
 		   int requestEpoch = Integer.parseInt(requestValues[1]);
 		   String position = requestValues[0].substring(1, 4);
 		   int x = Integer.parseInt(position.substring(0,1));
 		   int y = Integer.parseInt(position.substring(2,3));
 		   Point2D requestPoint = new Point2D(x, y);
 		   int nonce =Integer.parseInt(requestValues[2]);
-		   response = dealWithReq.obtainUsersAtLocationHandler(0,requestPoint, requestEpoch, nonce);
+		   response = dealWithReq.obtainUsersAtLocationHandler(request.getUserID(),requestPoint, requestEpoch, nonce);
 		   responseObserver.onNext(response.build());
 		   responseObserver.onCompleted();
 			
@@ -417,11 +415,11 @@ public class ServerImp extends serverServiceImplBase {
     		BigInteger p = DiffieHelman.read(request.getP());
     		BigInteger g = DiffieHelman.read(request.getG());
     		DiffieHelman df = new DiffieHelman(p, g);
-			PublicKey key = TrackerLocationSystem.getUserPublicKey(request.getUserID());
+			PublicKey key = TrackerLocationSystem.getUserPublicKey(request.getUserID(), request.getUserType());
 			String userPbkDigSig = request.getDigSigPubKey();
 			String userPubKey = request.getMyDHPubKey();
 		 	Key secretKey = TrackerLocationSystem.createSecretKey(df, userPbkDigSig, userPubKey, key);
-		 	dealWithReq.putOrUpdateSharedKeys(request.getUserID(), secretKey);
+		 	dealWithReq.putOrUpdateSharedKeys(request.getUserType(), request.getUserID(), secretKey);
 		 	PublicKey myPubkey = df.getPublicKey();
 		 	String pbkB64 = Base64.getEncoder().encodeToString(myPubkey.getEncoded());
 		 	String digSigMyDHpubkey = TrackerLocationSystem.getDHkeySigned(myPubkey, PRIVATE_KEY_PATH);
@@ -441,8 +439,8 @@ public class ServerImp extends serverServiceImplBase {
 	
     }
     
-    public String[] getfieldsFromSecureMessage(int userID, String secureMessage, String digsig) throws Exception {
-		return getPlainText(userID, secureMessage, digsig).split(Pattern.quote("||"));
+    public String[] getfieldsFromSecureMessage(int userID, String secureMessage, String digsig, String usertype) throws Exception {
+		return getPlainText(userID, secureMessage, digsig, usertype).split(Pattern.quote("||"));
 	}
 
 	public String[] getfieldsFromMessage(String message) {
@@ -450,19 +448,19 @@ public class ServerImp extends serverServiceImplBase {
 	}
 
 	public boolean verifySignature(int userID, String message, String signature) throws Exception {
-    	PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID);
+    	PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, "user");
     	return RSAProvider.istextAuthentic(message, signature, pubkey);
 	}
 
-	public String getPlainText(int userID, String ct) throws Exception {
-    	Key sharedKey = dealWithReq.getSharedKey(userID);
-    	PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID);
+	public String getPlainText(String userType, int userID, String ct) throws Exception {
+    	Key sharedKey = dealWithReq.getSharedKey(userType,userID);
+    	PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, "user");
     	return AESProvider.getPlainTextOfCipherText(ct, sharedKey);
 	}
 
-	public String getPlainText(int userID, String secureMessage, String digsig) throws Exception {
-    	Key sharedKey = dealWithReq.getSharedKey(userID);
-    	PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID);
+	public String getPlainText(int userID, String secureMessage, String digsig, String usertype) throws Exception {
+    	Key sharedKey = dealWithReq.getSharedKey(usertype, userID);
+    	PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, usertype);
     	String messPlainText = AESProvider.getPlainTextOfCipherText(secureMessage, sharedKey);
     	boolean DigSigIsValid = RSAProvider.istextAuthentic(messPlainText, digsig, pubkey);
 

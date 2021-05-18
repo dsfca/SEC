@@ -34,11 +34,12 @@ message secureReplay{
 
 
 message DHKeyExcReq{
-	int32 userID = 1;
-	BInteger p = 2;
-	BInteger g = 3;
-	string MyDHPubKey = 4;
-	string digSigPubKey = 5;
+	string user_type = 1;
+	int32 userID = 2;
+	BInteger p = 3;
+	BInteger g = 4;
+	string MyDHPubKey = 5;
+	string digSigPubKey = 6;
 }
 
 message DHKeyExcRep{

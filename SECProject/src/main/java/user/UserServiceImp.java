@@ -48,7 +48,7 @@ public class UserServiceImp extends userServiceImplBase  {
 			String req_dig_sig = request.getDigSign();
 			String req_conc = proverID +" "+ epoch +" "+ proverPt.toString();
 			
-			PublicKey provPubKey = TrackerLocationSystem.getUserPublicKey(proverID);
+			PublicKey provPubKey = TrackerLocationSystem.getUserPublicKey(proverID, "user");
 			Boolean reqIsAuth = RSAProvider.istextAuthentic(req_conc, req_dig_sig, provPubKey);
 
 			if (!reqIsAuth) {

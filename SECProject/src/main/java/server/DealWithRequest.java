@@ -22,7 +22,8 @@ import shared.TrackerLocationSystem;
 public class DealWithRequest {
 
 	private String PRIVATE_KEY_PATH;
-	private Map<Integer, Key> sharedKeys = new HashMap<>();
+	private Map<Integer, Key> normalUsersharedKeys = new HashMap<>();
+	private Map<Integer, Key> HAsharedKeys = new HashMap<>();
     private Map<Integer, List<Integer>> usersNonce = new HashMap<>();
     private InteractWithDB DB;
     private int ID;
@@ -39,7 +40,7 @@ public class DealWithRequest {
 
     public String[] validateSubmitRequest(int id, String ciphertext, String signature) throws Exception {
 		// Decrypt message
-    	String openText = getPlainText(id, ciphertext);
+    	String openText = getPlainText("user",id, ciphertext);
 		String[] reqFields = getfieldsFromMessage(openText);
 		String report = reqFields[0];
 
@@ -106,7 +107,7 @@ public class DealWithRequest {
 		}
 
     	for(ProofReport pr : proofReports) {
-   			PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(pr.getWitnessID());
+   			PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(pr.getWitnessID(), "user");
 			if(pr.proofDigSigIsValid(witPubKey)) {
 				DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),
 						pr.getWitnessPoint(), pr.getEpoch(), pr.isWitnessIsNearProof(),
@@ -118,7 +119,7 @@ public class DealWithRequest {
 
     	DB.addLocationToValidated(id, proverPos, epoch);
 		String message = "Your report was submitted successfully||" + (nonce - 1);
-		JsonObject secureMessage = getsecureMessage(message, id);
+		JsonObject secureMessage = getsecureMessage("user",message, id);
 		String confidentMessage = secureMessage.get("ciphertext").getAsString();
 		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
 		response.setOnError(false);
@@ -146,7 +147,7 @@ public class DealWithRequest {
     		Point2D userPoint = DB.getLocationGivenEpoch(userId, epoch);
     		if(userPoint != null) {
 	    		String message = userId + "||" +userPoint.toString() + "||" +(nonce - 1);
-	    		JsonObject secureMessage = getsecureMessage(message, userId);
+	    		JsonObject secureMessage = getsecureMessage("user",message, userId);
 		 		String confidentMessage = secureMessage.get("ciphertext").getAsString();
 		 		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
 	    		response.setOnError(false);
@@ -180,7 +181,7 @@ public class DealWithRequest {
 		    	Point2D userPoint = DB.getLocationGivenEpoch(userID, epoch);
 		    	if(userPoint != null) {
 			    	String message = userID + "||" +userPoint.toString() + "||" +(nonce - 1);
-		    		JsonObject secureMessage = getsecureMessage(message, requestUserID);
+		    		JsonObject secureMessage = getsecureMessage("HA", message, requestUserID);
 			 		String confidentMessage = secureMessage.get("ciphertext").getAsString();
 			 		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
 			    	response.setOnError(false);
@@ -209,7 +210,7 @@ public class DealWithRequest {
 	    													.distinct()
 	    													.collect(Collectors.toList());
 	    	String message = uniqueUsers.toString() + "||" +(nonce - 1);
-    		JsonObject secureMessage = getsecureMessage(message, userID);
+    		JsonObject secureMessage = getsecureMessage("HA",message, userID);
 	 		String confidentMessage = secureMessage.get("ciphertext").getAsString();
 	 		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
 	    	response.setOnError(false);
@@ -228,33 +229,49 @@ public class DealWithRequest {
      *      - id: 
      *		
      *		-key:
+     * @throws Exception 
      * ************************************************************************************/
-    public void putOrUpdateSharedKeys(int id , Key key) {
-    	if(sharedKeys.get(id) != null)
-    		sharedKeys.replace(id, key);
+    public void putOrUpdateSharedKeys(String type ,int id , Key key) throws Exception {
+    	if(type.equals("HA")) {
+    		if(HAsharedKeys.get(id) != null)
+    			HAsharedKeys.replace(id, key);
+        	else
+        		HAsharedKeys.put(id, key);
+    		System.out.println("key is stored for "+ type +" = " + id +" ****************************************");
+    	}
+    	else if(type.equals("user")) {
+    		if(normalUsersharedKeys.get(id) != null)
+    			normalUsersharedKeys.replace(id, key);
+    		else
+    			normalUsersharedKeys.put(id, key);
+    	}else throw new Exception("there is no user with this name: " + type);
+    		
+    }
+    
+    public Key getSharedKey(String type,int ID) throws Exception {
+    	if(type.equals("user"))
+    		return normalUsersharedKeys.get(ID);
+    	else if(type.equals("HA"))
+    		return HAsharedKeys.get(ID);
     	else
-    		sharedKeys.put(id, key);
+    		throw new Exception("there is no user with this name: "+ type);
     }
     
-    public Key getSharedKey(int ID) {
-    	return sharedKeys.get(ID);
-    }
-    
-    public JsonObject getsecureMessage(String message, int userID) throws Exception {
+    public JsonObject getsecureMessage(String type,String message, int userID) throws Exception {
 		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
-		Key sharedKey = getSharedKey(userID);
+		Key sharedKey = getSharedKey(type,userID);
 		JsonObject cipherReq  = TrackerLocationSystem.getSecureText(sharedKey, myprivkey, message);
 		return cipherReq;
 	}
 
 	public boolean verifySignature(int userID, String message, String signature) throws Exception {
-		PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID);
+		PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, "user");
 		return RSAProvider.istextAuthentic(message, signature, pubkey);
 	}
 
-	public String getPlainText(int userID, String ct) throws Exception {
-		Key sharedKey = getSharedKey(userID);
-		PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID);
+	public String getPlainText(String type, int userID, String ct) throws Exception {
+		Key sharedKey = getSharedKey(type, userID);
+		PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, "user");
 		return AESProvider.getPlainTextOfCipherText(ct, sharedKey);
 	}
 
