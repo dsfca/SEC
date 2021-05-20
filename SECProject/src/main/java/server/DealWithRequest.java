@@ -6,16 +6,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
 import com.google.gson.JsonObject;
+import com.google.protobuf.Empty;
 import com.server.grpc.ServerService.secureReplay;
-
+import com.user.grpc.Listener.secureRequest;
+import com.user.grpc.ListenerServiceGrpc;
 
 import crypto.AESProvider;
 import crypto.RSAProvider;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
 import shared.Point2D;
 import shared.TrackerLocationSystem;
 
@@ -27,10 +33,13 @@ public class DealWithRequest {
     private Map<Integer, List<Integer>> usersNonce = new HashMap<>();
     private InteractWithDB DB;
     private int ID;
+    private ArrayList<Listener> listeners = new ArrayList<>();
+    private boolean isByzantine;
     
-    public DealWithRequest(int id) {
+    public DealWithRequest(int id, boolean isByzantine) {
     	try {
     		this.ID = id;
+    		this.isByzantine = isByzantine;
     		PRIVATE_KEY_PATH = "resources/private_keys/server" + id +"_private.key";
 			DB = new InteractWithDB("variables.ini", id);
 		} catch (IOException e) {
@@ -44,7 +53,7 @@ public class DealWithRequest {
 		String[] reqFields = getfieldsFromMessage(openText);
 		String report = reqFields[0];
 
-		int nonce = Integer.parseInt(reqFields[1]);
+		int nonce = Integer.parseInt(reqFields[reqFields.length -1]);
 		if (!verifySignature(id, report, signature)) {
 			throw new Exception("Message was not authenticated");
 		}
@@ -72,7 +81,7 @@ public class DealWithRequest {
     	List<ProofReport> proofReports = getProofReports(reportList);
 
     	// Check expected number of proofs
-    	if( proofReports.size() <= TrackerLocationSystem.NUM_BIZANTINE_USERS) {
+    	if( proofReports.size() <= TrackerLocationSystem.getInstance().getNumBizantineUsers()) {
 			throw new Exception("Proof size must be larger than number of byzantine users");
 		}
 
@@ -102,12 +111,12 @@ public class DealWithRequest {
     	Point2D proverPos = null;
     	int epoch = 0;
 
-    	if( proofReports.size() <= TrackerLocationSystem.NUM_BIZANTINE_USERS) {
+    	if( proofReports.size() <= TrackerLocationSystem.getInstance().getNumBizantineUsers()) {
 			throw new Exception("Proof size must be larger than number of byzantine users");
 		}
 
     	for(ProofReport pr : proofReports) {
-   			PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(pr.getWitnessID(), "user");
+   			PublicKey witPubKey = TrackerLocationSystem.getInstance().getUserPublicKey(pr.getWitnessID(), "user");
 			if(pr.proofDigSigIsValid(witPubKey)) {
 				DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),
 						pr.getWitnessPoint(), pr.getEpoch(), pr.isWitnessIsNearProof(),
@@ -124,7 +133,7 @@ public class DealWithRequest {
 		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
 		response.setOnError(false);
 		response.setServerID(ID).setConfidentMessage(confidentMessage).setMessageDigitalSignature(messDigSig);
-
+		sendValueToListeners(id, epoch, proverPos.toString());
     	return response;
     }
     
@@ -137,12 +146,11 @@ public class DealWithRequest {
      * @throws Exception 
      *
      * ************************************************************************************/
-    public secureReplay.Builder obtainReportHandler(int userId, int epoch, int nonce, String sig) throws Exception {
-
-    	if (!verifyHashCash(userId + "||" + epoch, nonce))
+    public secureReplay.Builder obtainReportHandler(int userId, int epoch, int nonce, String sig, int listenerPort) throws Exception {
+    	if (!verifyHashCash(String.valueOf(epoch) , nonce))
     		throw new Exception("Invalid HashCash");
 
-    	if (!verifySignature(userId, userId + "||" + epoch, sig))
+    	if (!verifySignature(userId, String.valueOf(epoch), sig))
     		throw new Exception("Message not authentic");
 
     	secureReplay.Builder response = secureReplay.newBuilder();
@@ -150,8 +158,11 @@ public class DealWithRequest {
     		if(userNonces == null)
     			userNonces = new ArrayList<>();
     	if(!userNonces.contains(nonce)) {
-    		userNonces.add(nonce);
-    		Point2D userPoint = DB.getLocationGivenEpoch(userId, epoch);
+    		Point2D userPoint;
+    		userNonces.add(nonce);   		
+    		userPoint = DB.getLocationGivenEpoch(userId, epoch);
+    		if(this.isByzantine)
+    			userPoint = new Point2D(((int)Math.random()*10), ((int)Math.random()*10));
     		if(userPoint != null) {
 	    		String message = userId + "||" +userPoint.toString() + "||" +(nonce - 1);
 	    		JsonObject secureMessage = getsecureMessage("user",message, userId);
@@ -159,6 +170,7 @@ public class DealWithRequest {
 		 		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
 	    		response.setOnError(false);
 	    		 response.setServerID(ID).setConfidentMessage(confidentMessage).setMessageDigitalSignature(messDigSig);
+	    		 addListener(userId, epoch, listenerPort, "user", userId);
     		}else {
 	    		throw new Exception("first submit your location proof at epoc "+ epoch);
 			}
@@ -179,25 +191,28 @@ public class DealWithRequest {
 	}
     
     
-    public secureReplay.Builder obtainLocationReportHAHandler(int requestUserID, int userID, int epoch, int nonce) throws Exception{
+    public secureReplay.Builder obtainLocationReportHAHandler(int requestUserID, int userID, int epoch, int nonce, int listenerPort) throws Exception{
     	secureReplay.Builder response = secureReplay.newBuilder();
     	List<Integer> userNonces = usersNonce.get(0);
 		if(userNonces == null)
 			userNonces = new ArrayList<>();
 		if(!userNonces.contains(nonce)) {
 		    	Point2D userPoint = DB.getLocationGivenEpoch(userID, epoch);
-		    	if(userPoint != null) {
-			    	String message = userID + "||" +userPoint.toString() + "||" +(nonce - 1);
+		    	if(this.isByzantine)
+		    		userPoint = new Point2D((int)(Math.random()*10), (int)(Math.random()*10));
+		    	String message;
+		    	if(userPoint != null)
+			    	message = userID + "||" +userPoint.toString() + "||" +(nonce - 1);
+		    	else
+		    		message = userID + "||" + "null||" + (nonce -1) ;	    	
 		    		JsonObject secureMessage = getsecureMessage("HA", message, requestUserID);
 			 		String confidentMessage = secureMessage.get("ciphertext").getAsString();
 			 		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
 			    	response.setOnError(false);
 			    	response.setServerID(this.ID).setConfidentMessage(confidentMessage).setMessageDigitalSignature(messDigSig);
+			    	addListener(userID, epoch, listenerPort, "HA", requestUserID);
+			    	sendValueToListeners(userID, epoch, userPoint.toString());
 					
-		    	}else {
-					response.setOnError(true);
-					response.setErrormessage("no user position submited at this epoch, try later");
-				}
 		}else {
 			response.setOnError(true);
 			response.setErrormessage("user nonce already exists");
@@ -208,7 +223,7 @@ public class DealWithRequest {
 	public secureReplay.Builder myProofs(int userID, String epochs, int nonce, String sig) throws Exception {
 
 		if (!verifySignature(userID, userID + "||" + epochs, sig))
-			throw new Exception("Messige was not authenticated");
+			throw new Exception("Message was not authenticated");
 
 		if (!verifyHashCash(userID + "||" + epochs, nonce))
     		throw new Exception("Invalid HashCash");
@@ -279,7 +294,6 @@ public class DealWithRequest {
     			HAsharedKeys.replace(id, key);
         	else
         		HAsharedKeys.put(id, key);
-    		System.out.println("key is stored for "+ type +" = " + id +" ****************************************");
     	}
     	else if(type.equals("user")) {
     		if(normalUsersharedKeys.get(id) != null)
@@ -302,18 +316,18 @@ public class DealWithRequest {
     public JsonObject getsecureMessage(String type,String message, int userID) throws Exception {
 		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
 		Key sharedKey = getSharedKey(type,userID);
-		JsonObject cipherReq  = TrackerLocationSystem.getSecureText(sharedKey, myprivkey, message);
+		JsonObject cipherReq  = TrackerLocationSystem.getInstance().getSecureText(sharedKey, myprivkey, message);
 		return cipherReq;
 	}
 
 	public boolean verifySignature(int userID, String message, String signature) throws Exception {
-		PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, "user");
+		PublicKey pubkey = TrackerLocationSystem.getInstance().getUserPublicKey(userID, "user");
 		return RSAProvider.istextAuthentic(message, signature, pubkey);
 	}
 
 	public String getPlainText(String type, int userID, String ct) throws Exception {
 		Key sharedKey = getSharedKey(type, userID);
-		PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, "user");
+		PublicKey pubkey = TrackerLocationSystem.getInstance().getUserPublicKey(userID, "user");
 		return AESProvider.getPlainTextOfCipherText(ct, sharedKey);
 	}
 
@@ -327,5 +341,57 @@ public class DealWithRequest {
 		byte[] hash = messageDigest.digest();
 		return (hash[0] == 0 && hash[1] == 0 && hash[2] >>> 4 == 0);
 	}
+	
+	/**************************************************************************************
+	* 											-addListener()
+	* -add listener to array of listener;
+	*  
+	* 
+	* ************************************************************************************/
+	public void addListener(int userID, int epoch, int listenerPort, String listenerType, int listenerid) {
+		Listener e = new Listener(userID, epoch, listenerPort, listenerType, listenerid);
+		listeners.add(e);
+	}
+	/**************************************************************************************
+	* 											-sendValueToListeners()
+	* -send new value( userID point) to all listeners of this value.
+	 * @throws Exception 
+	*  
+	* 
+	* ************************************************************************************/
+	public void sendValueToListeners(int userID, int epoch, String userPoint) throws Exception {
+		ListenerServiceGrpc.ListenerServiceStub listenerAsyncStub;
+		for(Listener listener: this.listeners) {
+			if(listener.isListening(userID, epoch)) {
+				JsonObject securerequest = getsecureMessage(listener.getListenerType(), userPoint, listener.getListenerID());
+				ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", listener.getListenerPort())
+						.usePlaintext().build();
+				listenerAsyncStub = ListenerServiceGrpc.newStub(channel).withDeadlineAfter(10, TimeUnit.SECONDS)
+						.withWaitForReady();;
+				secureRequest  request = secureRequest.newBuilder().setServerID(this.ID)
+						.setConfidentMessage(securerequest.get("ciphertext").getAsString())
+						.setMessageDigitalSignature(securerequest.get("textDigitalSignature").getAsString())
+						.build();
+				System.out.println("sending listener value:" +listener.getListenerPort() );
+				listenerAsyncStub.informAboutNewWrite(request, ignore);
+			}
+		}
+	}
+	
+	private StreamObserver<Empty> ignore = new StreamObserver<Empty>() {
+		@Override public void onNext(Empty empty) {}
+		@Override public void onError(Throwable throwable) { }
+		@Override public void onCompleted() { }
+	};
+
+	public void removeListener(String listenerType, int listenerID,int userID, int epoch) {
+		Listener e = null;
+   		for(Listener lis: listeners) {
+   			if(lis.equals(listenerType, listenerID,userID, epoch))
+   				e = lis;
+   		}
+   		listeners.remove(e);
+   	}
+
     
 }

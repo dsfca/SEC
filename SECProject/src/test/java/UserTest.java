@@ -20,8 +20,8 @@ public class UserTest {
 	static TrackerLocationSystem trl;
     
 	
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
+	//@BeforeAll
+/*	static void setUpBeforeClass() throws Exception {
 		  num_users = 10;
 	        G_width = 3;
 	        G_height = 3;
@@ -32,12 +32,12 @@ public class UserTest {
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	        }
-	}
+	}*/
 
     /***
     * This test simulate the report submitreport of user 2 in epoch 2 to server.
      * */
-    @Test
+  /*  @Test
     void submitReportTest() {
 
        
@@ -56,10 +56,10 @@ public class UserTest {
             e.printStackTrace();
         }
 
-    }
+    }*/
     
-    @Test
-    void obtainLocationReportTest() {
+   // @Test
+ /*   void obtainLocationReportTest() {
     	try {
 
             int userID = 1;
@@ -76,6 +76,6 @@ public class UserTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 }

@@ -19,26 +19,36 @@ public final class ServerService {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int32 userID = 1;</code>
+     * <code>string userType = 1;</code>
+     */
+    java.lang.String getUserType();
+    /**
+     * <code>string userType = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getUserTypeBytes();
+
+    /**
+     * <code>int32 userID = 2;</code>
      */
     int getUserID();
 
     /**
-     * <code>string confidentMessage = 2;</code>
+     * <code>string confidentMessage = 3;</code>
      */
     java.lang.String getConfidentMessage();
     /**
-     * <code>string confidentMessage = 2;</code>
+     * <code>string confidentMessage = 3;</code>
      */
     com.google.protobuf.ByteString
         getConfidentMessageBytes();
 
     /**
-     * <code>string MessageDigitalSignature = 3;</code>
+     * <code>string MessageDigitalSignature = 4;</code>
      */
     java.lang.String getMessageDigitalSignature();
     /**
-     * <code>string MessageDigitalSignature = 3;</code>
+     * <code>string MessageDigitalSignature = 4;</code>
      */
     com.google.protobuf.ByteString
         getMessageDigitalSignatureBytes();
@@ -56,6 +66,7 @@ public final class ServerService {
       super(builder);
     }
     private secureRequest() {
+      userType_ = "";
       userID_ = 0;
       confidentMessage_ = "";
       messageDigitalSignature_ = "";
@@ -85,18 +96,24 @@ public final class ServerService {
             case 0:
               done = true;
               break;
-            case 8: {
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              userType_ = s;
+              break;
+            }
+            case 16: {
 
               userID_ = input.readInt32();
               break;
             }
-            case 18: {
+            case 26: {
               java.lang.String s = input.readStringRequireUtf8();
 
               confidentMessage_ = s;
               break;
             }
-            case 26: {
+            case 34: {
               java.lang.String s = input.readStringRequireUtf8();
 
               messageDigitalSignature_ = s;
@@ -134,19 +151,53 @@ public final class ServerService {
               com.server.grpc.ServerService.secureRequest.class, com.server.grpc.ServerService.secureRequest.Builder.class);
     }
 
-    public static final int USERID_FIELD_NUMBER = 1;
+    public static final int USERTYPE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object userType_;
+    /**
+     * <code>string userType = 1;</code>
+     */
+    public java.lang.String getUserType() {
+      java.lang.Object ref = userType_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        userType_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string userType = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUserTypeBytes() {
+      java.lang.Object ref = userType_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        userType_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int USERID_FIELD_NUMBER = 2;
     private int userID_;
     /**
-     * <code>int32 userID = 1;</code>
+     * <code>int32 userID = 2;</code>
      */
     public int getUserID() {
       return userID_;
     }
 
-    public static final int CONFIDENTMESSAGE_FIELD_NUMBER = 2;
+    public static final int CONFIDENTMESSAGE_FIELD_NUMBER = 3;
     private volatile java.lang.Object confidentMessage_;
     /**
-     * <code>string confidentMessage = 2;</code>
+     * <code>string confidentMessage = 3;</code>
      */
     public java.lang.String getConfidentMessage() {
       java.lang.Object ref = confidentMessage_;
@@ -161,7 +212,7 @@ public final class ServerService {
       }
     }
     /**
-     * <code>string confidentMessage = 2;</code>
+     * <code>string confidentMessage = 3;</code>
      */
     public com.google.protobuf.ByteString
         getConfidentMessageBytes() {
@@ -177,10 +228,10 @@ public final class ServerService {
       }
     }
 
-    public static final int MESSAGEDIGITALSIGNATURE_FIELD_NUMBER = 3;
+    public static final int MESSAGEDIGITALSIGNATURE_FIELD_NUMBER = 4;
     private volatile java.lang.Object messageDigitalSignature_;
     /**
-     * <code>string MessageDigitalSignature = 3;</code>
+     * <code>string MessageDigitalSignature = 4;</code>
      */
     public java.lang.String getMessageDigitalSignature() {
       java.lang.Object ref = messageDigitalSignature_;
@@ -195,7 +246,7 @@ public final class ServerService {
       }
     }
     /**
-     * <code>string MessageDigitalSignature = 3;</code>
+     * <code>string MessageDigitalSignature = 4;</code>
      */
     public com.google.protobuf.ByteString
         getMessageDigitalSignatureBytes() {
@@ -225,14 +276,17 @@ public final class ServerService {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (!getUserTypeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, userType_);
+      }
       if (userID_ != 0) {
-        output.writeInt32(1, userID_);
+        output.writeInt32(2, userID_);
       }
       if (!getConfidentMessageBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, confidentMessage_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, confidentMessage_);
       }
       if (!getMessageDigitalSignatureBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, messageDigitalSignature_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, messageDigitalSignature_);
       }
       unknownFields.writeTo(output);
     }
@@ -243,15 +297,18 @@ public final class ServerService {
       if (size != -1) return size;
 
       size = 0;
+      if (!getUserTypeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, userType_);
+      }
       if (userID_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, userID_);
+          .computeInt32Size(2, userID_);
       }
       if (!getConfidentMessageBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, confidentMessage_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, confidentMessage_);
       }
       if (!getMessageDigitalSignatureBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, messageDigitalSignature_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, messageDigitalSignature_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -269,6 +326,8 @@ public final class ServerService {
       com.server.grpc.ServerService.secureRequest other = (com.server.grpc.ServerService.secureRequest) obj;
 
       boolean result = true;
+      result = result && getUserType()
+          .equals(other.getUserType());
       result = result && (getUserID()
           == other.getUserID());
       result = result && getConfidentMessage()
@@ -286,6 +345,8 @@ public final class ServerService {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + USERTYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getUserType().hashCode();
       hash = (37 * hash) + USERID_FIELD_NUMBER;
       hash = (53 * hash) + getUserID();
       hash = (37 * hash) + CONFIDENTMESSAGE_FIELD_NUMBER;
@@ -425,6 +486,8 @@ public final class ServerService {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        userType_ = "";
+
         userID_ = 0;
 
         confidentMessage_ = "";
@@ -457,6 +520,7 @@ public final class ServerService {
       @java.lang.Override
       public com.server.grpc.ServerService.secureRequest buildPartial() {
         com.server.grpc.ServerService.secureRequest result = new com.server.grpc.ServerService.secureRequest(this);
+        result.userType_ = userType_;
         result.userID_ = userID_;
         result.confidentMessage_ = confidentMessage_;
         result.messageDigitalSignature_ = messageDigitalSignature_;
@@ -508,6 +572,10 @@ public final class ServerService {
 
       public Builder mergeFrom(com.server.grpc.ServerService.secureRequest other) {
         if (other == com.server.grpc.ServerService.secureRequest.getDefaultInstance()) return this;
+        if (!other.getUserType().isEmpty()) {
+          userType_ = other.userType_;
+          onChanged();
+        }
         if (other.getUserID() != 0) {
           setUserID(other.getUserID());
         }
@@ -548,15 +616,84 @@ public final class ServerService {
         return this;
       }
 
+      private java.lang.Object userType_ = "";
+      /**
+       * <code>string userType = 1;</code>
+       */
+      public java.lang.String getUserType() {
+        java.lang.Object ref = userType_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          userType_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string userType = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getUserTypeBytes() {
+        java.lang.Object ref = userType_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          userType_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string userType = 1;</code>
+       */
+      public Builder setUserType(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        userType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string userType = 1;</code>
+       */
+      public Builder clearUserType() {
+        
+        userType_ = getDefaultInstance().getUserType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string userType = 1;</code>
+       */
+      public Builder setUserTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        userType_ = value;
+        onChanged();
+        return this;
+      }
+
       private int userID_ ;
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>int32 userID = 2;</code>
        */
       public int getUserID() {
         return userID_;
       }
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>int32 userID = 2;</code>
        */
       public Builder setUserID(int value) {
         
@@ -565,7 +702,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>int32 userID = 1;</code>
+       * <code>int32 userID = 2;</code>
        */
       public Builder clearUserID() {
         
@@ -576,7 +713,7 @@ public final class ServerService {
 
       private java.lang.Object confidentMessage_ = "";
       /**
-       * <code>string confidentMessage = 2;</code>
+       * <code>string confidentMessage = 3;</code>
        */
       public java.lang.String getConfidentMessage() {
         java.lang.Object ref = confidentMessage_;
@@ -591,7 +728,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>string confidentMessage = 2;</code>
+       * <code>string confidentMessage = 3;</code>
        */
       public com.google.protobuf.ByteString
           getConfidentMessageBytes() {
@@ -607,7 +744,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>string confidentMessage = 2;</code>
+       * <code>string confidentMessage = 3;</code>
        */
       public Builder setConfidentMessage(
           java.lang.String value) {
@@ -620,7 +757,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>string confidentMessage = 2;</code>
+       * <code>string confidentMessage = 3;</code>
        */
       public Builder clearConfidentMessage() {
         
@@ -629,7 +766,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>string confidentMessage = 2;</code>
+       * <code>string confidentMessage = 3;</code>
        */
       public Builder setConfidentMessageBytes(
           com.google.protobuf.ByteString value) {
@@ -645,7 +782,7 @@ public final class ServerService {
 
       private java.lang.Object messageDigitalSignature_ = "";
       /**
-       * <code>string MessageDigitalSignature = 3;</code>
+       * <code>string MessageDigitalSignature = 4;</code>
        */
       public java.lang.String getMessageDigitalSignature() {
         java.lang.Object ref = messageDigitalSignature_;
@@ -660,7 +797,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>string MessageDigitalSignature = 3;</code>
+       * <code>string MessageDigitalSignature = 4;</code>
        */
       public com.google.protobuf.ByteString
           getMessageDigitalSignatureBytes() {
@@ -676,7 +813,7 @@ public final class ServerService {
         }
       }
       /**
-       * <code>string MessageDigitalSignature = 3;</code>
+       * <code>string MessageDigitalSignature = 4;</code>
        */
       public Builder setMessageDigitalSignature(
           java.lang.String value) {
@@ -689,7 +826,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>string MessageDigitalSignature = 3;</code>
+       * <code>string MessageDigitalSignature = 4;</code>
        */
       public Builder clearMessageDigitalSignature() {
         
@@ -698,7 +835,7 @@ public final class ServerService {
         return this;
       }
       /**
-       * <code>string MessageDigitalSignature = 3;</code>
+       * <code>string MessageDigitalSignature = 4;</code>
        */
       public Builder setMessageDigitalSignatureBytes(
           com.google.protobuf.ByteString value) {
@@ -4392,31 +4529,33 @@ public final class ServerService {
   static {
     java.lang.String[] descriptorData = {
       "\n\023serverService.proto\032\033google/protobuf/e" +
-      "mpty.proto\"Z\n\rsecureRequest\022\016\n\006userID\030\001 " +
-      "\001(\005\022\030\n\020confidentMessage\030\002 \001(\t\022\037\n\027Message" +
-      "DigitalSignature\030\003 \001(\t\"\202\001\n\014secureReplay\022" +
-      "\017\n\007onError\030\001 \001(\010\022\020\n\010serverID\030\002 \001(\005\022\030\n\020co" +
-      "nfidentMessage\030\003 \001(\t\022\037\n\027MessageDigitalSi" +
-      "gnature\030\004 \001(\t\022\024\n\014errormessage\030\005 \001(\t\"\206\001\n\013" +
-      "DHKeyExcReq\022\021\n\tuser_type\030\001 \001(\t\022\016\n\006userID" +
-      "\030\002 \001(\005\022\024\n\001p\030\003 \001(\0132\t.BInteger\022\024\n\001g\030\004 \001(\0132" +
-      "\t.BInteger\022\022\n\nMyDHPubKey\030\005 \001(\t\022\024\n\014digSig" +
-      "PubKey\030\006 \001(\t\"\\\n\013DHKeyExcRep\022\020\n\010myPubKey\030" +
-      "\001 \001(\t\022\024\n\014digSigPubkey\030\002 \001(\t\022\017\n\007onError\030\003" +
-      " \001(\010\022\024\n\014errorMessage\030\004 \001(\t\"\031\n\010BInteger\022\r" +
-      "\n\005value\030\001 \001(\0142\306\003\n\rserverService\0225\n\024submi" +
-      "tLocationReport\022\016.secureRequest\032\r.secure" +
-      "Replay\022:\n\020submitReportEcho\022\016.secureReque" +
-      "st\032\026.google.protobuf.Empty\022;\n\021submitRepo" +
-      "rtReady\022\016.secureRequest\032\026.google.protobu" +
-      "f.Empty\0225\n\024obtainLocationReport\022\016.secure" +
-      "Request\032\r.secureReplay\0227\n\026obtainLocation" +
-      "ReportHA\022\016.secureRequest\032\r.secureReplay\022" +
-      "6\n\025obtainUsersAtLocation\022\016.secureRequest" +
-      "\032\r.secureReplay\0220\n\017requestMyProofs\022\016.sec" +
-      "ureRequest\032\r.secureReplay\022+\n\rDHKeyExchan" +
-      "ge\022\014.DHKeyExcReq\032\014.DHKeyExcRepB\021\n\017com.se" +
-      "rver.grpcb\006proto3"
+      "mpty.proto\"l\n\rsecureRequest\022\020\n\010userType\030" +
+      "\001 \001(\t\022\016\n\006userID\030\002 \001(\005\022\030\n\020confidentMessag" +
+      "e\030\003 \001(\t\022\037\n\027MessageDigitalSignature\030\004 \001(\t" +
+      "\"\202\001\n\014secureReplay\022\017\n\007onError\030\001 \001(\010\022\020\n\010se" +
+      "rverID\030\002 \001(\005\022\030\n\020confidentMessage\030\003 \001(\t\022\037" +
+      "\n\027MessageDigitalSignature\030\004 \001(\t\022\024\n\014error" +
+      "message\030\005 \001(\t\"\206\001\n\013DHKeyExcReq\022\021\n\tuser_ty" +
+      "pe\030\001 \001(\t\022\016\n\006userID\030\002 \001(\005\022\024\n\001p\030\003 \001(\0132\t.BI" +
+      "nteger\022\024\n\001g\030\004 \001(\0132\t.BInteger\022\022\n\nMyDHPubK" +
+      "ey\030\005 \001(\t\022\024\n\014digSigPubKey\030\006 \001(\t\"\\\n\013DHKeyE" +
+      "xcRep\022\020\n\010myPubKey\030\001 \001(\t\022\024\n\014digSigPubkey\030" +
+      "\002 \001(\t\022\017\n\007onError\030\003 \001(\010\022\024\n\014errorMessage\030\004" +
+      " \001(\t\"\031\n\010BInteger\022\r\n\005value\030\001 \001(\0142\372\003\n\rserv" +
+      "erService\0225\n\024submitLocationReport\022\016.secu" +
+      "reRequest\032\r.secureReplay\022:\n\020submitReport" +
+      "Echo\022\016.secureRequest\032\026.google.protobuf.E" +
+      "mpty\022;\n\021submitReportReady\022\016.secureReques" +
+      "t\032\026.google.protobuf.Empty\0225\n\024obtainLocat" +
+      "ionReport\022\016.secureRequest\032\r.secureReplay" +
+      "\0227\n\026obtainLocationReportHA\022\016.secureReque" +
+      "st\032\r.secureReplay\0226\n\025obtainUsersAtLocati" +
+      "on\022\016.secureRequest\032\r.secureReplay\0220\n\017req" +
+      "uestMyProofs\022\016.secureRequest\032\r.secureRep" +
+      "lay\022+\n\rDHKeyExchange\022\014.DHKeyExcReq\032\014.DHK" +
+      "eyExcRep\0222\n\010readDone\022\016.secureRequest\032\026.g" +
+      "oogle.protobuf.EmptyB\021\n\017com.server.grpcb" +
+      "\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4436,7 +4575,7 @@ public final class ServerService {
     internal_static_secureRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_secureRequest_descriptor,
-        new java.lang.String[] { "UserID", "ConfidentMessage", "MessageDigitalSignature", });
+        new java.lang.String[] { "UserType", "UserID", "ConfidentMessage", "MessageDigitalSignature", });
     internal_static_secureReplay_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_secureReplay_fieldAccessorTable = new

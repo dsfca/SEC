@@ -283,6 +283,38 @@ public final class serverServiceGrpc {
      return getDHKeyExchangeMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
+      com.google.protobuf.Empty> getReadDoneMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "readDone",
+      requestType = com.server.grpc.ServerService.secureRequest.class,
+      responseType = com.google.protobuf.Empty.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
+      com.google.protobuf.Empty> getReadDoneMethod() {
+    io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest, com.google.protobuf.Empty> getReadDoneMethod;
+    if ((getReadDoneMethod = serverServiceGrpc.getReadDoneMethod) == null) {
+      synchronized (serverServiceGrpc.class) {
+        if ((getReadDoneMethod = serverServiceGrpc.getReadDoneMethod) == null) {
+          serverServiceGrpc.getReadDoneMethod = getReadDoneMethod = 
+              io.grpc.MethodDescriptor.<com.server.grpc.ServerService.secureRequest, com.google.protobuf.Empty>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "serverService", "readDone"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.secureRequest.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.google.protobuf.Empty.getDefaultInstance()))
+                  .setSchemaDescriptor(new serverServiceMethodDescriptorSupplier("readDone"))
+                  .build();
+          }
+        }
+     }
+     return getReadDoneMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -366,6 +398,13 @@ public final class serverServiceGrpc {
       asyncUnimplementedUnaryCall(getDHKeyExchangeMethod(), responseObserver);
     }
 
+    /**
+     */
+    public void readDone(com.server.grpc.ServerService.secureRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      asyncUnimplementedUnaryCall(getReadDoneMethod(), responseObserver);
+    }
+
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
@@ -424,6 +463,13 @@ public final class serverServiceGrpc {
                 com.server.grpc.ServerService.DHKeyExcReq,
                 com.server.grpc.ServerService.DHKeyExcRep>(
                   this, METHODID_DHKEY_EXCHANGE)))
+          .addMethod(
+            getReadDoneMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                com.server.grpc.ServerService.secureRequest,
+                com.google.protobuf.Empty>(
+                  this, METHODID_READ_DONE)))
           .build();
     }
   }
@@ -509,6 +555,14 @@ public final class serverServiceGrpc {
       asyncUnaryCall(
           getChannel().newCall(getDHKeyExchangeMethod(), getCallOptions()), request, responseObserver);
     }
+
+    /**
+     */
+    public void readDone(com.server.grpc.ServerService.secureRequest request,
+        io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getReadDoneMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -583,6 +637,13 @@ public final class serverServiceGrpc {
     public com.server.grpc.ServerService.DHKeyExcRep dHKeyExchange(com.server.grpc.ServerService.DHKeyExcReq request) {
       return blockingUnaryCall(
           getChannel(), getDHKeyExchangeMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.google.protobuf.Empty readDone(com.server.grpc.ServerService.secureRequest request) {
+      return blockingUnaryCall(
+          getChannel(), getReadDoneMethod(), getCallOptions(), request);
     }
   }
 
@@ -667,6 +728,14 @@ public final class serverServiceGrpc {
       return futureUnaryCall(
           getChannel().newCall(getDHKeyExchangeMethod(), getCallOptions()), request);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.google.protobuf.Empty> readDone(
+        com.server.grpc.ServerService.secureRequest request) {
+      return futureUnaryCall(
+          getChannel().newCall(getReadDoneMethod(), getCallOptions()), request);
+    }
   }
 
   private static final int METHODID_SUBMIT_LOCATION_REPORT = 0;
@@ -677,6 +746,7 @@ public final class serverServiceGrpc {
   private static final int METHODID_OBTAIN_USERS_AT_LOCATION = 5;
   private static final int METHODID_REQUEST_MY_PROOFS = 6;
   private static final int METHODID_DHKEY_EXCHANGE = 7;
+  private static final int METHODID_READ_DONE = 8;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -726,6 +796,10 @@ public final class serverServiceGrpc {
         case METHODID_DHKEY_EXCHANGE:
           serviceImpl.dHKeyExchange((com.server.grpc.ServerService.DHKeyExcReq) request,
               (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep>) responseObserver);
+          break;
+        case METHODID_READ_DONE:
+          serviceImpl.readDone((com.server.grpc.ServerService.secureRequest) request,
+              (io.grpc.stub.StreamObserver<com.google.protobuf.Empty>) responseObserver);
           break;
         default:
           throw new AssertionError();
@@ -796,6 +870,7 @@ public final class serverServiceGrpc {
               .addMethod(getObtainUsersAtLocationMethod())
               .addMethod(getRequestMyProofsMethod())
               .addMethod(getDHKeyExchangeMethod())
+              .addMethod(getReadDoneMethod())
               .build();
         }
       }

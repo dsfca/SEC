@@ -4,22 +4,22 @@ import com.server.grpc.ServerService.secureReplay;
 import com.server.grpc.ServerService.secureRequest;
 import com.google.gson.JsonObject;
 import com.server.grpc.serverServiceGrpc;
-import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
-import org.ini4j.Ini;
 import shared.Point2D;
+import shared.TrackerLocationSystem;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+
 
 public class HAUser extends User {
-
+	
     private enum MessageType {
         ObtainLocationReport,
         ObtainUsersAtLocation
@@ -44,8 +44,8 @@ public class HAUser extends User {
      *
      * ************************************************************************************/
     public String obtainLocationReport(int userId, int epoch) throws Exception {
-
-        String message = userId + "||" + epoch;
+    	
+        String message = userId + "||" + epoch + "||" + getMyListenerPort();
         return asyncReadRequest(message, MessageType.ObtainLocationReport);
 
     }
@@ -68,14 +68,15 @@ public class HAUser extends User {
         List<Integer> nonces = new ArrayList<>();
         Map<String, Integer> readvals = new HashMap<>();
         Set<Integer> acks = new HashSet<>();
-
-        final CountDownLatch finishLatch = new CountDownLatch(this.num_servers);
+        int num_servers = TrackerLocationSystem.getInstance().getNumServers();
+        final CountDownLatch finishLatch = new CountDownLatch(num_servers);
         StreamObserver<secureReplay> acksObserver = new StreamObserver<secureReplay>() {
             @Override
             public void onNext(secureReplay secureReplay) {
                 int serverId = secureReplay.getServerID();
-                if (acks.contains(serverId))
-					return;
+                if (acks.contains(serverId)) 
+                	return;          
+             
 
                 // Get Nonce from the message
                 String[] replyFields = new String[0];
@@ -93,27 +94,34 @@ public class HAUser extends User {
                 // Validate nonce
                 int serverNonce = Integer.parseInt(replyFields[replyFields.length-1]);
 				if(serverNonce != nonces.get(serverId)-1) {
-					System.out.println("[user" + myID + "] Submit Report Error: Unexpected nonce");
+					System.out.println("[user" + getMyID() + "] Submit Report Error: Unexpected nonce");
 					return;
 				}
 
 				// Compose plaintext message
                 String response = "";
-				for (int i = 0; i < replyFields.length-1; ++i)
-				    response += "||" + replyFields[i];
+                int responseInd = 0;
+				//for (int i = 0; i < replyFields.length-1; ++i)
+                if(type.equals(MessageType.ObtainLocationReport))
+                	responseInd = 1;
+                response = replyFields[responseInd];
 
                 if (!readvals.containsKey(response)) {
                     readvals.put(response, 1);
-                    return;
+                    //return;
                 }
-
+                
+              
                 readvals.put(response, readvals.get(response) + 1);
+                if(type.equals(MessageType.ObtainLocationReport))
+                	putValuesOnAnswers(serverId, response);            	
+                
             }
 
             @Override
             public void onError(Throwable t) {
                 Status status = Status.fromThrowable(t);
-				System.out.println("[HA" + myID + "] Error: " + status);
+				System.out.println("[HA" + getMyID() + "] Error: " + status);
 				finishLatch.countDown();
             }
 
@@ -124,21 +132,22 @@ public class HAUser extends User {
         List<ManagedChannel> serverChannels = new ArrayList<>();
 		serverServiceGrpc.serverServiceStub serverAsyncStub;
 
-        for(int server_id = 0; server_id < this.num_servers; server_id++) {
+        for(int server_id = 0; server_id < num_servers; server_id++) {
             int myNonce = new Random().nextInt();
             nonces.add(myNonce);
 
             JsonObject secureMessage = getsecureMessage(server_id, message + "||" + myNonce);
             String messagecipher = secureMessage.get("ciphertext").getAsString();
 			String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
-
-			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
+			
+			int serverPort = TrackerLocationSystem.getInstance().getMyServerPort(server_id);
+			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", serverPort)
 					                       .usePlaintext().build();
 			serverChannels.add(channel); // Store it for a proper close later
 			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(10, TimeUnit.SECONDS)
 																.withWaitForReady();
 
-			secureRequest request = secureRequest.newBuilder().setUserID(myID)
+			secureRequest request = secureRequest.newBuilder().setUserID(getMyID())
 													  				.setConfidentMessage(messagecipher)
 													  				.setMessageDigitalSignature(messageDigSig).build();
 			if (type == MessageType.ObtainLocationReport) {
@@ -169,9 +178,16 @@ public class HAUser extends User {
 			}
 		}
 
-		if (cnt <= quorum) throw new Exception("Not enough answers");
-
-        return consensus;
+		if (cnt <= quorum && !type.equals(MessageType.ObtainLocationReport)) throw new Exception("Not enough answers");
+		
+		if(type.equals(MessageType.ObtainLocationReport)) {
+			int userID =Integer.parseInt(message.split(Pattern.quote("||"))[0]);
+			int epoch = Integer.parseInt(message.split(Pattern.quote("||"))[1]);
+			String result = readAtomicValue(userID, epoch);
+			return result;
+		}
+		 return consensus;
+       
     }
 
     public static void main(String[] args) throws Exception {
@@ -188,7 +204,7 @@ public class HAUser extends User {
                 arg2 = sn.next().toLowerCase(Locale.ROOT);
                 try {
                     String reply = userHa.obtainLocationReport(Integer.parseInt(arg1), Integer.parseInt(arg2));
-                    System.out.println("Server replied: " + reply);
+                    System.out.println("result: " + reply);
                 } catch (Exception e) {
                 	e.printStackTrace();
                 	System.out.println(e.getMessage());
@@ -200,7 +216,7 @@ public class HAUser extends User {
                 try {
                     Point2D pos = new Point2D(Integer.parseInt(arg1), Integer.parseInt(arg2));
                     String reply = userHa.obtainUsersAtLocation(pos, Integer.parseInt(arg3));
-                    System.out.println("Server replied: " + reply);
+                    System.out.println("result: " + reply);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                     e.printStackTrace();

@@ -18,12 +18,15 @@ service serverService{
 	rpc requestMyProofs(secureRequest) returns (secureReplay);
 	
 	rpc DHKeyExchange(DHKeyExcReq) returns (DHKeyExcRep);
+	
+	rpc readDone(secureRequest) returns (google.protobuf.Empty);
 }
 
 message secureRequest{
-	int32 userID = 1;
-	string confidentMessage = 2;
-	string MessageDigitalSignature= 3;
+	string userType = 1;
+	int32 userID = 2;
+	string confidentMessage = 3;
+	string MessageDigitalSignature= 4;
 }
 
 message secureReplay{

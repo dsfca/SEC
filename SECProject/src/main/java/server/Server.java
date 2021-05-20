@@ -17,10 +17,10 @@ public class Server {
     private DealWithRequest serverDealWithReq;
     private int server_id;
 
-    public Server(int server_id, int port) {
+    public Server(int server_id, int port, boolean byzantine) {
         this.port = port;
         this.server_id = server_id;
-        serverDealWithReq = new DealWithRequest(this.server_id);
+        serverDealWithReq = new DealWithRequest(this.server_id, byzantine);
     }
 
     /**************************************************************************************
@@ -67,7 +67,7 @@ public class Server {
     
   //SERVER ATTRIBUTES GET FROM INI FILE 
     public static void main(String [] args) throws InvalidFileFormatException, IOException {
-    	Server server = new Server(0,new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class));
+    	Server server = new Server(0,new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class), false);
     	server.init();
     	
     	System.out.println("sbtring".substring(2,3));

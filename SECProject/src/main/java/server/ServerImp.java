@@ -25,7 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.Key;
-import java.security.PrivateKey;
+//import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -38,8 +38,8 @@ public class ServerImp extends serverServiceImplBase {
 
     private  String PRIVATE_KEY_PATH;
     private DealWithRequest dealWithReq;
-    private Key [] sharedKey;
-    private int N_timesSharedKeyUsed;
+   // private Key [] sharedKey;
+    //private int N_timesSharedKeyUsed;
     private String rep_sig_delimiter;
 
     private boolean sentReady;
@@ -92,7 +92,7 @@ public class ServerImp extends serverServiceImplBase {
 		this.sentReady = false;
 		this.server_start_port = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
 
-		this.sharedKey = new Key [num_servers];
+		//this.sharedKey = new Key [num_servers];
 		this.serverChannels = new ArrayList<>();
 
 		this.echos = new Hashtable<>();
@@ -117,8 +117,7 @@ public class ServerImp extends serverServiceImplBase {
 															  request.getConfidentMessage(),
 															  request.getMessageDigitalSignature());
 			String report = message[0];
-			int nonce = Integer.parseInt(message[1]);
-
+			int nonce = Integer.parseInt(message[message.length - 1]);
 	       	// Build channels with other servers
 			for(int server_id = 0; server_id < this.num_servers; server_id++) {
 				ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
@@ -323,10 +322,12 @@ public class ServerImp extends serverServiceImplBase {
     		String openText = getPlainText("user", request.getUserID(), request.getConfidentMessage());
 			String[] messageFields = getfieldsFromMessage(openText);
 
-			int epoch = Integer.parseInt(messageFields[1]);
-			int nonce = Integer.parseInt(messageFields[2]);
+			int epoch = Integer.parseInt(messageFields[0]);
+			int listenerPort = Integer.parseInt(messageFields[1]);
+			int nonce = Integer.parseInt(messageFields[messageFields.length - 1]);
+			
 
-		    ServerService.secureReplay.Builder response = dealWithReq.obtainReportHandler(request.getUserID(), epoch, nonce, request.getMessageDigitalSignature());
+		    ServerService.secureReplay.Builder response = dealWithReq.obtainReportHandler(request.getUserID(), epoch, nonce, request.getMessageDigitalSignature(), listenerPort);
 		    responseObserver.onNext(response.build());
 		    responseObserver.onCompleted();
 			
@@ -349,11 +350,11 @@ public class ServerImp extends serverServiceImplBase {
    public void obtainLocationReportHA(secureRequest request, StreamObserver<secureReplay> responseObserver) {
 	   try {
 		   String[] requestValues = getfieldsFromSecureMessage(request.getUserID(), request.getConfidentMessage(), request.getMessageDigitalSignature(), "HA");
-		   int nonce = Integer.parseInt(requestValues[2]);
 		   int userID = Integer.parseInt(requestValues[0]);
 		   int epoch = Integer.parseInt(requestValues[1]);
-		  
-		   secureReplay.Builder response = dealWithReq.obtainLocationReportHAHandler(request.getUserID(),userID, epoch, nonce);
+		   int listenerPort = Integer.parseInt(requestValues[2]);
+		   int nonce = Integer.parseInt(requestValues[requestValues.length -1]);
+		   secureReplay.Builder response = dealWithReq.obtainLocationReportHAHandler(request.getUserID(),userID, epoch, nonce,listenerPort);
 		   responseObserver.onNext(response.build());
 		   responseObserver.onCompleted();
 	   }catch (Exception e) {
@@ -398,7 +399,22 @@ public class ServerImp extends serverServiceImplBase {
 	}
    }
 
+   @Override
+   public void readDone(secureRequest request, StreamObserver<Empty> responseObserver) {
+	   String[] requestValues;
+	try {
+		requestValues = getfieldsFromSecureMessage(request.getUserID(), request.getConfidentMessage(), request.getMessageDigitalSignature(), request.getUserType());
+		int userID = Integer.parseInt(requestValues[0]);
+		int epoch = Integer.parseInt(requestValues[1]);
+		dealWithReq.removeListener(request.getUserType(), request.getUserID(), userID, epoch);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	  
+   }
 
+   	
    
     
 
@@ -417,14 +433,14 @@ public class ServerImp extends serverServiceImplBase {
     		BigInteger p = DiffieHelman.read(request.getP());
     		BigInteger g = DiffieHelman.read(request.getG());
     		DiffieHelman df = new DiffieHelman(p, g);
-			PublicKey key = TrackerLocationSystem.getUserPublicKey(request.getUserID(), request.getUserType());
+			PublicKey key = TrackerLocationSystem.getInstance().getUserPublicKey(request.getUserID(), request.getUserType());
 			String userPbkDigSig = request.getDigSigPubKey();
 			String userPubKey = request.getMyDHPubKey();
-		 	Key secretKey = TrackerLocationSystem.createSecretKey(df, userPbkDigSig, userPubKey, key);
+		 	Key secretKey = TrackerLocationSystem.getInstance().createSecretKey(df, userPbkDigSig, userPubKey, key);
 		 	dealWithReq.putOrUpdateSharedKeys(request.getUserType(), request.getUserID(), secretKey);
 		 	PublicKey myPubkey = df.getPublicKey();
 		 	String pbkB64 = Base64.getEncoder().encodeToString(myPubkey.getEncoded());
-		 	String digSigMyDHpubkey = TrackerLocationSystem.getDHkeySigned(myPubkey, PRIVATE_KEY_PATH);
+		 	String digSigMyDHpubkey = TrackerLocationSystem.getInstance().getDHkeySigned(myPubkey, PRIVATE_KEY_PATH);
 		 	
 		 	DHKeyExcRep.Builder rep = DHKeyExcRep.newBuilder().setOnError(false).setDigSigPubkey(digSigMyDHpubkey)
 		 			.setMyPubKey(pbkB64);
@@ -471,19 +487,19 @@ public class ServerImp extends serverServiceImplBase {
 	}
 
 	public boolean verifySignature(int userID, String message, String signature) throws Exception {
-    	PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, "user");
+    	PublicKey pubkey = TrackerLocationSystem.getInstance().getUserPublicKey(userID, "user");
     	return RSAProvider.istextAuthentic(message, signature, pubkey);
 	}
 
 	public String getPlainText(String userType, int userID, String ct) throws Exception {
     	Key sharedKey = dealWithReq.getSharedKey(userType,userID);
-    	PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, "user");
+    	PublicKey pubkey = TrackerLocationSystem.getInstance().getUserPublicKey(userID, "user");
     	return AESProvider.getPlainTextOfCipherText(ct, sharedKey);
 	}
 
 	public String getPlainText(int userID, String secureMessage, String digsig, String usertype) throws Exception {
     	Key sharedKey = dealWithReq.getSharedKey(usertype, userID);
-    	PublicKey pubkey = TrackerLocationSystem.getUserPublicKey(userID, usertype);
+    	PublicKey pubkey = TrackerLocationSystem.getInstance().getUserPublicKey(userID, usertype);
     	String messPlainText = AESProvider.getPlainTextOfCipherText(secureMessage, sharedKey);
     	boolean DigSigIsValid = RSAProvider.istextAuthentic(messPlainText, digsig, pubkey);
 

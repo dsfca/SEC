@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "com.user.grpc";
+
+import "google/protobuf/empty.proto";
+
+service ListenerService{
+	rpc informAboutNewWrite(secureRequest) returns (google.protobuf.Empty);
+}
+
+message secureRequest{
+	int32 serverID = 1;
+	string confidentMessage = 2;
+	string MessageDigitalSignature= 3;
+}

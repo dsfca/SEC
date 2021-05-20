@@ -1,14 +1,14 @@
 package user;
 
-import java.io.File;
+
 import java.io.IOException;
-import java.security.Key;
+
 import java.security.PublicKey;
-import java.sql.Time;
+
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import org.ini4j.Ini;
+
 import org.ini4j.InvalidFileFormatException;
 import com.user.grpc.UserService.LocProofRep;
 import com.user.grpc.UserService.LocProofReq;
@@ -16,9 +16,6 @@ import com.user.grpc.UserService.Position;
 import com.user.grpc.userServiceGrpc;
 import com.user.grpc.userServiceGrpc.userServiceStub;
 import com.server.grpc.serverServiceGrpc;
-import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
-import com.server.grpc.serverServiceGrpc.serverServiceStub;
-import com.google.gson.JsonObject;
 import com.server.grpc.ServerService.secureReplay;
 import com.server.grpc.ServerService.secureRequest;
 import io.grpc.*;
@@ -71,7 +68,7 @@ public class NormalUser extends User {
 					Server userServer = ServerBuilder.forPort(port).addService(new UserServiceImp(getMyID(), getPRIVATE_KEY_PATH())).build();
 					try {
 						userServer.start();
-						System.out.println("user " + myID + " server start at " + userServer.getPort());
+						System.out.println("user " + getMyID() + " server start at " + userServer.getPort());
 						
 						userServer.awaitTermination();
 					} catch (IOException | InterruptedException e) {
@@ -116,7 +113,7 @@ public class NormalUser extends User {
 				try {
 					String witnessProof = reply.getProof();
 					String witnessProofDigSig = reply.getProofDigSig();
-					PublicKey witPubKey = TrackerLocationSystem.getUserPublicKey(reply.getWitnessID(), "user");
+					PublicKey witPubKey = TrackerLocationSystem.getInstance().getUserPublicKey(reply.getWitnessID(), "user");
 					boolean proofIsAuth = RSAProvider.istextAuthentic(witnessProof, witnessProofDigSig, witPubKey);
 					if(proofIsAuth)
 						proofs.add(reply.getProof());
@@ -244,7 +241,7 @@ public class NormalUser extends User {
 
 						Thread.sleep(1000);
 						String reply =  obtainLocationReport(myCurrentEpoch);
-						System.out.println("user "+ getMyID() +" position at epoch "+ myCurrentEpoch +": "+ reply);
+						System.out.println("user: "+ getMyID() +" position at epoch "+ myCurrentEpoch +": "+ reply);
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
 					//e.printStackTrace();
@@ -278,8 +275,8 @@ public class NormalUser extends User {
         List<Integer> nonces = new ArrayList<>();
         Map<String, Integer> readvals = new HashMap<>();
         Set<Integer> replied = new HashSet<>();
-
-        final CountDownLatch finishLatch = new CountDownLatch(this.num_servers);
+        int num_servers = TrackerLocationSystem.getInstance().getNumServers();
+        final CountDownLatch finishLatch = new CountDownLatch(num_servers);
         StreamObserver<secureReplay> acksObserver = new StreamObserver<secureReplay>() {
             @Override
             public void onNext(secureReplay secureReplay) {
@@ -303,7 +300,7 @@ public class NormalUser extends User {
                 // Validate nonce
                 int serverNonce = Integer.parseInt(replyFields[replyFields.length-1]);
 				if(serverNonce != nonces.get(serverId)-1) {
-					System.out.println("[user" + myID + "] Submit Report Error: Unexpected nonce");
+					System.out.println("[user" + getMyID() + "] Submit Report Error: Unexpected nonce");
 					return;
 				}
 
@@ -314,16 +311,18 @@ public class NormalUser extends User {
 
                 if (!readvals.containsKey(response)) {
                     readvals.put(response, 1);
-                    return;
+                    //return;
                 }
 
                 readvals.put(response, readvals.get(response) + 1);
+                if(type.equals(MessageType.ObtainLocationReport))
+                	putValuesOnAnswers(serverId, response);
             }
 
             @Override
             public void onError(Throwable t) {
                 Status status = Status.fromThrowable(t);
-				System.out.println("[User" + myID + "] Error: " + status);
+				System.out.println("[User" + getMyID() + "] Error: " + status);
 				finishLatch.countDown();
             }
 
@@ -336,8 +335,7 @@ public class NormalUser extends User {
 
 		String signedMessage = signMessage(message);
 		int myNonce = hashCash(message);
-
-        for(int server_id = 0; server_id < this.num_servers; server_id++) {
+        for(int server_id = 0; server_id < num_servers; server_id++) {
 //            int myNonce = new Random().nextInt();
             nonces.add(myNonce);
 
@@ -345,15 +343,15 @@ public class NormalUser extends User {
 //            String messagecipher = secureMessage.get("ciphertext").getAsString();
 //			String messageDigSig = secureMessage.get("textDigitalSignature").getAsString();
 
-			String encryptedMessage = encryptMessage(server_id, message + "||" + myNonce);
-
-			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", server_start_port+server_id)
+			String encryptedMessage = encryptMessage(server_id, message + "||" + getMyListenerPort() + "||" + myNonce);
+			int serverPort = TrackerLocationSystem.getInstance().getMyServerPort(server_id);
+			ManagedChannel channel = ManagedChannelBuilder.forAddress("127.0.0.1", serverPort)
 					                       .usePlaintext().build();
 			serverChannels.add(channel); // Store it for a proper close later
 			serverAsyncStub = serverServiceGrpc.newStub(channel).withDeadlineAfter(10, TimeUnit.SECONDS)
 																.withWaitForReady();
 
-			secureRequest request = secureRequest.newBuilder().setUserID(myID)
+			secureRequest request = secureRequest.newBuilder().setUserID(getMyID())
 													  				.setConfidentMessage(encryptedMessage)
 													  				.setMessageDigitalSignature(signedMessage).build();
 			if (type == MessageType.ObtainLocationReport) {
@@ -386,10 +384,11 @@ public class NormalUser extends User {
 				consensus = entry.getKey();
 			}
 		}
-
-		if (cnt <= quorum)
+		if (cnt <= quorum && !type.equals(MessageType.ObtainLocationReport))
 			throw new Exception("Not enough answers.");
-
+		
+		if(type.equals(MessageType.ObtainLocationReport))
+			return readAtomicValue(getMyID(), Integer.parseInt(message));
         return consensus;
     }
 	

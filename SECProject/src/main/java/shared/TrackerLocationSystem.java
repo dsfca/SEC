@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.Key;
-import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -29,16 +28,33 @@ public class TrackerLocationSystem {
 	private int G_width;
 	private int G_height;
 	private int server_start_port;
-	public static int NUM_BIZANTINE_USERS;
+	private  int NUM_BIZANTINE_USERS;
+	private int NUM_BIZANTINE_SERVERS;
 	private int num_servers;
+	
+	private static TrackerLocationSystem INSTANCE;
 
-	public TrackerLocationSystem(int num_users, int G_width, int G_height, int f) throws Exception {
-		this.num_users = num_users;
+	public TrackerLocationSystem( int G_width, int G_height) throws Exception {
+		INSTANCE = this;
+		this.num_users =  new Ini(new File("variables.ini")).get("UserSpecs","number_of_users", Integer.class);;
 		this.G_width = G_width;
 		this.G_height = G_height;
 		this.server_start_port = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
-		NUM_BIZANTINE_USERS = f;
+		this.NUM_BIZANTINE_SERVERS = new Ini(new File("variables.ini")).get("Server","number_of_byzantines", Integer.class);
+		this.NUM_BIZANTINE_USERS = new Ini(new File("variables.ini")).get("UserSpecs","number_of_byzantines", Integer.class);
 		this.num_servers = new Ini(new File("variables.ini")).get("Server","number_of_servers", Integer.class);
+		verifyParameters();
+	}
+	
+	
+	public static TrackerLocationSystem getInstance() {
+		if(INSTANCE == null)
+			try {
+				INSTANCE = new TrackerLocationSystem( 1, 1);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		return INSTANCE;
 	}
 	
 	public void start() throws Exception {
@@ -48,8 +64,16 @@ public class TrackerLocationSystem {
 	}
 	
 	public void start_servers() throws Exception {
+		int j = 0;
+		boolean isByzantine = false;
 		for(int i = 0; i < num_servers; i++) {
-			Server server = new Server(i, (server_start_port + i));
+			if(j < NUM_BIZANTINE_SERVERS) {
+				isByzantine = true;
+				j++;
+			}
+			else
+				isByzantine = false;
+			Server server = new Server(i, (server_start_port + i), isByzantine);
 			server.init();
 		}
 	}
@@ -60,10 +84,31 @@ public class TrackerLocationSystem {
 		}
 	}
 	
-	public List<NormalUser> getUsers(){
-		return users;
+	public int getNumBizantineServers() {
+		return this.NUM_BIZANTINE_SERVERS;
 	}
-
+	
+	public int getNumBizantineUsers() {
+		return this.NUM_BIZANTINE_USERS;
+	}
+	
+	public int getNumServers() {
+		return this.num_servers;
+	}
+	
+	public int getMyServerPort(int myServerID) {
+		return server_start_port + myServerID;
+	}
+	
+	private void verifyParameters() throws Exception {
+		if(this.getNumServers() <=  3*this.getNumBizantineServers())
+			throw new Exception("number of server must be 3 times bigger than number of bizantine servers");
+		else if(this.num_users <= 3*this.getNumBizantineUsers())
+			throw new Exception("number of users must be 3 times bigger than number of bizantine users");
+		else if(this.G_height < 0 || this.G_width < 0)
+			throw new Exception("non negative dimensions");
+	}
+	
 	
 	
 	/**************************************************************************************
@@ -143,7 +188,7 @@ public class TrackerLocationSystem {
 	 * -returns: void
 	 *  
 	 * ************************************************************************************/
-	public static PublicKey getUserPublicKey(int id, String type) throws Exception {
+	public  PublicKey getUserPublicKey(int id, String type) throws Exception {
 		PublicKey key = null;
 		String path = "resources/public_keys/"+type+"" + id +"_public.key";
 		//key = RSAProvider.readPubKey(path);
@@ -151,7 +196,7 @@ public class TrackerLocationSystem {
 		return key;
 	}
 	
-	public static PublicKey getServerPublicKey(int serverID) throws Exception {
+	public  PublicKey getServerPublicKey(int serverID) throws Exception {
 		PublicKey key = null;
 		String path = "resources/public_keys/server" + serverID +"_public.key";
 		//key = RSAProvider.readPubKey(path);
@@ -173,7 +218,7 @@ public class TrackerLocationSystem {
 	 * -returns: void
 	 *  
 	 * ************************************************************************************/
-	public static void ini_pos_file(int n_user, int n_epoch, int G_width, int G_height) {
+	public  void ini_pos_file(int n_user, int n_epoch, int G_width, int G_height) {
 		boolean append = false;
 		for(int i = 1; i <= n_epoch; i++) {
 			for(int j = 0; j < n_user; j++) {
@@ -209,7 +254,7 @@ public class TrackerLocationSystem {
 		return null;
 	}
 	
-	public static String getDHkeySigned(PublicKey dfPubKey, String privateKeyPath ) throws Exception {
+	public  String getDHkeySigned(PublicKey dfPubKey, String privateKeyPath ) throws Exception {
 		byte[] myDHpbkbytes = dfPubKey.getEncoded();
 		String pbkB64 = Base64.getEncoder().encodeToString(myDHpbkbytes);
 		PrivateKey privkey = RSAProvider.readprivateKeyFromFile(privateKeyPath);
@@ -217,7 +262,7 @@ public class TrackerLocationSystem {
 		return digSigMyDHpubkey;
 	}
 	
-	public static Key createSecretKey(DiffieHelman df, String DHpubkeyDigSig, String DHpubKey, PublicKey key) throws Exception {
+	public  Key createSecretKey(DiffieHelman df, String DHpubkeyDigSig, String DHpubKey, PublicKey key) throws Exception {
 		boolean isServDHPbkDigSigValid = RSAProvider.istextAuthentic(DHpubKey, DHpubkeyDigSig, key);
 		if(isServDHPbkDigSigValid) {
 			byte[] serverPbkContent = Base64.getDecoder().decode(DHpubKey);
@@ -229,7 +274,7 @@ public class TrackerLocationSystem {
 	}
 	
 	
-	public static JsonObject getSecureText(Key key, PrivateKey prvkey, String plaintext) throws Exception {
+	public  JsonObject getSecureText(Key key, PrivateKey prvkey, String plaintext) throws Exception {
 		String cipherText = AESProvider.getCipherOfPlainText(plaintext, key);
 		String textDigSig = RSAProvider.getTexthashEnWithPriKey(plaintext, prvkey);
 		JsonObject secureText = JsonParser.parseString("{}").getAsJsonObject();
@@ -254,13 +299,12 @@ public class TrackerLocationSystem {
 	 *  
 	 * ************************************************************************************/
 	public static void main(String args[]) {
-		int num_users, G_width, G_height, f;
+		int G_width, G_height;
 		try {
-			num_users = Integer.parseInt(args[0]);
-			G_width = Integer.parseInt(args[1]);
-			G_height = Integer.parseInt(args[2]);
-			f = Integer.parseInt(args[3]);
-			TrackerLocationSystem trl = new TrackerLocationSystem(num_users, G_width, G_height, f);
+			//num_users = Integer.parseInt(args[0]);
+			G_width = Integer.parseInt(args[0]);
+			G_height = Integer.parseInt(args[1]);
+			TrackerLocationSystem trl = new TrackerLocationSystem(G_width, G_height);
 			trl.start();
 			/*while(true) {
 				Thread.sleep(10000);
