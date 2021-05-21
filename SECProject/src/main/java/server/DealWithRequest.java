@@ -1,5 +1,4 @@
 package server;
-
 import java.io.IOException;
 import java.security.*;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import com.google.protobuf.Empty;
 import com.server.grpc.serverServiceGrpc;
 import com.server.grpc.ServerService.BInteger;
 import com.server.grpc.ServerService.DHKeyExcRep;
-import com.server.grpc.ServerService.DHKeyExcReq;
 import com.server.grpc.ServerService.DHKeyExcServerReq;
 import com.server.grpc.ServerService.secureReplay;
 import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
@@ -105,7 +103,7 @@ public class DealWithRequest {
      * @throws Exception 
      *
      * ************************************************************************************/
-    public secureReplay.Builder submitReportHandler(int id, String report, int nonce) throws Exception {
+    public secureReplay.Builder submitReportHandler(int id, String report, int nonce, String requesDigSig) throws Exception {
     	secureReplay.Builder response = secureReplay.newBuilder();
 
     	report = report.replace("[", "").replace("]", "");
@@ -128,7 +126,7 @@ public class DealWithRequest {
 			if(pr.proofDigSigIsValid(witPubKey)) {
 				DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),
 						pr.getWitnessPoint(), pr.getEpoch(), pr.isWitnessIsNearProof(),
-						pr.getPorverDigSig(), pr.getWitnessDigSig());
+						requesDigSig, pr.getWitnessDigSig());
 			}
 			proverPos = pr.getProverPoint();
 			epoch = pr.getEpoch();
@@ -201,7 +199,7 @@ public class DealWithRequest {
     
     public secureReplay.Builder obtainLocationReportHAHandler(int requestUserID, int userID, int epoch, int nonce, int listenerPort) throws Exception{
     	secureReplay.Builder response = secureReplay.newBuilder();
-    	List<Integer> userNonces = usersNonce.get(0);
+    	List<Integer> userNonces = usersNonce.get(requestUserID);
 		if(userNonces == null)
 			userNonces = new ArrayList<>();
 		if(!userNonces.contains(nonce)) {
@@ -219,7 +217,6 @@ public class DealWithRequest {
 			    	response.setOnError(false);
 			    	response.setServerID(this.ID).setConfidentMessage(confidentMessage).setMessageDigitalSignature(messDigSig);
 			    	addListener(userID, epoch, listenerPort, "HA", requestUserID);
-			    	sendValueToListeners(userID, epoch, userPoint.toString());
 					
 		}else {
 			response.setOnError(true);

@@ -235,7 +235,7 @@ public class ServerImp extends serverServiceImplBase {
 			if(!(echos.get(echoMsg).ackCount() <= quorum || readys.get(echoMsg).ackCount() <= 2*this.num_byzantines)) {
 				/////////System.out.println("DENTRO:" + readys.get(echoMsg).ackCount());
 				// Message is considered delivered, time to add it to DB
-				ServerService.secureReplay.Builder response = dealWithReq.submitReportHandler(request.getUserID(), report, nonce);
+				ServerService.secureReplay.Builder response = dealWithReq.submitReportHandler(request.getUserID(), report, nonce,request.getMessageDigitalSignature() );
 				responseObserver.onNext(response.build());
 				responseObserver.onCompleted();
 			}
