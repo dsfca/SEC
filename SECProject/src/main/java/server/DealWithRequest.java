@@ -128,7 +128,7 @@ public class DealWithRequest {
 			if(pr.proofDigSigIsValid(witPubKey)) {
 				DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),
 						pr.getWitnessPoint(), pr.getEpoch(), pr.isWitnessIsNearProof(),
-						pr.getWitnessDigSig());
+						pr.getPorverDigSig(), pr.getWitnessDigSig());
 			}
 			proverPos = pr.getProverPoint();
 			epoch = pr.getEpoch();

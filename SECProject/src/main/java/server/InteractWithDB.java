@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.Key;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +81,7 @@ public class InteractWithDB {
 	
 	
 	//ADDS PROOF TO DATABSE - COLLECTION "ALL_LOCATIONS"
-	public void addReportToDatabase(int user1, int user2, Point2D pos1, Point2D pos2, int epoch, boolean near, String proof1) {
+	public void addReportToDatabase(int user1, int user2, Point2D pos1, Point2D pos2, int epoch, boolean near, String proof1, String proof2) {
 		Document document = new Document();
 		document.append("user1", user1);
 		document.append("user2", user2);
@@ -89,6 +90,7 @@ public class InteractWithDB {
 		document.append("epoch", epoch);
 		document.append("near", near);
 		document.append("Digi_sig_u1", proof1);
+		document.append("Digi_sig_u2", proof2);
 		mongo_collection_all.insertOne(document);
 		System.out.println("DB - Added report: " + document.toString() + " TO DB " + mongo_collection_all.getNamespace() + " OF SERVER"+ server_id + " ");
 	}
@@ -174,32 +176,51 @@ public class InteractWithDB {
 			}
 		}
 		return proofs;
-	}	
+	}
+	
+	//Check if proof is already in the DB
+	public boolean isReportInAll(String message) { //String format expected: "1, 1, (1;0), (0;0), 1, true, XXX, YYY"
+		MongoCursor<Document> cursor = mongo_collection_all.find().iterator();
+		ArrayList <String> proofs = new ArrayList <String> ();
+		boolean repeated = false;
 
+		while (cursor.hasNext()) {
+			Document current  = cursor.next();
+			String tmp = current.get("user1") + ", " + current.get("user2") + ", " + current.get("pos1") + ", " + 
+							current.get("pos2") + ", " + current.get("epoch") + ", " + current.get("near") + ", " +
+								current.get("Digi_sig_u1") + ", " + current.get("Digi_sig_u2");
+
+			if (tmp.equals(message)) {
+				repeated = true;
+			}
+		}
+		return repeated;
+	}
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		/**InteractWithDB it = new InteractWithDB("variables.ini", 1);
+		InteractWithDB it = new InteractWithDB("variables.ini", 1);
 		it.cleanValidatedCollection();
 		it.cleanAllLocationsCollection();
 		//LOCATIONS TO VALIDATED
-		it.addLocationToValidated(1, new Point2D(0,0), 1);
+		/**it.addLocationToValidated(1, new Point2D(0,0), 1);
 		it.addLocationToValidated(1, new Point2D(2,0), 2);
 		it.addLocationToValidated(1, new Point2D(0,1), 3);
-		
+		*/
 		
 		//LOCATIONS TO ALL
-		it.addReportToDatabase(1,1,new Point2D(1,0),new Point2D(0,0), 1, true, "XXX");
-		it.addReportToDatabase(1,3,new Point2D(1,0),new Point2D(0,0), 3, true, "XXX");
-		it.addReportToDatabase(4,1,new Point2D(1,0),new Point2D(0,0), 6, true, "XXX");
+		it.addReportToDatabase(1,1,new Point2D(1,0),new Point2D(0,0), 1, true, "XXX", "YYY");
+		it.addReportToDatabase(1,3,new Point2D(1,0),new Point2D(0,0), 3, true, "XXX", "YYY");
+		it.addReportToDatabase(4,1,new Point2D(1,0),new Point2D(0,0), 6, true, "XXX", "YYY");
 
 		//Point2D location = it.getLocationGivenEpoch(1, 2);
-		String [] epochs = {"1","3","6"};
+		/**String [] epochs = {"1","3","6"};
 		ArrayList <String> users = it.getUsersGivenPosAndEpoch(new Point2D(0,0), 1);
 		ArrayList <String> proofs = it.getProofsinEpochs(1, epochs);
-		System.out.println(proofs.toString());**/
+		System.out.println(proofs.toString());
 		
 		Hashtable<Integer, Hashtable<Key, Integer>> sharedKey = new Hashtable<>();
-		System.out.println(sharedKey.contains("x"));
+		System.out.println(sharedKey.contains("x"));**/
+		it.isReportInAll("1, 1, (1;0), (0;0), 1, true, XXX, YYY");
 	}
 
 }

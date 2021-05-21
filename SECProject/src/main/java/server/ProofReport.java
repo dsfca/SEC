@@ -16,10 +16,11 @@ public class ProofReport {
 	private Point2D witnessPoint;
 	private int epoch;
 	private String WitnessDigSig;
+	private String ProverDigSig;
 	private boolean witnessIsNearProof;
 	
 	public ProofReport(int proverID, int witnessID, Point2D proverPoint, Point2D witnessPoint, int epoch, Boolean witnessIsNearProof,
-			String digSig) {
+			String digSig1, String digSig2) {
 		super();
 		this.proverID = proverID;
 		this.witnessID = witnessID;
@@ -27,7 +28,8 @@ public class ProofReport {
 		this.witnessPoint = witnessPoint;
 		this.epoch = epoch;
 		this.witnessIsNearProof = witnessIsNearProof;
-		this.WitnessDigSig = digSig;
+		this.WitnessDigSig = digSig2;
+		this.ProverDigSig = digSig1;
 	}
 	
 	public ProofReport(String reportString) {
@@ -80,6 +82,10 @@ public class ProofReport {
 
 	public String getWitnessDigSig() {
 		return WitnessDigSig;
+	}
+	
+	public String getPorverDigSig() {
+		return ProverDigSig;
 	}
 
 	public boolean isWitnessIsNearProof() {
