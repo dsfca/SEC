@@ -35,11 +35,11 @@ public class TrackerLocationSystem {
 	
 	private static TrackerLocationSystem INSTANCE;
 
-	public TrackerLocationSystem( int G_width, int G_height) throws Exception {
+	public TrackerLocationSystem() throws Exception {
 		INSTANCE = this;
 		this.num_users =  new Ini(new File("variables.ini")).get("UserSpecs","number_of_users", Integer.class);;
-		this.G_width = G_width;
-		this.G_height = G_height;
+		this.G_width = new Ini(new File("variables.ini")).get("TLS","grid_width", Integer.class);
+		this.G_height = new Ini(new File("variables.ini")).get("TLS","grid_height", Integer.class);
 		this.server_start_port = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
 		this.NUM_BIZANTINE_SERVERS = new Ini(new File("variables.ini")).get("Server","number_of_byzantines", Integer.class);
 		this.NUM_BIZANTINE_USERS = new Ini(new File("variables.ini")).get("UserSpecs","number_of_byzantines", Integer.class);
@@ -51,7 +51,7 @@ public class TrackerLocationSystem {
 	public static TrackerLocationSystem getInstance() {
 		if(INSTANCE == null)
 			try {
-				INSTANCE = new TrackerLocationSystem( 1, 1);
+				INSTANCE = new TrackerLocationSystem();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -303,9 +303,9 @@ public class TrackerLocationSystem {
 		int G_width, G_height;
 		try {
 			//num_users = Integer.parseInt(args[0]);
-			G_width = Integer.parseInt(args[0]);
-			G_height = Integer.parseInt(args[1]);
-			TrackerLocationSystem trl = new TrackerLocationSystem(G_width, G_height);
+			//G_width = Integer.parseInt(args[0]);
+			//G_height = Integer.parseInt(args[1]);
+			TrackerLocationSystem trl = new TrackerLocationSystem();
 			trl.start();
 			/*while(true) {
 				Thread.sleep(10000);
