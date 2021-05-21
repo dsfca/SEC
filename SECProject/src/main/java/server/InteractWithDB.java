@@ -97,12 +97,15 @@ public class InteractWithDB {
 	
 	
 	//INSERTS LOCATION TO COLLECTION "VALIDATED"
-	public void addLocationToValidated(int user, Point2D pos, int epoch) {
-		Document document = new Document();
-		document.append("user", user);
-		document.append("location", pos.toString());
-		document.append("epoch", epoch);
-		mongo_collection_validated.insertOne(document);
+	public void addLocationToValidated(int user, Point2D pos, int epoch) throws Exception {
+		Point2D userPoint = getLocationGivenEpoch(user, epoch);
+		if(userPoint == null) {
+			Document document = new Document();
+			document.append("user", user);
+			document.append("location", pos.toString());
+			document.append("epoch", epoch);
+			mongo_collection_validated.insertOne(document);
+		}else throw new Exception("user with ID = "+user+ " already submit report for this epoch");
 	}
 	
 		
