@@ -21,6 +21,7 @@ import user.NormalUser;
 import user.UserLocation;
 
 public class TrackerLocationSystem {
+	public static final String password = "SEC";
 	
 	private  List<NormalUser> users = new ArrayList<NormalUser>();
 	private static final String pos_file_path = "resources/Grid.txt";
@@ -254,10 +255,10 @@ public class TrackerLocationSystem {
 		return null;
 	}
 	
-	public  String getDHkeySigned(PublicKey dfPubKey, String privateKeyPath ) throws Exception {
+	public  String getDHkeySigned(PublicKey dfPubKey, String privateKeyPath) throws Exception {
 		byte[] myDHpbkbytes = dfPubKey.getEncoded();
 		String pbkB64 = Base64.getEncoder().encodeToString(myDHpbkbytes);
-		PrivateKey privkey = RSAProvider.readprivateKeyFromFile(privateKeyPath);
+		PrivateKey privkey = RSAProvider.readprivateKeyFromFile(privateKeyPath, password);
 		String digSigMyDHpubkey = RSAProvider.getTexthashEnWithPriKey(pbkB64, privkey);
 		return digSigMyDHpubkey;
 	}

@@ -3127,6 +3127,1144 @@ public final class ServerService {
 
   }
 
+  public interface DHKeyExcServerReqOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:DHKeyExcServerReq)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int32 serverID = 2;</code>
+     */
+    int getServerID();
+
+    /**
+     * <code>.BInteger p = 3;</code>
+     */
+    boolean hasP();
+    /**
+     * <code>.BInteger p = 3;</code>
+     */
+    com.server.grpc.ServerService.BInteger getP();
+    /**
+     * <code>.BInteger p = 3;</code>
+     */
+    com.server.grpc.ServerService.BIntegerOrBuilder getPOrBuilder();
+
+    /**
+     * <code>.BInteger g = 4;</code>
+     */
+    boolean hasG();
+    /**
+     * <code>.BInteger g = 4;</code>
+     */
+    com.server.grpc.ServerService.BInteger getG();
+    /**
+     * <code>.BInteger g = 4;</code>
+     */
+    com.server.grpc.ServerService.BIntegerOrBuilder getGOrBuilder();
+
+    /**
+     * <code>string MyDHPubKey = 5;</code>
+     */
+    java.lang.String getMyDHPubKey();
+    /**
+     * <code>string MyDHPubKey = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getMyDHPubKeyBytes();
+
+    /**
+     * <code>string digSigPubKey = 6;</code>
+     */
+    java.lang.String getDigSigPubKey();
+    /**
+     * <code>string digSigPubKey = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getDigSigPubKeyBytes();
+  }
+  /**
+   * Protobuf type {@code DHKeyExcServerReq}
+   */
+  public  static final class DHKeyExcServerReq extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:DHKeyExcServerReq)
+      DHKeyExcServerReqOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use DHKeyExcServerReq.newBuilder() to construct.
+    private DHKeyExcServerReq(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private DHKeyExcServerReq() {
+      serverID_ = 0;
+      myDHPubKey_ = "";
+      digSigPubKey_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private DHKeyExcServerReq(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 16: {
+
+              serverID_ = input.readInt32();
+              break;
+            }
+            case 26: {
+              com.server.grpc.ServerService.BInteger.Builder subBuilder = null;
+              if (p_ != null) {
+                subBuilder = p_.toBuilder();
+              }
+              p_ = input.readMessage(com.server.grpc.ServerService.BInteger.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(p_);
+                p_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 34: {
+              com.server.grpc.ServerService.BInteger.Builder subBuilder = null;
+              if (g_ != null) {
+                subBuilder = g_.toBuilder();
+              }
+              g_ = input.readMessage(com.server.grpc.ServerService.BInteger.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(g_);
+                g_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              myDHPubKey_ = s;
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              digSigPubKey_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.server.grpc.ServerService.internal_static_DHKeyExcServerReq_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.server.grpc.ServerService.internal_static_DHKeyExcServerReq_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.server.grpc.ServerService.DHKeyExcServerReq.class, com.server.grpc.ServerService.DHKeyExcServerReq.Builder.class);
+    }
+
+    public static final int SERVERID_FIELD_NUMBER = 2;
+    private int serverID_;
+    /**
+     * <code>int32 serverID = 2;</code>
+     */
+    public int getServerID() {
+      return serverID_;
+    }
+
+    public static final int P_FIELD_NUMBER = 3;
+    private com.server.grpc.ServerService.BInteger p_;
+    /**
+     * <code>.BInteger p = 3;</code>
+     */
+    public boolean hasP() {
+      return p_ != null;
+    }
+    /**
+     * <code>.BInteger p = 3;</code>
+     */
+    public com.server.grpc.ServerService.BInteger getP() {
+      return p_ == null ? com.server.grpc.ServerService.BInteger.getDefaultInstance() : p_;
+    }
+    /**
+     * <code>.BInteger p = 3;</code>
+     */
+    public com.server.grpc.ServerService.BIntegerOrBuilder getPOrBuilder() {
+      return getP();
+    }
+
+    public static final int G_FIELD_NUMBER = 4;
+    private com.server.grpc.ServerService.BInteger g_;
+    /**
+     * <code>.BInteger g = 4;</code>
+     */
+    public boolean hasG() {
+      return g_ != null;
+    }
+    /**
+     * <code>.BInteger g = 4;</code>
+     */
+    public com.server.grpc.ServerService.BInteger getG() {
+      return g_ == null ? com.server.grpc.ServerService.BInteger.getDefaultInstance() : g_;
+    }
+    /**
+     * <code>.BInteger g = 4;</code>
+     */
+    public com.server.grpc.ServerService.BIntegerOrBuilder getGOrBuilder() {
+      return getG();
+    }
+
+    public static final int MYDHPUBKEY_FIELD_NUMBER = 5;
+    private volatile java.lang.Object myDHPubKey_;
+    /**
+     * <code>string MyDHPubKey = 5;</code>
+     */
+    public java.lang.String getMyDHPubKey() {
+      java.lang.Object ref = myDHPubKey_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        myDHPubKey_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string MyDHPubKey = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getMyDHPubKeyBytes() {
+      java.lang.Object ref = myDHPubKey_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        myDHPubKey_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DIGSIGPUBKEY_FIELD_NUMBER = 6;
+    private volatile java.lang.Object digSigPubKey_;
+    /**
+     * <code>string digSigPubKey = 6;</code>
+     */
+    public java.lang.String getDigSigPubKey() {
+      java.lang.Object ref = digSigPubKey_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        digSigPubKey_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string digSigPubKey = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDigSigPubKeyBytes() {
+      java.lang.Object ref = digSigPubKey_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        digSigPubKey_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (serverID_ != 0) {
+        output.writeInt32(2, serverID_);
+      }
+      if (p_ != null) {
+        output.writeMessage(3, getP());
+      }
+      if (g_ != null) {
+        output.writeMessage(4, getG());
+      }
+      if (!getMyDHPubKeyBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, myDHPubKey_);
+      }
+      if (!getDigSigPubKeyBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, digSigPubKey_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (serverID_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, serverID_);
+      }
+      if (p_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getP());
+      }
+      if (g_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getG());
+      }
+      if (!getMyDHPubKeyBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, myDHPubKey_);
+      }
+      if (!getDigSigPubKeyBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, digSigPubKey_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.server.grpc.ServerService.DHKeyExcServerReq)) {
+        return super.equals(obj);
+      }
+      com.server.grpc.ServerService.DHKeyExcServerReq other = (com.server.grpc.ServerService.DHKeyExcServerReq) obj;
+
+      boolean result = true;
+      result = result && (getServerID()
+          == other.getServerID());
+      result = result && (hasP() == other.hasP());
+      if (hasP()) {
+        result = result && getP()
+            .equals(other.getP());
+      }
+      result = result && (hasG() == other.hasG());
+      if (hasG()) {
+        result = result && getG()
+            .equals(other.getG());
+      }
+      result = result && getMyDHPubKey()
+          .equals(other.getMyDHPubKey());
+      result = result && getDigSigPubKey()
+          .equals(other.getDigSigPubKey());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + SERVERID_FIELD_NUMBER;
+      hash = (53 * hash) + getServerID();
+      if (hasP()) {
+        hash = (37 * hash) + P_FIELD_NUMBER;
+        hash = (53 * hash) + getP().hashCode();
+      }
+      if (hasG()) {
+        hash = (37 * hash) + G_FIELD_NUMBER;
+        hash = (53 * hash) + getG().hashCode();
+      }
+      hash = (37 * hash) + MYDHPUBKEY_FIELD_NUMBER;
+      hash = (53 * hash) + getMyDHPubKey().hashCode();
+      hash = (37 * hash) + DIGSIGPUBKEY_FIELD_NUMBER;
+      hash = (53 * hash) + getDigSigPubKey().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.server.grpc.ServerService.DHKeyExcServerReq parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.server.grpc.ServerService.DHKeyExcServerReq prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code DHKeyExcServerReq}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:DHKeyExcServerReq)
+        com.server.grpc.ServerService.DHKeyExcServerReqOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.server.grpc.ServerService.internal_static_DHKeyExcServerReq_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.server.grpc.ServerService.internal_static_DHKeyExcServerReq_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.server.grpc.ServerService.DHKeyExcServerReq.class, com.server.grpc.ServerService.DHKeyExcServerReq.Builder.class);
+      }
+
+      // Construct using com.server.grpc.ServerService.DHKeyExcServerReq.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        serverID_ = 0;
+
+        if (pBuilder_ == null) {
+          p_ = null;
+        } else {
+          p_ = null;
+          pBuilder_ = null;
+        }
+        if (gBuilder_ == null) {
+          g_ = null;
+        } else {
+          g_ = null;
+          gBuilder_ = null;
+        }
+        myDHPubKey_ = "";
+
+        digSigPubKey_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.server.grpc.ServerService.internal_static_DHKeyExcServerReq_descriptor;
+      }
+
+      @java.lang.Override
+      public com.server.grpc.ServerService.DHKeyExcServerReq getDefaultInstanceForType() {
+        return com.server.grpc.ServerService.DHKeyExcServerReq.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.server.grpc.ServerService.DHKeyExcServerReq build() {
+        com.server.grpc.ServerService.DHKeyExcServerReq result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.server.grpc.ServerService.DHKeyExcServerReq buildPartial() {
+        com.server.grpc.ServerService.DHKeyExcServerReq result = new com.server.grpc.ServerService.DHKeyExcServerReq(this);
+        result.serverID_ = serverID_;
+        if (pBuilder_ == null) {
+          result.p_ = p_;
+        } else {
+          result.p_ = pBuilder_.build();
+        }
+        if (gBuilder_ == null) {
+          result.g_ = g_;
+        } else {
+          result.g_ = gBuilder_.build();
+        }
+        result.myDHPubKey_ = myDHPubKey_;
+        result.digSigPubKey_ = digSigPubKey_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.server.grpc.ServerService.DHKeyExcServerReq) {
+          return mergeFrom((com.server.grpc.ServerService.DHKeyExcServerReq)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.server.grpc.ServerService.DHKeyExcServerReq other) {
+        if (other == com.server.grpc.ServerService.DHKeyExcServerReq.getDefaultInstance()) return this;
+        if (other.getServerID() != 0) {
+          setServerID(other.getServerID());
+        }
+        if (other.hasP()) {
+          mergeP(other.getP());
+        }
+        if (other.hasG()) {
+          mergeG(other.getG());
+        }
+        if (!other.getMyDHPubKey().isEmpty()) {
+          myDHPubKey_ = other.myDHPubKey_;
+          onChanged();
+        }
+        if (!other.getDigSigPubKey().isEmpty()) {
+          digSigPubKey_ = other.digSigPubKey_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.server.grpc.ServerService.DHKeyExcServerReq parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.server.grpc.ServerService.DHKeyExcServerReq) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private int serverID_ ;
+      /**
+       * <code>int32 serverID = 2;</code>
+       */
+      public int getServerID() {
+        return serverID_;
+      }
+      /**
+       * <code>int32 serverID = 2;</code>
+       */
+      public Builder setServerID(int value) {
+        
+        serverID_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 serverID = 2;</code>
+       */
+      public Builder clearServerID() {
+        
+        serverID_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private com.server.grpc.ServerService.BInteger p_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder> pBuilder_;
+      /**
+       * <code>.BInteger p = 3;</code>
+       */
+      public boolean hasP() {
+        return pBuilder_ != null || p_ != null;
+      }
+      /**
+       * <code>.BInteger p = 3;</code>
+       */
+      public com.server.grpc.ServerService.BInteger getP() {
+        if (pBuilder_ == null) {
+          return p_ == null ? com.server.grpc.ServerService.BInteger.getDefaultInstance() : p_;
+        } else {
+          return pBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.BInteger p = 3;</code>
+       */
+      public Builder setP(com.server.grpc.ServerService.BInteger value) {
+        if (pBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          p_ = value;
+          onChanged();
+        } else {
+          pBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.BInteger p = 3;</code>
+       */
+      public Builder setP(
+          com.server.grpc.ServerService.BInteger.Builder builderForValue) {
+        if (pBuilder_ == null) {
+          p_ = builderForValue.build();
+          onChanged();
+        } else {
+          pBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.BInteger p = 3;</code>
+       */
+      public Builder mergeP(com.server.grpc.ServerService.BInteger value) {
+        if (pBuilder_ == null) {
+          if (p_ != null) {
+            p_ =
+              com.server.grpc.ServerService.BInteger.newBuilder(p_).mergeFrom(value).buildPartial();
+          } else {
+            p_ = value;
+          }
+          onChanged();
+        } else {
+          pBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.BInteger p = 3;</code>
+       */
+      public Builder clearP() {
+        if (pBuilder_ == null) {
+          p_ = null;
+          onChanged();
+        } else {
+          p_ = null;
+          pBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.BInteger p = 3;</code>
+       */
+      public com.server.grpc.ServerService.BInteger.Builder getPBuilder() {
+        
+        onChanged();
+        return getPFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.BInteger p = 3;</code>
+       */
+      public com.server.grpc.ServerService.BIntegerOrBuilder getPOrBuilder() {
+        if (pBuilder_ != null) {
+          return pBuilder_.getMessageOrBuilder();
+        } else {
+          return p_ == null ?
+              com.server.grpc.ServerService.BInteger.getDefaultInstance() : p_;
+        }
+      }
+      /**
+       * <code>.BInteger p = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder> 
+          getPFieldBuilder() {
+        if (pBuilder_ == null) {
+          pBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder>(
+                  getP(),
+                  getParentForChildren(),
+                  isClean());
+          p_ = null;
+        }
+        return pBuilder_;
+      }
+
+      private com.server.grpc.ServerService.BInteger g_ = null;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder> gBuilder_;
+      /**
+       * <code>.BInteger g = 4;</code>
+       */
+      public boolean hasG() {
+        return gBuilder_ != null || g_ != null;
+      }
+      /**
+       * <code>.BInteger g = 4;</code>
+       */
+      public com.server.grpc.ServerService.BInteger getG() {
+        if (gBuilder_ == null) {
+          return g_ == null ? com.server.grpc.ServerService.BInteger.getDefaultInstance() : g_;
+        } else {
+          return gBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.BInteger g = 4;</code>
+       */
+      public Builder setG(com.server.grpc.ServerService.BInteger value) {
+        if (gBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          g_ = value;
+          onChanged();
+        } else {
+          gBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.BInteger g = 4;</code>
+       */
+      public Builder setG(
+          com.server.grpc.ServerService.BInteger.Builder builderForValue) {
+        if (gBuilder_ == null) {
+          g_ = builderForValue.build();
+          onChanged();
+        } else {
+          gBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.BInteger g = 4;</code>
+       */
+      public Builder mergeG(com.server.grpc.ServerService.BInteger value) {
+        if (gBuilder_ == null) {
+          if (g_ != null) {
+            g_ =
+              com.server.grpc.ServerService.BInteger.newBuilder(g_).mergeFrom(value).buildPartial();
+          } else {
+            g_ = value;
+          }
+          onChanged();
+        } else {
+          gBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.BInteger g = 4;</code>
+       */
+      public Builder clearG() {
+        if (gBuilder_ == null) {
+          g_ = null;
+          onChanged();
+        } else {
+          g_ = null;
+          gBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.BInteger g = 4;</code>
+       */
+      public com.server.grpc.ServerService.BInteger.Builder getGBuilder() {
+        
+        onChanged();
+        return getGFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.BInteger g = 4;</code>
+       */
+      public com.server.grpc.ServerService.BIntegerOrBuilder getGOrBuilder() {
+        if (gBuilder_ != null) {
+          return gBuilder_.getMessageOrBuilder();
+        } else {
+          return g_ == null ?
+              com.server.grpc.ServerService.BInteger.getDefaultInstance() : g_;
+        }
+      }
+      /**
+       * <code>.BInteger g = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder> 
+          getGFieldBuilder() {
+        if (gBuilder_ == null) {
+          gBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.server.grpc.ServerService.BInteger, com.server.grpc.ServerService.BInteger.Builder, com.server.grpc.ServerService.BIntegerOrBuilder>(
+                  getG(),
+                  getParentForChildren(),
+                  isClean());
+          g_ = null;
+        }
+        return gBuilder_;
+      }
+
+      private java.lang.Object myDHPubKey_ = "";
+      /**
+       * <code>string MyDHPubKey = 5;</code>
+       */
+      public java.lang.String getMyDHPubKey() {
+        java.lang.Object ref = myDHPubKey_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          myDHPubKey_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string MyDHPubKey = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getMyDHPubKeyBytes() {
+        java.lang.Object ref = myDHPubKey_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          myDHPubKey_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string MyDHPubKey = 5;</code>
+       */
+      public Builder setMyDHPubKey(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        myDHPubKey_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string MyDHPubKey = 5;</code>
+       */
+      public Builder clearMyDHPubKey() {
+        
+        myDHPubKey_ = getDefaultInstance().getMyDHPubKey();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string MyDHPubKey = 5;</code>
+       */
+      public Builder setMyDHPubKeyBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        myDHPubKey_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object digSigPubKey_ = "";
+      /**
+       * <code>string digSigPubKey = 6;</code>
+       */
+      public java.lang.String getDigSigPubKey() {
+        java.lang.Object ref = digSigPubKey_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          digSigPubKey_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string digSigPubKey = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDigSigPubKeyBytes() {
+        java.lang.Object ref = digSigPubKey_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          digSigPubKey_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string digSigPubKey = 6;</code>
+       */
+      public Builder setDigSigPubKey(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        digSigPubKey_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string digSigPubKey = 6;</code>
+       */
+      public Builder clearDigSigPubKey() {
+        
+        digSigPubKey_ = getDefaultInstance().getDigSigPubKey();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string digSigPubKey = 6;</code>
+       */
+      public Builder setDigSigPubKeyBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        digSigPubKey_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:DHKeyExcServerReq)
+    }
+
+    // @@protoc_insertion_point(class_scope:DHKeyExcServerReq)
+    private static final com.server.grpc.ServerService.DHKeyExcServerReq DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.server.grpc.ServerService.DHKeyExcServerReq();
+    }
+
+    public static com.server.grpc.ServerService.DHKeyExcServerReq getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<DHKeyExcServerReq>
+        PARSER = new com.google.protobuf.AbstractParser<DHKeyExcServerReq>() {
+      @java.lang.Override
+      public DHKeyExcServerReq parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new DHKeyExcServerReq(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<DHKeyExcServerReq> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<DHKeyExcServerReq> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.server.grpc.ServerService.DHKeyExcServerReq getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface DHKeyExcRepOrBuilder extends
       // @@protoc_insertion_point(interface_extends:DHKeyExcRep)
       com.google.protobuf.MessageOrBuilder {
@@ -4510,6 +5648,11 @@ public final class ServerService {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_DHKeyExcReq_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_DHKeyExcServerReq_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_DHKeyExcServerReq_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_DHKeyExcRep_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -4538,24 +5681,28 @@ public final class ServerService {
       "message\030\005 \001(\t\"\206\001\n\013DHKeyExcReq\022\021\n\tuser_ty" +
       "pe\030\001 \001(\t\022\016\n\006userID\030\002 \001(\005\022\024\n\001p\030\003 \001(\0132\t.BI" +
       "nteger\022\024\n\001g\030\004 \001(\0132\t.BInteger\022\022\n\nMyDHPubK" +
-      "ey\030\005 \001(\t\022\024\n\014digSigPubKey\030\006 \001(\t\"\\\n\013DHKeyE" +
-      "xcRep\022\020\n\010myPubKey\030\001 \001(\t\022\024\n\014digSigPubkey\030" +
-      "\002 \001(\t\022\017\n\007onError\030\003 \001(\010\022\024\n\014errorMessage\030\004" +
-      " \001(\t\"\031\n\010BInteger\022\r\n\005value\030\001 \001(\0142\372\003\n\rserv" +
-      "erService\0225\n\024submitLocationReport\022\016.secu" +
-      "reRequest\032\r.secureReplay\022:\n\020submitReport" +
-      "Echo\022\016.secureRequest\032\026.google.protobuf.E" +
-      "mpty\022;\n\021submitReportReady\022\016.secureReques" +
-      "t\032\026.google.protobuf.Empty\0225\n\024obtainLocat" +
-      "ionReport\022\016.secureRequest\032\r.secureReplay" +
-      "\0227\n\026obtainLocationReportHA\022\016.secureReque" +
-      "st\032\r.secureReplay\0226\n\025obtainUsersAtLocati" +
-      "on\022\016.secureRequest\032\r.secureReplay\0220\n\017req" +
-      "uestMyProofs\022\016.secureRequest\032\r.secureRep" +
-      "lay\022+\n\rDHKeyExchange\022\014.DHKeyExcReq\032\014.DHK" +
-      "eyExcRep\0222\n\010readDone\022\016.secureRequest\032\026.g" +
-      "oogle.protobuf.EmptyB\021\n\017com.server.grpcb" +
-      "\006proto3"
+      "ey\030\005 \001(\t\022\024\n\014digSigPubKey\030\006 \001(\t\"{\n\021DHKeyE" +
+      "xcServerReq\022\020\n\010serverID\030\002 \001(\005\022\024\n\001p\030\003 \001(\013" +
+      "2\t.BInteger\022\024\n\001g\030\004 \001(\0132\t.BInteger\022\022\n\nMyD" +
+      "HPubKey\030\005 \001(\t\022\024\n\014digSigPubKey\030\006 \001(\t\"\\\n\013D" +
+      "HKeyExcRep\022\020\n\010myPubKey\030\001 \001(\t\022\024\n\014digSigPu" +
+      "bkey\030\002 \001(\t\022\017\n\007onError\030\003 \001(\010\022\024\n\014errorMess" +
+      "age\030\004 \001(\t\"\031\n\010BInteger\022\r\n\005value\030\001 \001(\0142\263\004\n" +
+      "\rserverService\0225\n\024submitLocationReport\022\016" +
+      ".secureRequest\032\r.secureReplay\022:\n\020submitR" +
+      "eportEcho\022\016.secureRequest\032\026.google.proto" +
+      "buf.Empty\022;\n\021submitReportReady\022\016.secureR" +
+      "equest\032\026.google.protobuf.Empty\0225\n\024obtain" +
+      "LocationReport\022\016.secureRequest\032\r.secureR" +
+      "eplay\0227\n\026obtainLocationReportHA\022\016.secure" +
+      "Request\032\r.secureReplay\0226\n\025obtainUsersAtL" +
+      "ocation\022\016.secureRequest\032\r.secureReplay\0220" +
+      "\n\017requestMyProofs\022\016.secureRequest\032\r.secu" +
+      "reReplay\022+\n\rDHKeyExchange\022\014.DHKeyExcReq\032" +
+      "\014.DHKeyExcRep\0227\n\023DHKeyExchangeServer\022\022.D" +
+      "HKeyExcServerReq\032\014.DHKeyExcRep\0222\n\010readDo" +
+      "ne\022\016.secureRequest\032\026.google.protobuf.Emp" +
+      "tyB\021\n\017com.server.grpcb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4588,14 +5735,20 @@ public final class ServerService {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_DHKeyExcReq_descriptor,
         new java.lang.String[] { "UserType", "UserID", "P", "G", "MyDHPubKey", "DigSigPubKey", });
-    internal_static_DHKeyExcRep_descriptor =
+    internal_static_DHKeyExcServerReq_descriptor =
       getDescriptor().getMessageTypes().get(3);
+    internal_static_DHKeyExcServerReq_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_DHKeyExcServerReq_descriptor,
+        new java.lang.String[] { "ServerID", "P", "G", "MyDHPubKey", "DigSigPubKey", });
+    internal_static_DHKeyExcRep_descriptor =
+      getDescriptor().getMessageTypes().get(4);
     internal_static_DHKeyExcRep_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_DHKeyExcRep_descriptor,
         new java.lang.String[] { "MyPubKey", "DigSigPubkey", "OnError", "ErrorMessage", });
     internal_static_BInteger_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_BInteger_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_BInteger_descriptor,

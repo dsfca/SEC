@@ -283,6 +283,38 @@ public final class serverServiceGrpc {
      return getDHKeyExchangeMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.DHKeyExcServerReq,
+      com.server.grpc.ServerService.DHKeyExcRep> getDHKeyExchangeServerMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "DHKeyExchangeServer",
+      requestType = com.server.grpc.ServerService.DHKeyExcServerReq.class,
+      responseType = com.server.grpc.ServerService.DHKeyExcRep.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.server.grpc.ServerService.DHKeyExcServerReq,
+      com.server.grpc.ServerService.DHKeyExcRep> getDHKeyExchangeServerMethod() {
+    io.grpc.MethodDescriptor<com.server.grpc.ServerService.DHKeyExcServerReq, com.server.grpc.ServerService.DHKeyExcRep> getDHKeyExchangeServerMethod;
+    if ((getDHKeyExchangeServerMethod = serverServiceGrpc.getDHKeyExchangeServerMethod) == null) {
+      synchronized (serverServiceGrpc.class) {
+        if ((getDHKeyExchangeServerMethod = serverServiceGrpc.getDHKeyExchangeServerMethod) == null) {
+          serverServiceGrpc.getDHKeyExchangeServerMethod = getDHKeyExchangeServerMethod = 
+              io.grpc.MethodDescriptor.<com.server.grpc.ServerService.DHKeyExcServerReq, com.server.grpc.ServerService.DHKeyExcRep>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(
+                  "serverService", "DHKeyExchangeServer"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.DHKeyExcServerReq.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.server.grpc.ServerService.DHKeyExcRep.getDefaultInstance()))
+                  .setSchemaDescriptor(new serverServiceMethodDescriptorSupplier("DHKeyExchangeServer"))
+                  .build();
+          }
+        }
+     }
+     return getDHKeyExchangeServerMethod;
+  }
+
   private static volatile io.grpc.MethodDescriptor<com.server.grpc.ServerService.secureRequest,
       com.google.protobuf.Empty> getReadDoneMethod;
 
@@ -400,6 +432,13 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public void dHKeyExchangeServer(com.server.grpc.ServerService.DHKeyExcServerReq request,
+        io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep> responseObserver) {
+      asyncUnimplementedUnaryCall(getDHKeyExchangeServerMethod(), responseObserver);
+    }
+
+    /**
+     */
     public void readDone(com.server.grpc.ServerService.secureRequest request,
         io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
       asyncUnimplementedUnaryCall(getReadDoneMethod(), responseObserver);
@@ -463,6 +502,13 @@ public final class serverServiceGrpc {
                 com.server.grpc.ServerService.DHKeyExcReq,
                 com.server.grpc.ServerService.DHKeyExcRep>(
                   this, METHODID_DHKEY_EXCHANGE)))
+          .addMethod(
+            getDHKeyExchangeServerMethod(),
+            asyncUnaryCall(
+              new MethodHandlers<
+                com.server.grpc.ServerService.DHKeyExcServerReq,
+                com.server.grpc.ServerService.DHKeyExcRep>(
+                  this, METHODID_DHKEY_EXCHANGE_SERVER)))
           .addMethod(
             getReadDoneMethod(),
             asyncUnaryCall(
@@ -558,6 +604,14 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public void dHKeyExchangeServer(com.server.grpc.ServerService.DHKeyExcServerReq request,
+        io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep> responseObserver) {
+      asyncUnaryCall(
+          getChannel().newCall(getDHKeyExchangeServerMethod(), getCallOptions()), request, responseObserver);
+    }
+
+    /**
+     */
     public void readDone(com.server.grpc.ServerService.secureRequest request,
         io.grpc.stub.StreamObserver<com.google.protobuf.Empty> responseObserver) {
       asyncUnaryCall(
@@ -637,6 +691,13 @@ public final class serverServiceGrpc {
     public com.server.grpc.ServerService.DHKeyExcRep dHKeyExchange(com.server.grpc.ServerService.DHKeyExcReq request) {
       return blockingUnaryCall(
           getChannel(), getDHKeyExchangeMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public com.server.grpc.ServerService.DHKeyExcRep dHKeyExchangeServer(com.server.grpc.ServerService.DHKeyExcServerReq request) {
+      return blockingUnaryCall(
+          getChannel(), getDHKeyExchangeServerMethod(), getCallOptions(), request);
     }
 
     /**
@@ -731,6 +792,14 @@ public final class serverServiceGrpc {
 
     /**
      */
+    public com.google.common.util.concurrent.ListenableFuture<com.server.grpc.ServerService.DHKeyExcRep> dHKeyExchangeServer(
+        com.server.grpc.ServerService.DHKeyExcServerReq request) {
+      return futureUnaryCall(
+          getChannel().newCall(getDHKeyExchangeServerMethod(), getCallOptions()), request);
+    }
+
+    /**
+     */
     public com.google.common.util.concurrent.ListenableFuture<com.google.protobuf.Empty> readDone(
         com.server.grpc.ServerService.secureRequest request) {
       return futureUnaryCall(
@@ -746,7 +815,8 @@ public final class serverServiceGrpc {
   private static final int METHODID_OBTAIN_USERS_AT_LOCATION = 5;
   private static final int METHODID_REQUEST_MY_PROOFS = 6;
   private static final int METHODID_DHKEY_EXCHANGE = 7;
-  private static final int METHODID_READ_DONE = 8;
+  private static final int METHODID_DHKEY_EXCHANGE_SERVER = 8;
+  private static final int METHODID_READ_DONE = 9;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -795,6 +865,10 @@ public final class serverServiceGrpc {
           break;
         case METHODID_DHKEY_EXCHANGE:
           serviceImpl.dHKeyExchange((com.server.grpc.ServerService.DHKeyExcReq) request,
+              (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep>) responseObserver);
+          break;
+        case METHODID_DHKEY_EXCHANGE_SERVER:
+          serviceImpl.dHKeyExchangeServer((com.server.grpc.ServerService.DHKeyExcServerReq) request,
               (io.grpc.stub.StreamObserver<com.server.grpc.ServerService.DHKeyExcRep>) responseObserver);
           break;
         case METHODID_READ_DONE:
@@ -870,6 +944,7 @@ public final class serverServiceGrpc {
               .addMethod(getObtainUsersAtLocationMethod())
               .addMethod(getRequestMyProofsMethod())
               .addMethod(getDHKeyExchangeMethod())
+              .addMethod(getDHKeyExchangeServerMethod())
               .addMethod(getReadDoneMethod())
               .build();
         }

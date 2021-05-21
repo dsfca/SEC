@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.security.*;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,13 @@ import java.util.stream.Collectors;
 
 import com.google.gson.JsonObject;
 import com.google.protobuf.Empty;
+import com.server.grpc.serverServiceGrpc;
+import com.server.grpc.ServerService.BInteger;
+import com.server.grpc.ServerService.DHKeyExcRep;
+import com.server.grpc.ServerService.DHKeyExcReq;
+import com.server.grpc.ServerService.DHKeyExcServerReq;
 import com.server.grpc.ServerService.secureReplay;
+import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
 import com.user.grpc.Listener.secureRequest;
 import com.user.grpc.ListenerServiceGrpc;
 
@@ -22,6 +29,7 @@ import crypto.RSAProvider;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import shared.DiffieHelman;
 import shared.Point2D;
 import shared.TrackerLocationSystem;
 
@@ -278,6 +286,32 @@ public class DealWithRequest {
 		return response;
 	}
     
+    
+    public Key  DHkeyExchange(int serverID, int serverPort) throws Exception {
+		DiffieHelman df = new DiffieHelman();
+		PublicKey dfPubKey = df.getPublicKey();
+		String pbkB64 = Base64.getEncoder().encodeToString(dfPubKey.getEncoded());
+		String digSigMyDHpubkey = TrackerLocationSystem.getInstance().getDHkeySigned(dfPubKey, PRIVATE_KEY_PATH);	
+		BInteger p = DiffieHelman.write(df.getP());
+		BInteger g = DiffieHelman.write(df.getG());
+		
+		DHKeyExcServerReq req = DHKeyExcServerReq.newBuilder().setServerID(ID).setP(p).setG(g).setMyDHPubKey(pbkB64)
+				.setDigSigPubKey(digSigMyDHpubkey).build();
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", serverPort).usePlaintext().build();
+		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
+		
+		DHKeyExcRep rep = serverStub.dHKeyExchangeServer(req);
+		PublicKey key = TrackerLocationSystem.getInstance().getServerPublicKey(serverID);
+		String servPbkDigSig = rep.getDigSigPubkey();
+		String servPubKey = rep.getMyPubKey();
+		channel.shutdown();
+		return TrackerLocationSystem.getInstance().createSecretKey(df, servPbkDigSig, servPubKey, key);	
+	}
+    
+    
+    
+    
+    
     /**************************************************************************************
      * 											- putOrUpdateSharedKeys()
      * -
@@ -314,7 +348,7 @@ public class DealWithRequest {
     }
     
     public JsonObject getsecureMessage(String type,String message, int userID) throws Exception {
-		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
+		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH, TrackerLocationSystem.password);
 		Key sharedKey = getSharedKey(type,userID);
 		JsonObject cipherReq  = TrackerLocationSystem.getInstance().getSecureText(sharedKey, myprivkey, message);
 		return cipherReq;

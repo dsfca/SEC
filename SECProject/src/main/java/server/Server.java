@@ -1,6 +1,7 @@
 package server;
 
 import io.grpc.ServerBuilder;
+import shared.TrackerLocationSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,9 +60,9 @@ public class Server {
 		String pubkeypath = "resources/public_keys/"+serverOrUser +"" + id +"_public.key";
 		String privKeyPath = "resources/private_keys/"+serverOrUser +"" + id +"_private.key";	
 		try {
-			KeyPair mykeypair = RSAProvider.readRSAKey(pubkeypath, privKeyPath);
+			KeyPair mykeypair = RSAProvider.readRSAKey(pubkeypath, privKeyPath, TrackerLocationSystem.password);
 		} catch (Exception e) {
-			RSAProvider.RSAKeyGenerator(privKeyPath, pubkeypath);
+			RSAProvider.RSAKeyGenerator(privKeyPath, pubkeypath, TrackerLocationSystem.password);
 		}
 	} 
     

@@ -2,14 +2,13 @@ package crypto;
 
 import java.io.FileInputStream;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.MessageDigest;
 import java.security.Security;
+import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -17,6 +16,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 public class AESProvider {
 	
 	private static final String SYMMETRIC_CYPHER_ALGO = "AES";
+	private static final int KEY_DERIVATION_ITERACTION = 65536;
+	private static final int AES_KEY_SIZE = 128;
 
 	/**************************************************************************************
 	 * 											-AESKeyGenerator()
@@ -30,6 +31,25 @@ public class AESProvider {
         KeyGenerator keyGen = KeyGenerator.getInstance(SYMMETRIC_CYPHER_ALGO, "BC");
         keyGen.init(128);
         Key key = keyGen.generateKey();
+        return key;
+	}
+	
+	/**************************************************************************************
+	 * 											-generateSecretKey()
+	 * - generates aes secret key given a password, compute the hash of the password and then
+	 * 		use it to create secret key	
+	 * 
+	 * - input:
+	 * 		- password : secret key password
+	 * 
+	 *- return: final result text by applying key and operation mode encoded in base64
+	 * 
+	 * ************************************************************************************/
+	public static Key generateSecretKey(String password) throws Exception {
+		MessageDigest sha256 = MessageDigest.getInstance("SHA-256"); 
+        byte[] bkey = Arrays.copyOf(
+                sha256.digest(password.getBytes()), AES_KEY_SIZE / Byte.SIZE);
+        SecretKeySpec key = new SecretKeySpec(bkey, "AES");
         return key;
 	}
 	
@@ -54,6 +74,14 @@ public class AESProvider {
     	byte[] messageCyphered = cipher.doFinal(messageBytes);
     	String cipherB64String = Base64.getEncoder().encodeToString(messageCyphered);
     	return cipherB64String;
+	}
+	
+	
+	public static byte[] AESCipherDecipher(Key key, byte[] content, int mode) throws Exception {
+		Cipher cipher = Cipher.getInstance(SYMMETRIC_CYPHER_ALGO);
+    	cipher.init(mode, key);
+    	byte[] contentCiphered = cipher.doFinal(content);
+    	return  contentCiphered;
 	}
 	
 	

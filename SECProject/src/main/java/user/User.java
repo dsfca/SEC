@@ -101,7 +101,7 @@ public class User extends ListenerServiceImplBase {
 	}
 
 	public String signMessage(String message) throws Exception {
-		PrivateKey privkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
+		PrivateKey privkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH, TrackerLocationSystem.password);
 		return RSAProvider.getTexthashEnWithPriKey(message, privkey);
 	}
 	
@@ -181,7 +181,7 @@ public class User extends ListenerServiceImplBase {
 	}
 	
 	public JsonObject getsecureMessage(int serverID, String message) throws Exception {
-		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH);
+		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH, TrackerLocationSystem.password);
 		if(this.sharedKey[serverID] == null || N_timesSharedKeyUsed % 5 == 0 ) {
 			int serverPort = new Ini(new File("variables.ini")).get("Server","server_start_port", Integer.class);
 			this.sharedKey[serverID] = DHkeyExchange(serverID, serverPort + serverID);
@@ -250,10 +250,10 @@ public class User extends ListenerServiceImplBase {
 		String pubkeypath = "resources/public_keys/"+serverOrUser +"" + id +"_public.key";
 		String privKeyPath = "resources/private_keys/"+serverOrUser +"" + id +"_private.key";	
 		try {
-			KeyPair mykeypair = RSAProvider.readRSAKey(pubkeypath, privKeyPath);
+			KeyPair mykeypair = RSAProvider.readRSAKey(pubkeypath, privKeyPath, TrackerLocationSystem.password);
 		} catch (Exception e) {
 			System.out.println(e);
-			RSAProvider.RSAKeyGenerator(privKeyPath, pubkeypath);
+			RSAProvider.RSAKeyGenerator(privKeyPath, pubkeypath, TrackerLocationSystem.password);
 		}
 	}
 

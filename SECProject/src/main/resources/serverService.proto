@@ -18,6 +18,7 @@ service serverService{
 	rpc requestMyProofs(secureRequest) returns (secureReplay);
 	
 	rpc DHKeyExchange(DHKeyExcReq) returns (DHKeyExcRep);
+	rpc DHKeyExchangeServer(DHKeyExcServerReq) returns (DHKeyExcRep);
 	
 	rpc readDone(secureRequest) returns (google.protobuf.Empty);
 }
@@ -46,6 +47,15 @@ message DHKeyExcReq{
 	string MyDHPubKey = 5;
 	string digSigPubKey = 6;
 }
+
+message DHKeyExcServerReq{
+	int32 serverID = 2;
+	BInteger p = 3;
+	BInteger g = 4;
+	string MyDHPubKey = 5;
+	string digSigPubKey = 6;
+}
+
 
 message DHKeyExcRep{
 	string myPubKey = 1;
