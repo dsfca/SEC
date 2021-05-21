@@ -37,7 +37,7 @@ public class Server {
                     io.grpc.Server server = ServerBuilder.forPort(port).addService(new ServerImp(server_id,serverDealWithReq)).build();
                 	verifyKeys(server_id, "server");
                     server.start();
-                    System.out.println("INIT: Server " + getID() + " started at " + server.getPort());
+                    System.out.println("INIT SERVER: Server " + getID() + " started at " + server.getPort());
 
                     server.awaitTermination();
                 } catch (Exception e) {
@@ -48,7 +48,7 @@ public class Server {
         };
 
         new Thread(r).start();
-        System.out.println("INIT: Server " + getID() + " thread running");
+        System.out.println("INIT SERVER: Server " + getID() + " thread running");
 
     }
     

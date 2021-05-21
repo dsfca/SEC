@@ -3,12 +3,15 @@ package server;
 import com.google.gson.JsonObject;
 import com.google.protobuf.Empty;
 import com.server.grpc.ServerService;
+import com.server.grpc.ServerService.BInteger;
 import com.server.grpc.ServerService.DHKeyExcRep;
 import com.server.grpc.ServerService.DHKeyExcReq;
+import com.server.grpc.ServerService.DHKeyExcServerReq;
 import com.server.grpc.ServerService.secureReplay;
 import com.server.grpc.ServerService.secureRequest;
 import com.server.grpc.serverServiceGrpc;
 import com.server.grpc.serverServiceGrpc.serverServiceStub;
+import com.server.grpc.serverServiceGrpc.serverServiceBlockingStub;
 import com.server.grpc.serverServiceGrpc.serverServiceImplBase;
 import crypto.AESProvider;
 import crypto.RSAProvider;
@@ -25,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.Key;
+import java.security.PrivateKey;
 //import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.*;
@@ -53,6 +57,9 @@ public class ServerImp extends serverServiceImplBase {
 
     private Hashtable<String, ackDetail> echos;
     private Hashtable<String, ackDetail> readys;
+    
+    private Hashtable<Integer, List<Object>> sharedKey;
+    private int N_timesSharedKeyUsed;
 
     /** This stores details about echos and readys messages during BRB */
     private class ackDetail {
@@ -99,9 +106,95 @@ public class ServerImp extends serverServiceImplBase {
 		this.readys = new Hashtable<>();
 
 		this.rep_sig_delimiter = "|<<<|";
+		
+		//Security BRB
+		this.sharedKey = new Hashtable<>();
+		this.N_timesSharedKeyUsed = new Ini(new File("variables.ini")).get("Server","max_key_usage", Integer.class);
 	}
     
-
+    public int getN_timesSharedKeyUsed() {
+		return N_timesSharedKeyUsed;
+	}
+    
+    public void incrementUsage(int serverID) {
+    	int current = Integer.valueOf((String)this.sharedKey.get(serverID).get(1));
+    	this.sharedKey.get(serverID).set(0, current+1);
+    }
+    
+    public int getKeyUsage(int serverID) {
+    	return Integer.valueOf((String)this.sharedKey.get(serverID).get(1));
+    }
+    
+    public Key getSharedKey(int serverID) {
+    	return (Key) this.sharedKey.get(serverID);
+    }
+    
+    //Editing
+    public String signMessage(String message) throws Exception {
+		PrivateKey privkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH, TrackerLocationSystem.password);
+		return RSAProvider.getTexthashEnWithPriKey(message, privkey);
+	}
+    
+    //Editing
+    public String encryptMessage(int serverID, String message) throws Exception {
+		if(getSharedKey(serverID) == null || getKeyUsage(serverID) < N_timesSharedKeyUsed) {
+			List <Object> tmp = new ArrayList <>();
+			tmp.add(DHkeyExchange(serverID, server_start_port + serverID));
+			tmp.add(0);
+			this.sharedKey.put(serverID, tmp);
+		}
+		incrementUsage(serverID);
+		return AESProvider.getCipherOfPlainText(message, (Key) sharedKey.get(serverID).get(0));
+	}
+	
+    //Editing
+	public JsonObject getsecureMessage(int serverID, String message) throws Exception {
+		PrivateKey myprivkey = RSAProvider.readprivateKeyFromFile(PRIVATE_KEY_PATH, TrackerLocationSystem.password);
+		if(getSharedKey(serverID) == null || getKeyUsage(serverID) < N_timesSharedKeyUsed) {
+			List <Object> tmp = new ArrayList <>();
+			tmp.add(DHkeyExchange(serverID, server_start_port + serverID));
+			tmp.add(0);
+			this.sharedKey.put(serverID, tmp);
+		}
+		JsonObject cipherReq  = TrackerLocationSystem.getInstance().getSecureText(getSharedKey(serverID), myprivkey, message);
+		incrementUsage(serverID);
+		return cipherReq;
+	}
+	
+	//Editing
+	public String[] getfieldsFromSecureMessage(int serverID, String secureMessage, String digsig) throws Exception {
+		PublicKey pubkey = TrackerLocationSystem.getInstance().getServerPublicKey(serverID);
+		String messPlainText = AESProvider.getPlainTextOfCipherText(secureMessage, getSharedKey(serverID));
+		boolean DigSigIsValid = RSAProvider.istextAuthentic(messPlainText, digsig, pubkey);
+		if(DigSigIsValid) {
+			String[] requestValues = messPlainText.split(Pattern.quote("||"));
+			return requestValues;
+		}else {
+			throw new Exception("ECHO WARNING: the message is not authentic");
+		}
+	}
+	//Editing
+	public Key DHkeyExchange(int serverID, int serverPort) throws Exception {
+		DiffieHelman df = new DiffieHelman();
+		PublicKey dfPubKey = df.getPublicKey();
+		String pbkB64 = Base64.getEncoder().encodeToString(dfPubKey.getEncoded());
+		String digSigMyDHpubkey = TrackerLocationSystem.getInstance().getDHkeySigned(dfPubKey, PRIVATE_KEY_PATH);	
+		BInteger p = DiffieHelman.write(df.getP());
+		BInteger g = DiffieHelman.write(df.getG());
+		
+		DHKeyExcServerReq req = DHKeyExcServerReq.newBuilder().setServerID(this.myId).setP(p).setG(g).setMyDHPubKey(pbkB64)
+				.setDigSigPubKey(digSigMyDHpubkey).build();
+		ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", serverPort).usePlaintext().build();
+		serverServiceBlockingStub serverStub = serverServiceGrpc.newBlockingStub(channel);
+		
+		DHKeyExcRep rep = serverStub.dHKeyExchangeServer(req);
+		PublicKey key = TrackerLocationSystem.getInstance().getServerPublicKey(serverID);
+		String servPbkDigSig = rep.getDigSigPubkey();
+		String servPubKey = rep.getMyPubKey();
+		channel.shutdown();
+		return TrackerLocationSystem.getInstance().createSecretKey(df, servPbkDigSig, servPubKey, key);	
+	}
+	
 	/**************************************************************************************
      *                                  - submitLocationReport()
      *  RPC: server received location report from a user; handle it and send reply
@@ -130,19 +223,29 @@ public class ServerImp extends serverServiceImplBase {
 			ackDetail echoReady = new ackDetail(false);
 			readys.put(echoMsg, echoReady);
 
-	       	// Broadcast echo message, wait for delivery but 10s tops
+			// Broadcast echo message, wait for delivery but 10s tops
 			echoSubmitRequest(report + this.rep_sig_delimiter + request.getMessageDigitalSignature());
+			///////System.out.println(readys.get(echoMsg).ackCount());
 			echoReady.getLatch().await(10, TimeUnit.SECONDS);
+			if(echoReady.ackCount() < quorum) {
+				System.out.println("ECHO: [Server" + this.myId + "] Did not receive quorum");
+			}
 
-			// Message is considered delivered, time to add it to DB
-	       	ServerService.secureReplay.Builder response = dealWithReq.submitReportHandler(request.getUserID(), report, nonce);
-		    responseObserver.onNext(response.build());
-		    responseObserver.onCompleted();
-	        
+			////////System.out.println(echos.get(echoMsg).ackCount());
+			if(!(echos.get(echoMsg).ackCount() <= quorum || readys.get(echoMsg).ackCount() <= 2*this.num_byzantines)) {
+				/////////System.out.println("DENTRO:" + readys.get(echoMsg).ackCount());
+				// Message is considered delivered, time to add it to DB
+				ServerService.secureReplay.Builder response = dealWithReq.submitReportHandler(request.getUserID(), report, nonce);
+				responseObserver.onNext(response.build());
+				responseObserver.onCompleted();
+			}
+
+
+
     	}catch (Exception e) {
     		System.out.println(e.getMessage());
-			responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
-		}
+    		responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+    	}
 
     }
 
@@ -152,8 +255,9 @@ public class ServerImp extends serverServiceImplBase {
      *  - input:
      *      - echoMsg to broadcast to all servers
      * TODO: Echomsg enc/dec
+     * @throws Exception 
      * ************************************************************************************/
-    private void echoSubmitRequest(String echoMsg) {
+    private void echoSubmitRequest(String echoMsg) throws Exception {
 
 		// Save information, that echo{report, sig} was sent (so duplications are not created)
 		if (!echos.containsKey(echoMsg)) {
@@ -177,13 +281,16 @@ public class ServerImp extends serverServiceImplBase {
     	// Broadcast echo message
 		serverServiceStub serverAsyncStub;
 		secureRequest echo;
+		//String signedMessage = signMessage(echoMsg); //######
 		for(int server_id = 0; server_id < this.num_servers; server_id++) {
+			//String encryptedMessage = encryptMessage(server_id, echoMsg);
 			serverAsyncStub = serverServiceGrpc.newStub(serverChannels.get(server_id))
 											   .withWaitForReady();
 
 			echo = secureRequest.newBuilder().setUserID(this.myId)
 					 						 .setConfidentMessage(echoMsg)
 											 .setMessageDigitalSignature("").build();
+			//System.out.println("HEYYYYY" + echo); //#######
 			serverAsyncStub.submitReportEcho(echo, ignore);
 		}
 
@@ -196,7 +303,7 @@ public class ServerImp extends serverServiceImplBase {
 	 * @param request {serverId, echoMessage, signedEchoMessage}
 	 * @param responseObserver is not used. Does not wait for replies.
 	 */
-	@Override
+    @Override
 	public void submitReportEcho(secureRequest request, StreamObserver<Empty> responseObserver) {
 
 		int serverId = request.getUserID();
@@ -206,13 +313,17 @@ public class ServerImp extends serverServiceImplBase {
 			ackDetail tmp = new ackDetail(false);
 			echos.put(echoMsg, tmp);
 		}
-
 		ackDetail echoAck = echos.get(echoMsg);
-		echoAck.addId(serverId); // Store who sent it
-
-		System.out.println("[Server" + this.myId + "] Received echo from Server" + serverId
-				+ " cnt: " + echoAck.ackCount());
-
+		
+		if(!echos.get(echoMsg).serverIds.contains(serverId)) { //Prevent Malicious servers from sending multiple
+			echoAck.addId(serverId); // Store who sent it
+			System.out.println("ECHO: [Server" + this.myId + "] Received echo from Server" + serverId
+					+ " count: " + echoAck.ackCount());
+		}
+		else {
+			System.out.println("ECHO: [Server" + this.myId + "] Server" + serverId
+					+ " already sent echo, count: " + echoAck.ackCount());
+		}
 		// No quorum of that message yet
 		if (echoAck.ackCount() <= this.quorum)
 			return;
@@ -292,15 +403,15 @@ public class ServerImp extends serverServiceImplBase {
 		readyAck.addId(serverId);
 
 
-		System.out.println("[Server" + this.myId + "] Received ready from Server" + serverId
-				+ " cnt: " + readyAck.ackCount());
+		System.out.println("READY [Server" + this.myId + "] Received ready from Server" + serverId
+				+ " count: " + readyAck.ackCount());
 
 		// Accept this message
 		if (readyAck.ackCount() > 2*this.num_byzantines) {
-			System.out.println("[Server" + this.myId + "] Delivered report");
+			System.out.println("READY [Server" + this.myId + "] Achieved reports > 2f");
 			readyAck.getLatch().countDown();
 		} else if (readyAck.ackCount() > this.num_byzantines && !readyAck.isAckSent()) {
-			System.out.println("[Server" + this.myId + "] Amplification step");
+			System.out.println("READY [Server" + this.myId + "] Amplification step");
 			readySubmitRequest(readyMsg);
 		}
 

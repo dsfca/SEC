@@ -19,7 +19,9 @@ import org.ini4j.Ini;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.Key;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
@@ -88,7 +90,7 @@ public class InteractWithDB {
 		document.append("near", near);
 		document.append("Digi_sig_u1", proof1);
 		mongo_collection_all.insertOne(document);
-		System.out.println("ADDED TO DB   " + mongo_collection_all.getNamespace() + "   OF SERVER "+ server_id);
+		System.out.println("DB - Added report: " + document.toString() + " TO DB " + mongo_collection_all.getNamespace() + " OF SERVER"+ server_id + " ");
 	}
 	
 	
@@ -176,7 +178,7 @@ public class InteractWithDB {
 
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		InteractWithDB it = new InteractWithDB("variables.ini", 1);
+		/**InteractWithDB it = new InteractWithDB("variables.ini", 1);
 		it.cleanValidatedCollection();
 		it.cleanAllLocationsCollection();
 		//LOCATIONS TO VALIDATED
@@ -194,8 +196,10 @@ public class InteractWithDB {
 		String [] epochs = {"1","3","6"};
 		ArrayList <String> users = it.getUsersGivenPosAndEpoch(new Point2D(0,0), 1);
 		ArrayList <String> proofs = it.getProofsinEpochs(1, epochs);
-		System.out.println(proofs.toString());
+		System.out.println(proofs.toString());**/
+		
+		Hashtable<Integer, Hashtable<Key, Integer>> sharedKey = new Hashtable<>();
+		System.out.println(sharedKey.contains("x"));
 	}
 
 }
-

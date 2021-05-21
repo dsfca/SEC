@@ -63,11 +63,11 @@ public class DealWithRequest {
 
 		int nonce = Integer.parseInt(reqFields[reqFields.length -1]);
 		if (!verifySignature(id, report, signature)) {
-			throw new Exception("Message was not authenticated");
+			throw new Exception("SERVER WARNING: Message was not authenticated");
 		}
 
 		if (!verifyHashCash(report, nonce)) {
-			throw new Exception("Invalid HashCash");
+			throw new Exception("SERVER WARNING: Invalid HashCash");
 		}
 
 		// Check uniqueness of nonce
@@ -76,13 +76,13 @@ public class DealWithRequest {
     		userNonces = new ArrayList<>();
 
 		if(userNonces.contains(nonce)) {
-    		throw new Exception("Nonce must be unique for each request");
+    		throw new Exception("SERVER WARNING: Nonce must be unique for each request");
 		}
 
 		userNonces.add(nonce);
 		report = report.replace("[", "").replace("]", "");
 		if(report.length() <= 0) {
-    		throw new Exception("You cannot prove your location with 0 users near you!");
+    		throw new Exception("SERVER WARNING: You cannot prove your location with 0 users near you!");
 		}
 
 		String[] reportList = report.split(",");
@@ -90,7 +90,7 @@ public class DealWithRequest {
 
     	// Check expected number of proofs
     	if( proofReports.size() <= TrackerLocationSystem.getInstance().getNumBizantineUsers()) {
-			throw new Exception("Proof size must be larger than number of byzantine users");
+			throw new Exception("SERVER WARNING: Proof size must be larger than number of byzantine users");
 		}
 
 		return reqFields;
