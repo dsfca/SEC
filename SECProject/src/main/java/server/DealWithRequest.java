@@ -118,28 +118,30 @@ public class DealWithRequest {
     	int epoch = 0;
 
     	if( proofReports.size() <= TrackerLocationSystem.getInstance().getNumBizantineUsers()) {
-			throw new Exception("Proof size must be larger than number of byzantine users");
-		}
+    		throw new Exception("Proof size must be larger than number of byzantine users");
+    	}
 
     	for(ProofReport pr : proofReports) {
-   			PublicKey witPubKey = TrackerLocationSystem.getInstance().getUserPublicKey(pr.getWitnessID(), "user");
-			if(pr.proofDigSigIsValid(witPubKey)) {
-				DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),
-						pr.getWitnessPoint(), pr.getEpoch(), pr.isWitnessIsNearProof(),
-						requesDigSig, pr.getWitnessDigSig());
-			}
-			proverPos = pr.getProverPoint();
-			epoch = pr.getEpoch();
-		}
-
+    		if(pr.isfakereport(id)) {
+    			throw new Exception("Fake report");
+    		}
+    		PublicKey witPubKey = TrackerLocationSystem.getInstance().getUserPublicKey(pr.getWitnessID(), "user");
+    		if(pr.proofDigSigIsValid(witPubKey)) {
+    			DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),
+    					pr.getWitnessPoint(), pr.getEpoch(), pr.isWitnessIsNearProof(),
+    					requesDigSig, pr.getWitnessDigSig());
+    		}
+    		proverPos = pr.getProverPoint();
+    		epoch = pr.getEpoch();
+    	}
     	DB.addLocationToValidated(id, proverPos, epoch);
-		String message = "Your report was submitted successfully||" + (nonce - 1);
-		JsonObject secureMessage = getsecureMessage("user",message, id);
-		String confidentMessage = secureMessage.get("ciphertext").getAsString();
-		String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
-		response.setOnError(false);
-		response.setServerID(ID).setConfidentMessage(confidentMessage).setMessageDigitalSignature(messDigSig);
-		sendValueToListeners(id, epoch, proverPos.toString());
+    	String message = "Your report was submitted successfully||" + (nonce - 1);
+    	JsonObject secureMessage = getsecureMessage("user",message, id);
+    	String confidentMessage = secureMessage.get("ciphertext").getAsString();
+    	String messDigSig = secureMessage.get("textDigitalSignature").getAsString();
+    	response.setOnError(false);
+    	response.setServerID(ID).setConfidentMessage(confidentMessage).setMessageDigitalSignature(messDigSig);
+    	sendValueToListeners(id, epoch, proverPos.toString());
     	return response;
     }
     

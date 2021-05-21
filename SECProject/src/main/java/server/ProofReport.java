@@ -92,6 +92,10 @@ public class ProofReport {
 		return witnessIsNearProof;
 	}
 	
+	public boolean isfakereport(int requestID) {
+        return this.proverID != requestID;
+    }
+	
 	@Override
 	public String toString() {
 		return proverID +" "+ witnessID +" "+ proverPoint.toString() +" "+ witnessPoint.toString() +" "+ epoch +" "+ witnessIsNearProof;
