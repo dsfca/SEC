@@ -147,7 +147,7 @@ public class NormalUser extends User {
 		}
 		finishLatch.await();
 		for(ManagedChannel channel : channels)
-			channel.shutdown();
+			channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
 		return proofs;
 	}
 
@@ -371,7 +371,7 @@ public class NormalUser extends User {
 
         // Close channels
 		for(ManagedChannel ch : serverChannels)
-			ch.shutdown();
+			ch.shutdown().awaitTermination(10, TimeUnit.SECONDS);
 
         // There is more than quorum of returned messages, find the most common
         Integer max = 0;

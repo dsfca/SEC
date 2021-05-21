@@ -191,7 +191,7 @@ public class ServerImp extends serverServiceImplBase {
 		PublicKey key = TrackerLocationSystem.getInstance().getServerPublicKey(serverID);
 		String servPbkDigSig = rep.getDigSigPubkey();
 		String servPubKey = rep.getMyPubKey();
-		channel.shutdown();
+		channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 		return TrackerLocationSystem.getInstance().createSecretKey(df, servPbkDigSig, servPubKey, key);	
 	}
 	

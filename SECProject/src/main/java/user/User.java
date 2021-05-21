@@ -168,7 +168,7 @@ public class User extends ListenerServiceImplBase {
 			serverAsyncStub.readDone(request, ignore);
 		}
 		for(ManagedChannel channel : serverChannels)
-			channel.shutdown();
+			channel.shutdown().awaitTermination(10, TimeUnit.SECONDS);
 	}
 
 	public String encryptMessage(int serverID, String message) throws Exception {
@@ -242,7 +242,7 @@ public class User extends ListenerServiceImplBase {
 		PublicKey key = TrackerLocationSystem.getInstance().getServerPublicKey(serverID);
 		String servPbkDigSig = rep.getDigSigPubkey();
 		String servPubKey = rep.getMyPubKey();
-		channel.shutdown();
+		channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 		return TrackerLocationSystem.getInstance().createSecretKey(df, servPbkDigSig, servPubKey, key);	
 	}
 	

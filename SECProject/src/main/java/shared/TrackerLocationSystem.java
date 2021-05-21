@@ -79,7 +79,7 @@ public class TrackerLocationSystem {
 		}
 	}
 	public void start_users(int num_users, int g_width, int g_height) throws Exception {
-		for(int i = 1; i < num_users; i++) {
+		for(int i = 0; i < num_users; i++) {
 			NormalUser user = new NormalUser(i);
 			users.add(user);
 		}
@@ -303,8 +303,8 @@ public class TrackerLocationSystem {
 		int G_width, G_height;
 		try {
 			//num_users = Integer.parseInt(args[0]);
-			G_width = Integer.parseInt(args[0]);
-			G_height = Integer.parseInt(args[1]);
+			G_width = 3;//Integer.parseInt(args[0]);
+			G_height = 3;//Integer.parseInt(args[1]);
 			TrackerLocationSystem trl = new TrackerLocationSystem(G_width, G_height);
 			trl.start();
 			/*while(true) {
