@@ -122,6 +122,8 @@ public class DealWithRequest {
 		}
 
     	for(ProofReport pr : proofReports) {
+    		if(pr.isfakereport(id))
+    			throw new Exception("fake report");
    			PublicKey witPubKey = TrackerLocationSystem.getInstance().getUserPublicKey(pr.getWitnessID(), "user");
 			if(pr.proofDigSigIsValid(witPubKey)) {
 				DB.addReportToDatabase(pr.getProverID(), pr.getWitnessID(), pr.getProverPoint(),

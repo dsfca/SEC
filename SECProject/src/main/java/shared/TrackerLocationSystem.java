@@ -79,9 +79,17 @@ public class TrackerLocationSystem {
 		}
 	}
 	public void start_users(int num_users, int g_width, int g_height) throws Exception {
+		int j = 0;
+		boolean isByzantine = false;
 		for(int i = 0; i < num_users; i++) {
-			NormalUser user = new NormalUser(i);
-			users.add(user);
+			if(j < NUM_BIZANTINE_USERS) {
+				isByzantine = true;
+				j++;
+			}
+			else
+				isByzantine = false;
+			NormalUser user = new NormalUser(i, isByzantine);
+			user.init();
 		}
 	}
 	

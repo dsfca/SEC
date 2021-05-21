@@ -102,5 +102,9 @@ public class ProofReport {
 		return RSAProvider.istextAuthentic(proof, this.WitnessDigSig, witPubKey);
 	}
 	
+
+	public boolean isfakereport(int requestID) {
+		return this.proverID != requestID;
+	}
 	
 }

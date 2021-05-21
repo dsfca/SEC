@@ -1,6 +1,7 @@
 package user;
 
 
+import java.io.File;
 import java.io.IOException;
 
 import java.security.PublicKey;
@@ -32,7 +33,7 @@ public class NormalUser extends User {
 	
 	//distance that user consider to see if a user is near him
 	private final double closer_range_dist = 2;
-
+	private boolean isByzantine = false;
 	private enum MessageType {
 		ObtainLocationReport,
 		SubmitLocationReport,
@@ -48,11 +49,11 @@ public class NormalUser extends User {
 	 * @throws InvalidFileFormatException 
 	* 
 	* ************************************************************************************/
-	public NormalUser(int ID) throws Exception {
+	public NormalUser(int ID, boolean isByzantine) throws Exception {
 		super(ID, "user");
 		this.port = ID + Integer.parseInt("9090");
-		init();
-		initThreadToSndReqProof();
+		this.isByzantine = isByzantine;
+		
 	}
 
 	/**************************************************************************************
@@ -61,7 +62,7 @@ public class NormalUser extends User {
 	 * and use localhost as IP
 	 * 
 	 * ************************************************************************************/
-	private void init() {
+	public void init() {
 		 Runnable r =	new Runnable() {
 				@Override
 				public void run() {
@@ -79,7 +80,7 @@ public class NormalUser extends User {
 			};
 			
 			new Thread(r).start();
-			
+			initThreadToSndReqProof();
 		}
 	
 	/**************************************************************************************
@@ -166,12 +167,19 @@ public class NormalUser extends User {
 	 *
 	 * ************************************************************************************/
 	public boolean submitLocationReport(List<String> proofs, int ID, int epoch, Point2D position) throws Exception {
-
-		String message = proofs.toString();
+		String message;
+		if(this.isByzantine) {
+			ByzantineUser byzantine = new ByzantineUser();
+			message = byzantine.claming_anotherUser();
+			System.out.println("************************************************byzantine user sendig message*******************************************************");
+		}else
+			message = proofs.toString();
 		String quorumReply = asyncServerRequest(message, MessageType.SubmitLocationReport);
 		return quorumReply.equals("||Your report was submitted successfully");
 
 	}
+
+	
 
 	/**************************************************************************************
 	 * 											-getCloserUsers()
@@ -389,6 +397,9 @@ public class NormalUser extends User {
 		
 		if(type.equals(MessageType.ObtainLocationReport))
 			return readAtomicValue(getMyID(), Integer.parseInt(message));
+		if(type.equals(MessageType.SubmitLocationReport)) {
+			ByzantineUser.storeProof(message + "\n");
+		}
         return consensus;
     }
 	
