@@ -192,8 +192,7 @@ public class HAUser extends User {
 
     public static void main(String[] args) throws Exception {
         String help = "Accept only following formats:\n\tgetReport <ID> <epoch>\n\tgetUsers <X> <Y> <epoch>";
-//        HAUser userHa = new HAUser(Integer.parseInt(args[0]));
-        HAUser userHa = new HAUser(0);
+        HAUser userHa = new HAUser(Integer.parseInt(args[0]));
         String cmd, arg1, arg2, arg3;
         Scanner sn = new Scanner(System.in);
         System.out.println(help);
